@@ -1,0 +1,118 @@
+
+      subroutine rungekutta                                        
+c******************************************************************************
+c     this routine calculates the spectrum at a wavelength via a 4th order                 
+c     Runge-Kutta integration routine
+c******************************************************************************
+
+      implicit real*8 (a-h,o-z)
+      include 'Atmos.com'
+      include 'Linex.com'
+      real*8 Stokes(3), Continuum(3), B
+      real*8 exptau_I, exptau_Q, exptau_V
+      real*8 dTau_I, dTau_Q, dTau_V
+      real*8 dQ, dV, junk
+      integer nlayers
+
+      nlayers = 300
+
+c*****continuum "contribution curve" calculation                           
+      if (number .eq. 1) then
+         do i=1,ntau                                                    
+            scont(i) = ((1.19089d+25/wave**2)*1.0d+10)/(wave**3*
+     .                 (dexp(1.43879d+08/(wave*t(i)))-1.0d+00))
+            if (fluxintopt .eq. 1) then
+               cd(i) = kaplam(i)*tauref(i)*scont(i)/mu*
+     .                 dexp(-taulam(i)/mu)/(0.4343*kapref(i))
+            else
+               cd(i) = 2.0*kaplam(i)*tauref(i)*scont(i)*
+     .                 expint(taulam(i),2)/(0.4343*kapref(i))
+            endif
+         enddo
+                       
+c*****line plus continuum "contribution curve" calculation    
+      elseif (number .eq. 2) then
+         do i=1,ntau                                                    
+            sline(i) = scont(i)   
+c            write (*,*) 'Tau nu: ', taunu(i), taulam(i)
+            if (fluxintopt .eq. 1) then
+               if ((taulam(i)+taunu(i))/mu .le. 50.) then
+                  exptau = dexp((-taulam(i)-taunu(i))/mu)
+               else
+                  exptau = 0.                        
+               endif
+               cd(i) = tauref(i)*kaplam(i)/(mu*0.4343*flux*
+     .                 kapref(i))*(scont(i)*dexp(-taulam(i)/mu) - 
+     .                 kapeff(i)*sline(i)*exptau)    
+            else
+               cd(i) = 2.0*tauref(i)*kaplam(i)/(0.4343*flux*
+     .                 kapref(i))*(scont(i)*expint(taulam(i),2) - 
+     .                 (1.0+kapnu(i)/kaplam(i))*sline(i)*
+     .                 expint(taulam(i)+taunu(i),2)) 
+            endif
+         enddo
+      elseif (number .eq. 3) then
+         StokesI = scont(1)
+         StokesQ = 0.0
+         StokesV = 0.0
+         do i= 1,ntau
+             sline(i) = scont(i)
+             if ((taulam(i)+taunu_I(i))/mu .le. 50.) then
+                 exptau_I = dexp((-taulam(i)-taunu_I(i))/mu)
+             else
+                 exptau_I = 0.
+             endif
+             if ((taulam(i)+taunu_Q(i))/mu .le. 50.) then
+                 exptau_Q = dexp((-taulam(i)-taunu_Q(i))/mu)
+             else
+                 exptau_Q = 0.
+             endif
+             if ((taulam(i)+taunu_V(i))/mu .le. 50.) then
+                 exptau_V = dexp((-taulam(i)-taunu_V(i))/mu)
+             else
+                 exptau_V = 0.
+             endif
+             dI = ((1.0+kapnu_I(i)/kaplam(i))*StokesI + (kapnu_Q(i)/
+     .               kaplam(i))*StokesQ+(kapnu_V(i)/kaplam(i))*StokesV -
+     .               (1.0+kapnu_I(i)/kaplam(i))*scont(i))*exptau_I
+             dQ = (kapnu_Q(i)/kaplam(i)*(StokesI-scont(i)*
+     .               dexp(-taulam(i)/mu))+(1.0+kapnu_I(i)/kaplam(i))*
+     .               StokesQ)*exptau_I
+             dV = (kapnu_V(i)/kaplam(i)*(StokesI-scont(i)*
+     .               dexp(-taulam(i)/mu))+(1.0+kapnu_I(i)/kaplam(i))*
+     .               StokesV)*exptau_I
+             cd(i) = tauref(i)*kaplam(i)/(mu*0.4343*flux*
+     .               kapref(i))*(scont(i)*dexp(-taulam(i)/mu) + dI)
+c             write (*,*) dI, dQ, dV, cd(i), i
+             dTau_I = taunu_I(i) - prev_tau_I
+             dTau_Q = taunu_Q(i) - prev_tau_Q
+             dTau_V = taunu_V(i) - prev_tau_V
+             dTau = taulam(i) - prev_tau_lam
+             prev_tau_I = taunu_I(i)
+             prev_tau_Q = taunu_Q(i)
+             prev_tau_V = taunu_V(i)
+             prev_tau_lam = taulam(i)
+c             if ((wave .gt. 11689.5) .AND. (wave .lt. 11690.5)) then
+c                 write (*,*) dI, dQ, dV, cd(i), wave
+c             endif
+c             write (*,*) i, taulam(i), taunu_I(i), taunu_Q(i),taunu_V(i)
+c             write (*,*) i, cd(i), kapnu_I(i), kapnu_Q(i), kapnu_V(i)
+c             write (*,*) i, scont(i), stokesI, stokesQ, stokesV
+c             write (*,*) i, StokesI, dI
+             StokesI = StokesI-dI
+             StokesQ = StokesQ-dQ
+             StokesV = StokesV-dV
+          enddo    
+c          write (*,*) wave, flux/StokesI, StokesQ, StokesV
+c          if ((wave .gt. 11689.5) .AND. (wave .lt. 11690.5)) then
+c              read (*,*)
+c          endif
+c          read (*,*) junk
+c          write (*,*) StokesI
+      endif
+
+c*****normal exit
+      return
+
+
+      end                                                               

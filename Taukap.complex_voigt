@@ -9,10 +9,9 @@ c******************************************************************************
       include 'Atmos.com'
       include 'Linex.com'
       include 'Dummy.com'
-      real*8 kapnu_I(100), kapnu_Q(100), kapnu_V(100), kapnu_U(100),
+      real*8 kapnu_I(100), kapnu_Q(100), kapnu_V(100), old_voigt,
      .       new_voigt, new_fv, voigt_x, voigt_y, gam_L, gam_D,
-     .       zetnu_Q(100), zetnu_V(100), zetnu_U(100), sqrtpi, old_voigt
-      complex Z, hui, w4
+     .       zetnu_Q(100), zetnu_V(100), sqrtpi
 
 c*****compute the total line opacity at each depth    
       
@@ -20,28 +19,24 @@ c*****compute the total line opacity at each depth
       do i=1,ntau     
          kapnu_I(i) = 0.0
          kapnu_Q(i) = 0.0
-         kapnu_U(i) = 0.0
          kapnu_V(i) = 0.0
          zetnu_Q(i) = 0.0
-         zetnu_U(i) = 0.0
          zetnu_V(i) = 0.0
          kapnu(i) = 0.0
          do j=lim1,lim2
-c            v = 2.997929d10*dabs(wave-wave1(j))/
-c     .             (wave1(j)*dopp(j,i))            
-c            old_voigt = voigt(a(j,i),v)
+            v = 2.997929d10*dabs(wave-wave1(j))/
+     .             (wave1(j)*dopp(j,i))            
+            old_voigt = voigt(a(j,i),v)
             gam_L = a(j,i)
-            gam_D = dopp(j,i)/(2.997929d2*wave)
-            voigt_x = !sqrt(log(2.0))*
-     .                 dabs((1.0d8*(1./wave-1./wave1(j)))/
-     .                 (gam_D))
-            voigt_y =(gam_L)!*sqrt(log(2.0))
-            Z = cmplx(voigt_x, voigt_y)
-            hui = w4(Z)
-c            call complexVoigt(voigt_x,voigt_y,
-c     .                        new_voigt, new_fv)
-            new_voigt = REAL(hui)/(1.772453851)
-            new_fv = AIMAG(hui)/(1.772453851)
+            gam_D = dopp(j,i)/(2.997929d10*(wave*1d-8))
+            voigt_x = sqrt(log(2.0))*
+     .                dabs((1.0d8*(1./wave-1./wave1(j)))/
+     .                (gam_D))
+            voigt_y =sqrt(log(2.0))*(gam_L)
+            call complexVoigt(voigt_x,voigt_y,
+     .                        new_voigt, new_fv)
+c            new_voigt = new_voigt/1.772453851
+c            new_fv = new_fv/(5.0*1.772453851)
             if (width(j) .eq. 0.0) then
                 kapnu_I(i) = kapnu_I(i) + kapnu0(j,i)*new_voigt*
      .             (sin(phi)**2.0)/2.0
@@ -67,66 +62,58 @@ c     .                        new_voigt, new_fv)
 c*****do the same for the strong lines
          if (dostrong .gt. 0) then
             do j=nlines+1,nlines+nstrong
-c               v = 2.997929d10*dabs(wave-wave1(j))/
-c     .             (wave1(j)*dopp(j,i)) 
-c               old_voigt = voigt(a(j,i),v)
+               v = 2.997929d10*dabs(wave-wave1(j))/
+     .             (wave1(j)*dopp(j,i)) 
+               old_voigt = voigt(a(j,i),v)
                gam_L = a(j,i)
-               gam_D = dopp(j,i)/(2.997929d2*wave)
-               voigt_x = !sqrt(log(2.0))*
+               gam_D = dopp(j,i)/(2.997929d10*(wave*1d-8))
+c               voigt_x = dabs((1.0d8*(1./wave-1./wave1(j)))/
+c     .                    (gam_D))
+c               voigt_y = (gam_L)
+               voigt_x = sqrt(log(2.0))*
      .                    dabs((1.0d8*(1./wave-1./wave1(j)))/
      .                    (gam_D))
-               voigt_y =(gam_L)!*sqrt(log(2.0))
-               Z = cmplx(voigt_x, voigt_y)
-               hui = w4(Z)
-c               call complexVoigt(voigt_x,voigt_y,
-c     .                           new_voigt, new_fv)
-               new_voigt = REAL(hui)/(1.772453851)
-               new_fv = AIMAG(hui)/(1.772453851)
+               voigt_y =sqrt(log(2.0))*(gam_L)
+               call complexVoigt(voigt_x,voigt_y,
+     .                           new_voigt, new_fv)
+c               new_voigt = new_voigt/(1.772453851
+c     .                  *(dopp(j,i)/(wave*1.0d-8)))
+c               new_fv = new_fv/(1.772453851
+c     .                  *(dopp(j,i)/(wave*1.0d-8)))
+c               write(*,*) tauref(i), voigt_x, a(j,i), voigt_y,
+c     .             new_voigt/(old_voigt), t(i), new_fv/old_voigt
+c               read(*,*)
+c               write(*,*)i, a(j,i), dopp(j,i), gam_L, gam_D
+c     .                  ,voigt_x, voigt_y, new_voigt, old_voigt
+c     .                  ,new_voigt/(1.77245*old_voigt)
+c     .                            v, a(j,i)
                if (width(j) .eq. 0.0) then
                    kapnu_I(i) = kapnu_I(i)+ kapnu0(j,i)*new_voigt*
      .                 (sin(phi)**2.0)/2.0
                    kapnu_Q(i) = kapnu_Q(i)+ kapnu0(j,i)*new_voigt*
      .                 (sin(phi)**2.0)/2.0
-c                   kapnu_U(i) = kapnu_U(i)+ kapnu0(j,i)*new_voigt*
-c     .                 (sin(phi)**2.0)*sin(2.0*zeta)/2.0
                    zetnu_Q(i) = zetnu_Q(i) + kapnu0(j,i)*new_fv*
      .                 (sin(phi)**2.0)/2.0
-c                   zetnu_U(i) = zetnu_U(i) + kapnu0(j,i)*new_fv*
-c     .                 (sin(phi)**2.0)*sin(2.0*zeta)/2.0
                else
                    kapnu_I(i) = kapnu_I(i)+ kapnu0(j,i)*new_voigt*
      .                 (1.0+cos(phi)**2.0)/4.0
                    kapnu_Q(i) = kapnu_Q(i)- kapnu0(j,i)*new_voigt*
      .                 (sin(phi)**2.0)/4.0
-c                   kapnu_U(i) = kapnu_U(i)- kapnu0(j,i)*new_voigt*
-c     .                 (sin(phi)**2.0)*sin(2.0*zeta)/4.0
-                   kapnu_V(i) = kapnu_V(i)-kapnu0(j,i)*new_voigt*
+                   kapnu_V(i) = kapnu_V(i)+kapnu0(j,i)*new_voigt*
      .                 (cos(phi))/2.0*width(j)
                    zetnu_Q(i) = zetnu_Q(i) - kapnu0(j,i)*new_fv*
      .                 (sin(phi)**2.0)/4.0
-c                   zetnu_U(i) = zetnu_U(i) - kapnu0(j,i)*new_fv*
-c     .                 (sin(phi)**2.0)*sin(2.0*zeta)/4.0
                    zetnu_V(i) = zetnu_V(i) + kapnu0(j,i)*new_fv*
      .                 (cos(phi))/2.0*width(j)
                endif
             enddo
-c            write (*,*) i, kapnu_Q(i), kapnu_U(i)
 c            read (*,*)
          endif
          eta_I(i) = kapnu_I(i)/(0.4343*kaplam(i))
          eta_Q(i) = kapnu_Q(i)/(0.4343*kaplam(i))
-c         eta_U(i) = kapnu_U(i)/(0.4343*kaplam(i))
          eta_V(i) = kapnu_V(i)/(0.4343*kaplam(i))
-         zet_Q(i) = zetnu_Q(i)/(0.4343*kaplam(i))
-c         zet_U(i) = zetnu_U(i)/(0.4343*kaplam(i))
+         zet_Q(i) = zetnu_Q(i)/(kaplam(i)
          zet_V(i) = zetnu_V(i)/(0.4343*kaplam(i))
-c         eta_I(i) = kapnu_I(i)/(kaplam(i))
-c         eta_Q(i) = kapnu_Q(i)/(kaplam(i))
-c         eta_U(i) = kapnu_U(i)/(kaplam(i))
-c         eta_V(i) = kapnu_V(i)/(kaplam(i))
-c         zet_Q(i) = zetnu_Q(i)/(kaplam(i))
-c         zet_U(i) = zetnu_U(i)/(kaplam(i))
-c         zet_V(i) = zetnu_V(i)/(kaplam(i))
 c         write (*,*) zet_Q(i), zet_V(i)
 c         read (*,*)
 c         write (nf11out,321) wave,tauref(i),t(i),eta_I(i),eta_Q(i)

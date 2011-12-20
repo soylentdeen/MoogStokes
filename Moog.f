@@ -33,9 +33,9 @@ c*****for x11 terminal types, define the parameters of plotting windows;
 c     set up an x11 screen geometry and placement that is good for spectrum
 c     syntheses (long, but not tall); the user should play with the format
 c     statements for particular machines.
-c      write (smt1,1018)
+      write (smt1,1018)
 c     now do the same for line abundance trend plots (short but tall).
-c      write (smt2,1017)
+      write (smt2,1017)
 c$$$$$$$$$$$$$$$$$$$$$$$ END OF USER SETUP $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 

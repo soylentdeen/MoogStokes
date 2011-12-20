@@ -16,7 +16,8 @@ c******************************************************************************
      .             rdmass(2500), gambark(2500), alpbark(2500),
      .             wid1comp(2500)
       real*8       kapnu(100), taunu(100), cd(100), sline(100)
-      real*8       eta_I(100), eta_Q(100), eta_V(100)
+      real*8       eta_I(100), eta_Q(100), eta_V(100), eta_U(100)
+      real*8       zet_Q(100), zet_V(100), zet_U(100)
       real*8       d(5000), dellam(400), w(100),
      .             rwtab(3000), gftab(3000), gfhold
       real*8       delta, start, sstop, step,
@@ -37,7 +38,8 @@ c******************************************************************************
      .             rdmass, gambark, alpbark,
      .             wid1comp,
      .             kapnu, taunu, cd, sline,
-     .             eta_I, eta_Q, eta_V,
+     .             eta_I, eta_Q, eta_V, eta_U,
+     .             zet_Q, zet_V, zet_U,
      .             d, dellam, w,
      .             rwtab, gftab, gfhold,
      .             delta, start, sstop, step,   

@@ -14,7 +14,7 @@ c     information about how often an intermediate value is to be stored.
 c*****************************************************************************
 
       include "Linex.com"
-      PARAMETER (MAXSTP=100000,NMAX=10, TWO=2.0, ZERO=0.0, TINY=1.e-30)
+      PARAMETER (MAXSTP=1000000,NMAX=10, TWO=2.0, ZERO=0.0, TINY=1.e-30)
 c      COMMON /PATH/ KMAX, KOUNT, KXSAV, XP(200), YP(10,200)
 c           USER STORAGE FOR INTERMEDIATE RESULTS.  PRESET DXSAV AND KMAX
 
@@ -37,35 +37,28 @@ c      write (*,*) "Starting ODE INT"
       XSAV=X
       do NSTP=1,MAXSTP
           CALL DERIVS(10.0**X,Y,DYDX)
-c          write (*,*) X, Y, DYDX
           STEPSIZE = 10.0**(X+H)-10.0**(X)
-          CALL LINTERPOLATE(ETA_I, 10.0**X, EI)
 c          write (*,*) "Stepsize = ", stepsize
           do I=1,NVAR
-             YSCAL(I)=MAX((ABS(Y(I))+ABS(STEPSIZE*DYDX(I)))
-     .            +TINY,100.0)
+              YSCAL(I)=MAX(ABS(Y(I))+ABS(STEPSIZE*DYDX(I))+TINY,100.0)
 c              YSCAL(I)=ABS(Y(I))+ABS(STEPSIZE*DYDX(I))+TINY
           enddo
-          if (YSCAL(2).eq.100.0) YSCAL(2) = YSCAL(1)
-          if (YSCAL(3).eq.100.0) YSCAL(3) = YSCAL(1)
-          if (YSCAL(4).eq.100.0) YSCAL(4) = YSCAL(1)
-c          write(*,*)"Scale Factors : ", YSCAL
-c          read(*,*)
+
           IF ((X+H-X2)*(X+H-X1).GT.ZERO) H=X2-X
           CALL RKQC(Y,DYDX,NVAR,X,H,EPS,YSCAL,HDID,HNEXT)
           
+c          CALL LINTERPOLATE(ETA_I, 10.0**X, EI)
 c          CALL LINTERPOLATE(ETA_Q, 10.0**X, EQ)
 c          CALL LINTERPOLATE(ETA_V, 10.0**X, EV)
 c          CALL LINTERPOLATE(ZET_Q, 10.0**X, ZQ)
 c          CALL LINTERPOLATE(ZET_V, 10.0**X, ZV)
 c          CALL LINTERPOLATE(T, 10.0**X, TEFF)
 c          write (nf11out, 321) 10.0**X, TEFF, EI, EQ, EV, ZQ, ZV
-c          write (nf11out, 322) 10.0**X, EI, YSCAL(1), Y(1), Y(5)
+c          write (nf11out, 322) 10.0**X, Y(1), Y(2), Y(3), Y(4), Y(5)
           IF(HDID.EQ.H)THEN
               NOK=NOK+1
           ELSE
               NBAD=NBAD+1
-c              write (*, 322) 10.0**X, Y(1), Y(2), Y(3), Y(4),Y(5)
           ENDIF
           IF( (X-X2)*(X2-X1).GE.ZERO)THEN
               DO I=1,NVAR
@@ -77,7 +70,6 @@ c              read (*,*)
               RETURN
           ENDIF
           IF (ABS(HNEXT).LT.log10(HMIN)) THEN
-c              close (nf11out)
               PAUSE 'Stepsize smaller than minimum.'
           ENDIF
           H=HNEXT
@@ -87,7 +79,7 @@ c          read (*,*)
       RETURN
 
 321   format (9e13.5)
-322   format (5e13.5)
+322   format (6e13.5)
       END
 
       SUBROUTINE LINTERPOLATE(Y_OLD, X_NEW, Y_NEW)
@@ -104,10 +96,8 @@ c          read (*,*)
           ENDIF
       ENDDO
 10    SLOPE=(Y_OLD(I+1)-Y_OLD(I))/(TAUREF(I+1)*KAPLAM(I+1)/
-     .   (KAPREF(I+1)*MU)-TAUREF(I)*KAPLAM(I)/
-     .   (KAPREF(I)*MU))
-      Y_NEW = Y_OLD(I)+SLOPE*(X_NEW-TAUREF(I)*KAPLAM(I)/
-     .   (KAPREF(I)*MU))
+     .   (KAPREF(I+1)*MU)-TAUREF(I)*KAPLAM(I)/(KAPREF(I)*MU))
+      Y_NEW = Y_OLD(I)+SLOPE*(X_NEW-TAUREF(I)*KAPLAM(I)/(KAPREF(I)*MU))
       RETURN
       END
 
@@ -122,25 +112,19 @@ C*****************************************************************************
 c      include "Factor.com"
 c      include "Pstuff.com"
 c      include "Dummy.com"
-      real*8 X, Y(5), DYDX(5), B, TEFF, EI, EQ, EU, EV, ZQ, ZU, ZV
+      real*8 X, Y(5), DYDX(5), B, TEFF, EI, EQ, EV, ZQ, ZV
 c      real*8 X, Y(4), DYDX(4)
       
 c      write (*,*) X,Y, DYDX, 'Checkpoint C'
       CALL LINTERPOLATE(ETA_I, X, EI)
       CALL LINTERPOLATE(ETA_Q, X, EQ)
-c      CALL LINTERPOLATE(ETA_U, X, EU)
       CALL LINTERPOLATE(ETA_V, X, EV)
       CALL LINTERPOLATE(ZET_Q, X, ZQ)
-c      CALL LINTERPOLATE(ZET_U, X, ZU)
       CALL LINTERPOLATE(ZET_V, X, ZV)
       CALL LINTERPOLATE(T, X, TEFF)
 
       CALL PLANCK(TEFF, B)
-c      write (*,*) X, EI, EQ, EU, EV, ZQ, ZU, ZV, B
-c      DYDX(1) = (1.0+EI)*Y(1)+EQ*Y(2)+EU*Y(3)+EV*Y(4) - (1.0+EI)*B
-c      DYDX(2) = EQ*Y(1)+(1.0+EI)*Y(2)+ZV*Y(3)-ZU*Y(4) - (EQ)*B
-c      DYDX(3) = EU*Y(1)-ZV*Y(2)+(1.0+EI)*Y(3)+ZQ*Y(4) - (EU)*B
-c      DYDX(4) = EV*Y(1)+ZU*Y(2)-ZQ*Y(3)+(1.0+EI)*Y(4) - (EV)*B
+c      write (*,*) X, EI, EQ, EV, ZQ, ZV, B
       DYDX(1) = (1.0+EI)*Y(1)+EQ*Y(2)+EV*Y(4) - (1.0+EI)*B
       DYDX(2) = EQ*Y(1)+(1.0+EI)*Y(2)+ZV*Y(3) - (EQ)*B
       DYDX(3) = -ZV*Y(2)+(1.0+EI)*Y(3)+ZQ*Y(4)
@@ -209,7 +193,6 @@ c     their new values, HDID is the stepsize which was actually accomplished,
 c     and HNEXT is the estimated next stepsize.  DERIVS is the user-supplied
 c     subroutine that computes the right-hand side derivatives.
 c*****************************************************************************
-      include "Atmos.com"
       PARAMETER (NMAX=10,PGROW=-0.20,PSHRINK=-0.25,FCOR=1./15.,ONE=1.,
      .          SAFETY=0.9,ERRCON=6.e-4)
 c          THE VALUE ERROCON EQUALS (4/SAFETY)**(1/PGROW)
@@ -259,14 +242,9 @@ c      write (*,*) "YSCAL: ", YSCAL
 C          YTEMP NOW CONTAINS THE ERROR ESTIMATE
           YTEMP(I)=Y(I)-YTEMP(I)
           ERRMAX=MAX(ERRMAX,ABS(YTEMP(I)/YSCAL(I)))
-c          write (*,*) ERRMAX,I,ABS(YTEMP(I)/YSCAL(I)),YTEMP(I), YSCAL(I)
       ENDDO
 C          SCALE TO RELATIVE TO REQUIRED TOLERANCE
 c      write (*,*) "ERRMAX: ", ERRMAX, EPS
-c      write (nf11out, 321) X, ABS(YTEMP(1)/YSCAL(1)),
-c     .      ABS(YTEMP(2)/YSCAL(2)),ABS(YTEMP(3)/YSCAL(3)),
-c     .      ABS(YTEMP(4)/YSCAL(4)),ABS(YTEMP(5)/YSCAL(5)), 
-c     .      YSCAL(1), YSCAL(2), YSCAL(3), YSCAL(4), YSCAL(5)
       ERRMAX=ERRMAX/EPS
       IF(ERRMAX.GT.ONE)THEN
 C          TRUNCATION ERROR TOO LARGE, REDUCE STEPSIZE, TRY AGAIN
@@ -288,13 +266,10 @@ c              write (*,*) Y
               HNEXT=SAFETY*HT*(ERRMAX**PGROW)
           ELSE
 c              write (*,*) "Crap", ERRMAX, X, HT
-c              read (*,*)
 c              write (*,*) YTEMP
 c              write (*,*) YSCAL
 c              write (*,*) Y
-c              HNEXT=HT*(1.2+(HT/abs(HT))*0.2)
-              HNEXT=HT*(1.05)
-c              write (*,*) "HNEXT = ", HNEXT
+              HNEXT=HT+(HT/abs(HT))*0.2
           ENDIF
 c          write (*,*) "Success!",ERRMAX,H,HNEXT,X
 c          write (*,*) "YSCAL :", YSCAL
@@ -305,8 +280,6 @@ c      write (*,*) "HDID = ", HDID
           Y(I)=Y(I)+YTEMP(I)*FCOR
       ENDDO
       RETURN
-
-321   format (11e13.5)
       END
 
       SUBROUTINE RK4(Y,DYDX,N,X,H,YOUT)

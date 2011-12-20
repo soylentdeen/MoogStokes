@@ -68,7 +68,6 @@ c                    to be used for some other purpose as needed`
       f8out =   'no_filename_given'
       f9out =   'no_filename_given'
       f10out =  'no_filename_given'
-      f11out =  'no_filename_given'
       nf1out =   0
       nf2out =   0
       nf3out =   0
@@ -79,7 +78,6 @@ c                    to be used for some other purpose as needed`
       nf8out =   0
       nf9out =   0
       nf10out =  0
-      nf11out =  0
       modelnum = 0
 
 
@@ -131,9 +129,7 @@ c  source function with scat+abs          scatopt
       deviations   = 0
       scatopt      = 0
       gfstyle      = 0
-      mu           = 1.0
-      phi          = 0.0
-      zeta         = 0.0
+      theta        = 0.0
  
 
 c  INITIALIZE SOME VARIABLES:
@@ -248,9 +244,6 @@ c  keyword 'hardpost_out' controls the name of a postscript plot output
       elseif (keyword .eq. 'hardpost_out') then
          read (array,*) f5out
 
-c  keyword 'opacity_out' controls the name of the output opacity file
-      elseif (keyword .eq. 'stokes_out') then
-         read (array,*) f11out
 
 c  keyword 'speccomp_out' controls the name of a text file containing the
 c  comparisons (wavelength shifts, sigmas, etc.) between observed and
@@ -319,16 +312,8 @@ c  keyword 'observed_in' controls the name of the input observed spectrum
       elseif (keyword .eq. 'observed_in') then
          read (array,*) fobs
 
-      elseif (keyword .eq. 'mu') then
-         read (array,*) mu
-         phi = acos(mu)
-
-      elseif (keyword .eq. 'phi') then
-         read (array,*) phi
-         mu = cos(phi)
-
-      elseif (keyword .eq. 'zeta') then
-         read (array,*) zeta
+      elseif (keyword .eq. 'theta') then
+         read (array,*) theta
 
 c  keyword 'table_in' controls the name of the extra input instruction file
       elseif (keyword .eq. 'table_in   ') then

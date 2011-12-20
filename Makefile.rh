@@ -20,7 +20,7 @@ OBJECTS = Abfind.o Abpop.o Abunplot.o Batom.o Begin.o Binary.o \
         Rinteg.o Smooth.o Specplot.o Stats.o Sunder.o Synpop.o Synspec.o \
         Synth.o Taukap.o Total.o Trudamp.o Ucalc.o Vargauss.o \
         Vmacro.o Voigt.o Wavecalc.o Weedout.o Writenumber.o OdeInt.o \
-        complexVoigt.o
+        complexVoigt.o Hui.o
 
 
 COMMON =  Atmos.com Dummy.com Equivs.com Factor.com Kappa.com Linex.com \
@@ -49,7 +49,7 @@ all: MOOG ;
 	@echo -----------------------------------------------------------------
 
 MOOG:  $(OBJECTS);
-	$(FC) $(OBJECTS) -o mg_stokes -L$(X11LIB) -lX11 \
+	$(FC) $(OBJECTS) -o moog_complex -L$(X11LIB) -lX11 \
         -L$(SMLIB) -lplotsub -ldevices -lutils
 
 $(OBJECTS): $(COMMON)
