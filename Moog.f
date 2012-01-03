@@ -19,7 +19,7 @@ c     be able to pull in auxiliary data files; executing 'make' will
 c     generate a reminder of this necessity
       write (moogpath,1001)
       moogpath = 
-     .  '/home/r900-1/deen/Code/MOOG/'
+     .  '/home/r900-1/deen/Code/MoogStokes/'
 
 
 c*****What kind of machine are you using?  Possible ones are:
@@ -33,9 +33,9 @@ c*****for x11 terminal types, define the parameters of plotting windows;
 c     set up an x11 screen geometry and placement that is good for spectrum
 c     syntheses (long, but not tall); the user should play with the format
 c     statements for particular machines.
-      write (smt1,1018)
+c      write (smt1,1018)
 c     now do the same for line abundance trend plots (short but tall).
-      write (smt2,1017)
+c      write (smt2,1017)
 c$$$$$$$$$$$$$$$$$$$$$$$ END OF USER SETUP $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 
@@ -53,38 +53,8 @@ c*****invoke the overall starting routine
 
 
 c*****use one of the standard driver routines ("isotop" is obsolete):
-      if     (control .eq. 'synplot') then
-         call plotit
-      elseif (control .eq. 'synth  ') then
-         call synth
-      elseif (control .eq. 'cogsyn ') then
-         call cogsyn  
-      elseif (control .eq. 'blends ') then
-         call blends  
-      elseif (control .eq. 'abfind ') then
-         call abfind
-      elseif (control .eq. 'ewfind ') then
-         call ewfind
-      elseif (control .eq. 'cog    ') then
-         call cog
-      elseif (control .eq. 'calmod ') then
-         call calmod
-      elseif (control .eq. 'doflux ') then
-         call doflux   
-      elseif (control .eq. 'weedout') then
-         call weedout  
-      elseif (control .eq. 'gridsyn') then
+      if (control .eq. 'gridsyn') then
          call gridsyn  
-      elseif (control .eq. 'gridplo') then
-         call gridplo  
-      elseif (control .eq. 'binary ') then
-         call binary
-      elseif (control .eq. 'abpop  ') then
-         call abpop
-      elseif (control .eq. 'synpop ') then
-         call synpop
-
-
 c*****or, put in your own drivers in the form below....
       elseif (control .eq. 'mine  ') then
          call  mydriver 

@@ -20,6 +20,10 @@ c        go to 10
       endif
 
 
+c       THESE LINES HAVE BEEN COMMENTED OUT TO ENABLE MOOG TO RUN
+C       IN A BATCH MODE WHERE THE CALLING TERMINAL HAS BEEN KILLED
+C       AND/OR THE USER STARTING THE PROGRAM HAS LOGGED OUT
+C
 c*****define the number of lines available on the text screen for
 c     interactive mode; this number is discovered from the "stty -a"
 c     command, for which the output format is unique to the operating

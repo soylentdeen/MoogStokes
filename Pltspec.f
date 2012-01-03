@@ -196,128 +196,128 @@ c*****or the plot boundaries may be changed
 
 
 c*****or the cross hairs can be used to zoom in on a part of the plot
-      if (choice .eq. 'z') then
-         array = 'MARK THE LOWER LEFT HAND CORNER WITH THE CURSOR'
-220      istat = ivcleof(13,1)
-         istat = ivwrite(13,3,array,47)
-         call pointcurs
-         xlo = xplotpos
-         ylo = yplotpos
-         array = 'MARK THE UPPER RIGHT HAND CORNER WITH THE CURSOR'
-212      istat = ivcleof(14,1)
-         istat = ivwrite (14,1,array,48)
-         call pointcurs
-         xhi = xplotpos
-         yhi = yplotpos
-         call boxit
-         if (iunits .eq. 1) then
-            xlo = 1.d-4*xlo
-            xhi = 1.d-4*xhi
-         endif
-         whichwin = '1of1'
-      endif
+C      if (choice .eq. 'z') then
+C         array = 'MARK THE LOWER LEFT HAND CORNER WITH THE CURSOR'
+C220      istat = ivcleof(13,1)
+C         istat = ivwrite(13,3,array,47)
+C         call pointcurs
+C         xlo = xplotpos
+C         ylo = yplotpos
+C         array = 'MARK THE UPPER RIGHT HAND CORNER WITH THE CURSOR'
+C212      istat = ivcleof(14,1)
+C         istat = ivwrite (14,1,array,48)
+C         call pointcurs
+C         xhi = xplotpos
+C         yhi = yplotpos
+C         call boxit
+C         if (iunits .eq. 1) then
+C            xlo = 1.d-4*xlo
+C            xhi = 1.d-4*xhi
+C         endif
+C         whichwin = '1of1'
+C      endif
 
 
 
 c*****or cursor position can be returned
-      if (choice .eq. 'p') then
-         array = 'MARK THE POSITION WITH THE CURSOR'
- 213     istat=ivcleof(21,1)
-         istat=ivwrite(13,3,array,34)
-         call drawcurs
-         go to 100
-      endif
+C      if (choice .eq. 'p') then
+C         array = 'MARK THE POSITION WITH THE CURSOR'
+C 213     istat=ivcleof(21,1)
+C         istat=ivwrite(13,3,array,34)
+C         call drawcurs
+C         go to 100
+C      endif
 
 
 c*****or the title of the model can be changed
-      if (choice .eq. 't') then
-         array = 'ENTER THE NEW TITLE'
-         istat = ivcleof(21,1)
-         istat = ivwrite (13,3,array,19)
-         read (*,33) moditle
-33       format(a80)
-      endif
+C      if (choice .eq. 't') then
+C         array = 'ENTER THE NEW TITLE'
+C         istat = ivcleof(21,1)
+C         istat = ivwrite (13,3,array,19)
+C         read (*,33) moditle
+C33       format(a80)
+C      endif
    
 
 c*****or the spectra can be replotted, with a separate plot showing the 
 c     observed/synthtic spectrum differences
-      if (choice .eq. 'd') then
-         deviations = 1
-         whichwin = '2of2'
-      endif
+C      if (choice .eq. 'd') then
+C         deviations = 1
+C         whichwin = '2of2'
+C      endif
 
 
 c*****or the plot boundaries may be reset to the original values;
 c     this is a basic starting over plot
-13    if (choice .eq. 'o') then
-         xlo = start
-         xhi = sstop
-         if (iunits .eq. 1) then
-            xlo = 1.d-4*xlo
-            xhi = 1.d-4*xhi
-         endif
-         xlo = origxlo
-         xhi = origxhi
-         ylo = origylo
-         yhi = origyhi
-         lim1obs = 1
-         lim2obs = lount
-         deviations = 0
-         call boxit
-      endif
+C13    if (choice .eq. 'o') then
+C         xlo = start
+C         xhi = sstop
+C         if (iunits .eq. 1) then
+C            xlo = 1.d-4*xlo
+C            xhi = 1.d-4*xhi
+C         endif
+C         xlo = origxlo
+C         xhi = origxhi
+C         ylo = origylo
+C         yhi = origyhi
+C         lim1obs = 1
+C         lim2obs = lount
+C         deviations = 0
+C         call boxit
+C      endif
 
 
 c*****or the plot can simply be redone
-      if (choice .eq. 'm') then
-         go to 90
-      endif
+C      if (choice .eq. 'm') then
+C         go to 90
+C      endif
 
 
 c*****now either here make a hardcopy plot
-      if (choice .eq. 'h') then
-         if (control .eq. 'binary ') then
-            plotroutine = 'hard_land_bin '
-         else
-            plotroutine = 'hard_land_spec'
-         endif
-         if (deviations .eq. 0) then
-            whichwin = '1of1'
-         else
-            whichwin = '2of2'
-         endif
-         lscreen = 12
-         call makeplot (lscreen)
-         go to 100
-      endif
+C      if (choice .eq. 'h') then
+C         if (control .eq. 'binary ') then
+C            plotroutine = 'hard_land_bin '
+C         else
+C            plotroutine = 'hard_land_spec'
+C         endif
+C         if (deviations .eq. 0) then
+C            whichwin = '1of1'
+C         else
+C            whichwin = '2of2'
+C         endif
+C         lscreen = 12
+C         call makeplot (lscreen)
+C         go to 100
+C      endif
 
 
 c*****or write the plot to a postscript file
-      if (choice.eq.'f' .or. choice.eq.'g') then
-         if (control .eq. 'binary ') then
-            plotroutine = 'file_land_bin '
-         else
-            plotroutine = 'file_land_spec'
-         endif
-         if (deviations .eq. 0) then
-            whichwin = '1of1'
-         else
-            whichwin = '2of2'
-         endif
-         lscreen = 12
-         call makeplot (lscreen)
-         if (choice .eq. 'g') then
-            return
-         else
-            go to 90
-         endif
-      endif
+C      if (choice.eq.'f' .or. choice.eq.'g') then
+C         if (control .eq. 'binary ') then
+C            plotroutine = 'file_land_bin '
+C         else
+C            plotroutine = 'file_land_spec'
+C         endif
+C         if (deviations .eq. 0) then
+C            whichwin = '1of1'
+C         else
+C            whichwin = '2of2'
+C         endif
+C         lscreen = 12
+C         call makeplot (lscreen)
+C         if (choice .eq. 'g') then
+C            return
+C         else
+C            go to 90
+C         endif
+C      endif
 
       
 c*****or return to the calling routine in order to change abundances
-      if (choice .eq. 'n') then
-         call plotremember (3)
-         return
-      endif
+C      if (choice .eq. 'n') then
+C         call plotremember (3)
+C         return
+C      endif
 
 
 c*****or add an additional uniform amount of flux, expressed in terms of

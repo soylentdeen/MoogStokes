@@ -19,7 +19,7 @@
       RETURN
       END
 
-      SUBROUTINE DERIVS(X,Y,DYDX)
+      SUBROUTINE DERIVS(N,X,Y,DYDX,RPAR,IPAR)
 C*****************************************************************************
 C     This subroutine calculates the derivatives of the stokes parameters at
 C     Tau = X.

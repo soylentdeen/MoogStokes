@@ -14,6 +14,9 @@ c******************************************************************************
       real*8 Stokes(5)
       real*8 NOK, NBAD, H_MIN, H_GUESS, EPS, B
       real*8 factor, right
+      real*8 work(76), iwork(21)
+      integer ipar, lwork, liwork
+      real*8 rpar
       logical direction, prev_step
 
 c*****initialize the synthesis
@@ -85,6 +88,10 @@ c*****compute a spectrum depth at this point
       EPS = 0.01
       NOK = 0
       NBAD = 0
+      lwork = 76
+      liwork = 21
+      rpar = 0.0
+      ipar = 0
 c      write (*,*) Stokes(1), B
 c      call rkdumb(Stokes,4,log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)
 c     .         *mu)), log10(tauref(1)*kaplam(1)/(kapref(1)*mu)),700)
@@ -95,7 +102,7 @@ c     .     EPS, H_GUESS, H_MIN, NOK, NBAD)
       call DOP853(5, derivs,
      .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
      .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, 0,
-     .      junk, 0,)
+     .      junk, 0, work, lwork, iwork, liwork, rpar, ipar)
       d(n) = 1.0-Stokes(1)/Stokes(5)
       write (nf11out,12345) wave,1.0-d(n),Stokes
 c      write (*,*) wave,1.0-d(n), Stokes(1), Stokes(2), Stokes(3),
