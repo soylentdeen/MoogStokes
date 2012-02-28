@@ -24,28 +24,40 @@ C*****************************************************************************
 C     This subroutine calculates the derivatives of the stokes parameters at
 C     Tau = X.
 C*****************************************************************************
-      implicit NONE
+      IMPLICIT REAL*8 (A-H,O-Z)
+      DIMENSION Y(N), DYDX(N)
       include "Atmos.com"
       include "Linex.com"
-      real*8 X, Y(5), DYDX(5), B, TEFF, EI, EQ, EU, EV, ZQ, ZU, ZV
+      real*8 TEFF,EI,EQ,EU,EV,ZQ,ZU,ZV
       
-      CALL LINTERPOLATE(ETA_I, X, EI)
-      CALL LINTERPOLATE(ETA_Q, X, EQ)
-      CALL LINTERPOLATE(ETA_V, X, EV)
-      CALL LINTERPOLATE(ZET_Q, X, ZQ)
-      CALL LINTERPOLATE(ZET_V, X, ZV)
-      CALL LINTERPOLATE(T, X, TEFF)
+      CALL LINTERPOLATE(ETA_I, 10.0**X, EI)
+      CALL LINTERPOLATE(ETA_Q, 10.0**X, EQ)
+      CALL LINTERPOLATE(ETA_V, 10.0**X, EV)
+      CALL LINTERPOLATE(ZET_Q, 10.0**X, ZQ)
+      CALL LINTERPOLATE(ZET_V, 10.0**X, ZV)
+      CALL LINTERPOLATE(T, 10.0**X, TEFF)
 
       CALL PLANCK(TEFF, B)
 c      DYDX(1) = (1.0+EI)*Y(1)+EQ*Y(2)+EU*Y(3)+EV*Y(4) - (1.0+EI)*B
 c      DYDX(2) = EQ*Y(1)+(1.0+EI)*Y(2)+ZV*Y(3)-ZU*Y(4) - (EQ)*B
 c      DYDX(3) = EU*Y(1)-ZV*Y(2)+(1.0+EI)*Y(3)+ZQ*Y(4) - (EU)*B
 c      DYDX(4) = EV*Y(1)+ZU*Y(2)-ZQ*Y(3)+(1.0+EI)*Y(4) - (EV)*B
-      DYDX(1) = (1.0+EI)*Y(1)+EQ*Y(2)+EV*Y(4) - (1.0+EI)*B
-      DYDX(2) = EQ*Y(1)+(1.0+EI)*Y(2)+ZV*Y(3) - (EQ)*B
-      DYDX(3) = -ZV*Y(2)+(1.0+EI)*Y(3)+ZQ*Y(4)
-      DYDX(4) = EV*Y(1)-ZQ*Y(3)+(1.0+EI)*Y(4) - (EV)*B
-      DYDX(5) = Y(5)-B
+      DYDX(1) = ((1.0+EI)*Y(1)+EQ*Y(2)+EV*Y(4) - (1.0+EI)*B)*10**X*2.302
+      DYDX(2) = (EQ*Y(1)+(1.0+EI)*Y(2)+ZV*Y(3) - (EQ)*B)*10**X*2.302
+      DYDX(3) = (-ZV*Y(2)+(1.0+EI)*Y(3)+ZQ*Y(4))*10**X*2.302
+      DYDX(4) = (EV*Y(1)-ZQ*Y(3)+(1.0+EI)*Y(4) - (EV)*B)*10**X*2.302
+      DYDX(5) = (Y(5)-B)*10**X*2.302
+c      write (*,*) "Tau = ", 10**X, ' log(Tau) = ', X
+c      write (*,*) "Y = ", Y
+c      write (*,*) "DYDX = ", DYDX
 c      write (*,*) "Derivatives: ", DYDX
+c      read (*,*) 
       RETURN
       END
+
+c      SUBROUTINE SOLOUT(NR,XOLD,X,Y,N,CON,ICOMP,ND,
+c     .                  RPAR, IPAR, IRTRN, XOUT)
+c      DIMENSION Y(N),CON(8*ND),ICOMP(ND)
+c      DO I=1,N
+c         Y(
+c      ENDDO

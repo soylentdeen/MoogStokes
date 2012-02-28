@@ -11,13 +11,20 @@ c******************************************************************************
       include 'Pstuff.com'
       include 'Dummy.com'
       real*8 dd(5000)
-      real*8 Stokes(5)
+c      real*8 Stokes(5)
       real*8 NOK, NBAD, H_MIN, H_GUESS, EPS, B
       real*8 factor, right
-      real*8 work(76), iwork(21)
-      integer ipar, lwork, liwork
-      real*8 rpar
+      PARAMETER (NDGL=5,NRD=0)
+      PARAMETER (LWORK=11*NDGL+8*NRD+21, LIWORK=NRD+21)
+      DIMENSION STOKES(NDGL),WORK(LWORK),IWORK(LIWORK)
+c      real*8 work(76), iwork(21)
+c      integer ipar(1), lwork, liwork
+c      real*8 rpar(1)
       logical direction, prev_step
+      EXTERNAL derivs
+
+      NEQS = 5
+      RPAR=1.0D-3
 
 c*****initialize the synthesis
       direction = .TRUE.
@@ -88,10 +95,11 @@ c*****compute a spectrum depth at this point
       EPS = 0.01
       NOK = 0
       NBAD = 0
-      lwork = 76
-      liwork = 21
-      rpar = 0.0
-      ipar = 0
+      TOL = 1.0D-1
+      ITOL = 0
+      RTOL = TOL
+      ATOL = TOL
+      IOUT = 0
 c      write (*,*) Stokes(1), B
 c      call rkdumb(Stokes,4,log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)
 c     .         *mu)), log10(tauref(1)*kaplam(1)/(kapref(1)*mu)),700)
@@ -99,11 +107,18 @@ c      call odeint(Stokes,5,log10(tauref(ntau)*kaplam(ntau)/
 c     .     (kapref(ntau)*MU)),log10(tauref(1)*kaplam(1)/(
 c     .     kapref(1)*MU)),
 c     .     EPS, H_GUESS, H_MIN, NOK, NBAD)
-      call DOP853(5, derivs,
+c      call DOP853(NDGL, derivs,
+c     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
+c     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
+c     .      junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
+      call DOP853(NDGL, derivs,
      .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
-     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, 0,
-     .      junk, 0, work, lwork, iwork, liwork, rpar, ipar)
+     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
+     .      junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
+c      write (*,*) "Checkpoint F"
       d(n) = 1.0-Stokes(1)/Stokes(5)
+c      write (*,*) wave, 1.0-d(n)!, Stokes
+c      read (*,*)
       write (nf11out,12345) wave,1.0-d(n),Stokes
 c      write (*,*) wave,1.0-d(n), Stokes(1), Stokes(2), Stokes(3),
 c     .              Stokes(4), Stokes(5), NOK, NBAD
@@ -130,7 +145,7 @@ c      read (*,*)
 
 c*****step in wavelength and try again 
       if (d(n).gt.0.05) then
-          stepsize = dopp(nstrong,50)*wave/2.997929e10
+          stepsize = dopp(nstrong,50)*wave/2.997929e11
 c            First step into a region with a line.  Need to reverse direction
           if (.not.prev_step) THEN
               direction = .FALSE.
