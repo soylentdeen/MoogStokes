@@ -111,9 +111,13 @@ c      call DOP853(NDGL, derivs,
 c     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
 c     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
 c     .      junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
-      call DOP853(NDGL, derivs,
-     .      tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu), Stokes,
-     .      tauref(1)*kaplam(1)/(kapref(1)*mu), RTOL, ATOL, ITOL,
+c      call DOP853(NDGL, derivs,
+c     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
+c     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
+c     .      junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
+      call radau5(NDGL, derivs,
+     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
+     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
      .      junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
 c      write (*,*) "Checkpoint F"
       d(n) = 1.0-Stokes(1)/Stokes(5)
