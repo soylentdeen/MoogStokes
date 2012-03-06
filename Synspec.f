@@ -20,11 +20,13 @@ c      real*8 Stokes(5)
 c      real*8 work(76), iwork(21)
 c      integer ipar(1), lwork, liwork
 c      real*8 rpar(1)
+      integer counter
       logical direction, prev_step
-      EXTERNAL derivs
+      EXTERNAL derivs, SOLOUT
 
       NEQS = 5
-      RPAR=1.0D-3
+      RPAR=0.0
+      counter = 0
 
 c*****initialize the synthesis
       direction = .TRUE.
@@ -95,10 +97,10 @@ c*****compute a spectrum depth at this point
       EPS = 0.01
       NOK = 0
       NBAD = 0
-      TOL = 1.0D-1
+      TOL = 1.0D-5
       ITOL = 0
       RTOL = TOL
-      ATOL = TOL
+      ATOL = 0
       IOUT = 0
 c      write (*,*) Stokes(1), B
 c      call rkdumb(Stokes,4,log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)
@@ -111,15 +113,55 @@ c      call DOP853(NDGL, derivs,
 c     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
 c     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
 c     .      junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
+      do 21 i=1,LWORK
+21        work(i)=0.0
+      do 23 i=1,LIWORK
+23        iwork(i)=0.0
+c      work(7) = -0.1
       call DOP853(NDGL, derivs,
-     .      tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu), Stokes,
-     .      tauref(1)*kaplam(1)/(kapref(1)*mu), RTOL, ATOL, ITOL,
+     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
+     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
      .      junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
 c      write (*,*) "Checkpoint F"
+      write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
       d(n) = 1.0-Stokes(1)/Stokes(5)
-c      write (*,*) wave, 1.0-d(n)!, Stokes
+      if (idid .ne. 1) then
+         write (*,*) wave, 1.0-d(n),idid, counter
+         write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
+         write (*,*) log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu))
+         write (*,*) log10(tauref(1)*kaplam(1)/(kapref(1)*mu))
+c         open(nf3out)
+c         call dump_taus(d(n))
+         read (*,*) 
+         do 24 i=1,LWORK
+24          work(i)=0.0
+         do 25 i=1,LIWORK
+25          iwork(i)=0.0
+c         work(7) = -0.1
+c         work(5) = 0.05
+         Stokes(1) = B
+         Stokes(2) = 0.0
+         Stokes(3) = 0.0
+         Stokes(4) = 0.0
+         Stokes(5) = B
+         IOUT = 1
+         call DOP853(NDGL, derivs,
+     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
+     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
+     .      Solout, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
+         IOUT = 0
+         write (*,*) Stokes(1)/Stokes(5)
+         write (*,*) wave, idid, counter
+         write (*,*) iwork(17),iwork(18),iwork(19),iwork(20), n, num
+         read (*,*) 
+      endif
+      counter = counter +1
 c      read (*,*)
       write (nf11out,12345) wave,1.0-d(n),Stokes
+      if (1.0-d(n) .gt. 2.0) then
+         write (*,*) 'I am less than intelligent'
+         read (*,*)
+      endif
 c      write (*,*) wave,1.0-d(n), Stokes(1), Stokes(2), Stokes(3),
 c     .              Stokes(4), Stokes(5), NOK, NBAD
 c      write (*,*) wave,1.0-d(n), NOK, NBAD
@@ -145,7 +187,7 @@ c      read (*,*)
 
 c*****step in wavelength and try again 
       if (d(n).gt.0.05) then
-          stepsize = dopp(nstrong,50)*wave/2.997929e11
+          stepsize = dopp(nstrong,50)*wave/2.997929e10
 c            First step into a region with a line.  Need to reverse direction
           if (.not.prev_step) THEN
               direction = .FALSE.
@@ -161,7 +203,7 @@ c          write (*,*) "line!  - ", d(n), wave, wave*dopp(nstrong,20)
 c     .           /2.997929e10
           wave = wave + factor*stepsize
       else
-          stepsize = dopp(nstrong, 50)*wave/2.997929e10
+          stepsize = dopp(nstrong, 50)*wave/2.997929e9
           prev_step = .FALSE.
           if (.not.direction) THEN
               direction = .TRUE.
@@ -240,7 +282,6 @@ c*****format statements
 1114  format ('FINAL WAVELENGTH/FREQUENCY =',f10.3/)
 12345 format (f10.4,f10.7,5e10.3)
 
-
       end                                
 
 
@@ -256,3 +297,26 @@ c*****format statements
      .      (dexp(1.43879d+08/(wave*temperature))-1.0d+00))
       end
 
+      subroutine Solout(NR,XOLD,X,Y,N,CON,ICOMP,ND,RPAR,IPAR,IRTRN,XOUT)
+      DIMENSION Y(N),CON(8*ND),ICOMP(ND)
+      write (*,*) NR, XOLD, X, N
+      read (*,*)
+      end 
+
+
+      subroutine dump_taus(value)
+
+      implicit real*8 (a-h,o-z)
+      include 'Atmos.com'
+      include 'Linex.com'
+      include 'Factor.com'
+      include 'Pstuff.com'
+      include 'Dummy.com'
+
+      do 56 i=1, ntau
+56      write (nf3out,321) tauref(i), eta_I(i),eta_Q(i),eta_V(i),
+     .        zet_Q(i),zet_V(i)
+      close(nf3out)
+
+321   format (f11.3, 5e11.3)
+      end
