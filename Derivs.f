@@ -47,11 +47,6 @@ c      DYDX(4) = EV*Y(1)+ZU*Y(2)-ZQ*Y(3)+(1.0+EI)*Y(4) - (EV)*B
       DYDX(3) = (-ZV*Y(2)+(1.0+EI)*Y(3)+ZQ*Y(4))*10**X*2.302
       DYDX(4) = (EV*Y(1)-ZQ*Y(3)+(1.0+EI)*Y(4) - (EV)*B)*10**X*2.302
       DYDX(5) = (Y(5)-B)*10**X*2.302
-c      write (*,*) "Tau = ", 10**X, ' log(Tau) = ', X
-c      write (*,*) "Y = ", Y
-c      write (*,*) "DYDX = ", DYDX
-c      write (*,*) "Derivatives: ", DYDX
-c      read (*,*) 
       RETURN
       END
 
