@@ -102,17 +102,6 @@ c*****compute a spectrum depth at this point
       RTOL = TOL
       ATOL = 0
       IOUT = 0
-c      write (*,*) Stokes(1), B
-c      call rkdumb(Stokes,4,log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)
-c     .         *mu)), log10(tauref(1)*kaplam(1)/(kapref(1)*mu)),700)
-c      call odeint(Stokes,5,log10(tauref(ntau)*kaplam(ntau)/
-c     .     (kapref(ntau)*MU)),log10(tauref(1)*kaplam(1)/(
-c     .     kapref(1)*MU)),
-c     .     EPS, H_GUESS, H_MIN, NOK, NBAD)
-c      call DOP853(NDGL, derivs,
-c     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
-c     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
-c     .      junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
       do 21 i=1,LWORK
 21        work(i)=0.0
       do 23 i=1,LIWORK
@@ -125,14 +114,10 @@ c      work(7) = -0.1
 c      write (*,*) "Checkpoint F"
       write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
       d(n) = 1.0-Stokes(1)/Stokes(5)
+      write (*,*) wave, 1.0-d(n),idid
       if (idid .ne. 1) then
-         write (*,*) wave, 1.0-d(n),idid, counter
-         write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
-         write (*,*) log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu))
-         write (*,*) log10(tauref(1)*kaplam(1)/(kapref(1)*mu))
 c         open(nf3out)
 c         call dump_taus(d(n))
-         read (*,*) 
          do 24 i=1,LWORK
 24          work(i)=0.0
          do 25 i=1,LIWORK
@@ -151,8 +136,8 @@ c         work(5) = 0.05
      .      Solout, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
          IOUT = 0
          write (*,*) Stokes(1)/Stokes(5)
-         write (*,*) wave, idid, counter
-         write (*,*) iwork(17),iwork(18),iwork(19),iwork(20), n, num
+         write (*,*) wave, idid
+         write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
          read (*,*) 
       endif
       counter = counter +1
@@ -297,10 +282,10 @@ c*****format statements
      .      (dexp(1.43879d+08/(wave*temperature))-1.0d+00))
       end
 
-      subroutine Solout(NR,XOLD,X,Y,N,CON,ICOMP,ND,RPAR,IPAR,IRTRN,XOUT)
+      subroutine Solout(NR,XOLD,X,Y,N,CON,ICOMP,ND,
+     &                     RPAR,IPAR,IRTRN,XOUT)
       DIMENSION Y(N),CON(8*ND),ICOMP(ND)
-      write (*,*) NR, XOLD, X, N
-      read (*,*)
+      write (*,*) X, Y
       end 
 
 

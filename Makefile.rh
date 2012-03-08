@@ -18,8 +18,8 @@ OBJECTS = Batom.o Begin.o dop853.o \
         Partnew.o Prinfo.o Putasci.o Readobs.o Plotremember.o \
         Rinteg.o Smooth.o Stats.o Sunder.o Synspec.o \
         Taukap.o Total.o Trudamp.o Ucalc.o Vargauss.o \
-        Vmacro.o Voigt.o Wavecalc.o Weedout.o Writenumber.o OdeInt.o \
-        complexVoigt.o Hui.o
+        Vmacro.o Voigt.o Wavecalc.o Weedout.o Writenumber.o \
+        complexVoigt.o Hui.o Derivs.o
 
 
 COMMON =  Atmos.com Dummy.com Equivs.com Factor.com Kappa.com Linex.com \
