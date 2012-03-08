@@ -123,6 +123,7 @@ c      work(7) = -0.1
      .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
      .      junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
 c      write (*,*) "Checkpoint F"
+      write (*,*) wave, 1.0-d(n),idid, counter
       write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
       d(n) = 1.0-Stokes(1)/Stokes(5)
       if (idid .ne. 1) then
@@ -300,7 +301,7 @@ c*****format statements
       subroutine Solout(NR,XOLD,X,Y,N,CON,ICOMP,ND,RPAR,IPAR,IRTRN,XOUT)
       DIMENSION Y(N),CON(8*ND),ICOMP(ND)
       write (*,*) NR, XOLD, X, N
-      read (*,*)
+c      read (*,*)
       end 
 
 
