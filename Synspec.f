@@ -16,16 +16,19 @@ c      real*8 Stokes(5)
       real*8 factor, right
       PARAMETER (NDGL=5,NRD=0)
       PARAMETER (LWORK=11*NDGL+8*NRD+21, LIWORK=NRD+21)
-      DIMENSION STOKES(NDGL),WORK(LWORK),IWORK(LIWORK)
+c      DIMENSION STOKES(NDGL),WORK(LWORK),IWORK(LIWORK)
+      DIMENSION WORK(LWORK),IWORK(LIWORK)
+      real*8 STOKES(NDGL), rpar, atol, rtol
 c      real*8 work(76), iwork(21)
 c      integer ipar(1), lwork, liwork
 c      real*8 rpar(1)
-      integer counter
+      integer ipar
       logical direction, prev_step
       EXTERNAL derivs, SOLOUT
 
       NEQS = 5
       RPAR=0.0
+      ipar = 0
       counter = 0
 
 c*****initialize the synthesis
@@ -64,6 +67,7 @@ c*****calculate continuum quantities at the spectrum wavelength
       right = wave
       wavl = 0.
       open(unit=nf11out, file=f11out)
+      open(unit=nf12out, file=f12out)
 30    if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave   
          call opacit (2,wave)    
@@ -97,26 +101,33 @@ c*****compute a spectrum depth at this point
       EPS = 0.01
       NOK = 0
       NBAD = 0
-      TOL = 1.0D-5
+      TOL = 1.0D-3
       ITOL = 0
       RTOL = TOL
       ATOL = 0
-      IOUT = 0
+      IOUT = 1
       do 21 i=1,LWORK
 21        work(i)=0.0
       do 23 i=1,LIWORK
 23        iwork(i)=0.0
 c      work(7) = -0.1
+      write(*,*)NDGL,log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu))
+      write (*,*) log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL
+      write (*,*) ITOL, IOUT, rpar, ipar
       call DOP853(NDGL, derivs,
      .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
      .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
-     .      junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
+     .      Solout, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
 c      write (*,*) "Checkpoint F"
-      write (*,*) wave, 1.0-d(n),idid, counter
-      write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
       d(n) = 1.0-Stokes(1)/Stokes(5)
       write (*,*) wave, 1.0-d(n),idid
+      write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
+      write (*,*) lwork, work
+      write (*,*) liwork, iwork
       if (idid .ne. 1) then
+          read(*,*)
+      endif
+      if (1 .ne. 1) then
 c         open(nf3out)
 c         call dump_taus(d(n))
          do 24 i=1,LWORK
@@ -143,7 +154,7 @@ c         work(5) = 0.05
       endif
       counter = counter +1
 c      read (*,*)
-      write (nf11out,12345) wave,1.0-d(n),Stokes
+c      write (nf11out,12345) wave,1.0-d(n),Stokes
       if (1.0-d(n) .gt. 2.0) then
          write (*,*) 'I am less than intelligent'
          read (*,*)
@@ -285,8 +296,19 @@ c*****format statements
 
       subroutine Solout(NR,XOLD,X,Y,N,CON,ICOMP,ND,
      &                     RPAR,IPAR,IRTRN,XOUT)
-      DIMENSION Y(N),CON(8*ND),ICOMP(ND)
-      write (*,*) X, Y
+      DIMENSION CON(8*ND),ICOMP(ND)
+      real*8 X, EI, EQ, EV, ZQ, ZV
+      real*8 Y(N)
+      include 'Atmos.com'
+      include 'Linex.com'
+      CALL LINTERPOLATE(ETA_I, 10.0**X, EI)
+      CALL LINTERPOLATE(ETA_Q, 10.0**X, EQ)
+      CALL LINTERPOLATE(ETA_V, 10.0**X, EV)
+      CALL LINTERPOLATE(ZETA_Q, 10.0**X, ZQ)
+      CALL LINTERPOLATE(ZETA_V, 10.0**X, ZV)
+      write (nf12out,322) X, EI, EQ, EV, ZQ, ZV
+c      write (nf12out,322) X, Y
+322   format (e11.3, 5e11.3)
       end 
 
 
@@ -295,9 +317,6 @@ c*****format statements
       implicit real*8 (a-h,o-z)
       include 'Atmos.com'
       include 'Linex.com'
-      include 'Factor.com'
-      include 'Pstuff.com'
-      include 'Dummy.com'
 
       do 56 i=1, ntau
 56      write (nf3out,321) tauref(i), eta_I(i),eta_Q(i),eta_V(i),
