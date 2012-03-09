@@ -104,7 +104,7 @@ c*****compute a spectrum depth at this point
       ITOL = 0
       RTOL = TOL
       ATOL = 1e-10
-      IOUT = 0
+      IOUT = 1
       do 21 i=1,LWORK
 21        work(i)=0.0
       do 23 i=1,LIWORK
