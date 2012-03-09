@@ -111,9 +111,9 @@ c*****compute a spectrum depth at this point
       do 23 i=1,LIWORK
 23        iwork(i)=0.0
 c      work(7) = -0.1
-      write(*,*)NDGL,log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu))
-      write (*,*) log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL
-      write (*,*) ITOL, IOUT, rpar, ipar
+c      write(*,*)NDGL,log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu))
+c      write (*,*) log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL
+c      write (*,*) ITOL, IOUT, rpar, ipar
       call DOP853(NDGL, derivs,
      .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
      .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
@@ -122,12 +122,12 @@ c      write (*,*) "Checkpoint F"
       d(n) = 1.0-Stokes(1)/Stokes(5)
       write (*,*) wave, 1.0-d(n),idid
       write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
-      write (*,*) lwork, work
-      write (*,*) liwork, iwork
+c      write (*,*) lwork, work
+c      write (*,*) liwork, iwork
       if (idid .ne. 1) then
-          read(*,*)
-      endif
-      if (1 .ne. 1) then
+c          read(*,*)
+c      endif
+c      if (1 .ne. 1) then
 c         open(nf3out)
 c         call dump_taus(d(n))
          do 24 i=1,LWORK
