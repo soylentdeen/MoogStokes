@@ -110,8 +110,6 @@ c     .                 (sin(phi)**2.0)*sin(2.0*zeta)/4.0
      .                 (cos(phi))/2.0*width(j)
                endif
             enddo
-c            write (*,*) i, kapnu_Q(i), kapnu_U(i)
-c            read (*,*)
          endif
          eta_I(i) = kapnu_I(i)/(0.4343*kaplam(i))
          eta_Q(i) = kapnu_Q(i)/(0.4343*kaplam(i))
@@ -120,24 +118,7 @@ c         eta_U(i) = kapnu_U(i)/(0.4343*kaplam(i))
          zet_Q(i) = zetnu_Q(i)/(0.4343*kaplam(i))
 c         zet_U(i) = zetnu_U(i)/(0.4343*kaplam(i))
          zet_V(i) = zetnu_V(i)/(0.4343*kaplam(i))
-c         eta_I(i) = kapnu_I(i)/(kaplam(i))
-c         eta_Q(i) = kapnu_Q(i)/(kaplam(i))
-c         eta_U(i) = kapnu_U(i)/(kaplam(i))
-c         eta_V(i) = kapnu_V(i)/(kaplam(i))
-c         zet_Q(i) = zetnu_Q(i)/(kaplam(i))
-c         zet_U(i) = zetnu_U(i)/(kaplam(i))
-c         zet_V(i) = zetnu_V(i)/(kaplam(i))
-c         write (*,*) zet_Q(i), zet_V(i)
-c         read (*,*)
-c         write (nf11out,321) wave,tauref(i),t(i),eta_I(i),eta_Q(i)
-c     .         ,eta_V(i),zet_Q(i), zet_V(i)
-c         write (*,321) wave,tauref(i),t(i),eta_I(i),eta_Q(i),
-c     .          eta_V(i), zet_Q(i), zet_V(i)
-c     .          kapnu_V(i), kaplam(i), kapref(i)
       enddo      
-c      close(nf11out)
-c      write (*,*) "Taukap Done"
-c      read (*,*)
 
 c*****compute the optical depths                                            
 c      first = tauref(1)*kapnu(1)/kapref(1)

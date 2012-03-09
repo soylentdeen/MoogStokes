@@ -66,8 +66,12 @@ c*****calculate continuum quantities at the spectrum wavelength
       left = wave
       right = wave
       wavl = 0.
+      nf11out=11
+      nf12out=12
+      nf13out=13
       open(unit=nf11out, file=f11out)
       open(unit=nf12out, file=f12out)
+      open(unit=nf13out, file=f13out)
 30    if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave   
          call opacit (2,wave)    
@@ -96,73 +100,27 @@ c*****compute a spectrum depth at this point
       Stokes(3) = 0.0
       Stokes(4) = 0.0
       Stokes(5) = B
-      H_guess = 0.0001
-      H_min = 1.0e-2
-      EPS = 0.01
-      NOK = 0
-      NBAD = 0
       TOL = 1.0D-3
       ITOL = 0
       RTOL = TOL
-      ATOL = 0
-      IOUT = 1
+      ATOL = 1e-10
+      IOUT = 0
       do 21 i=1,LWORK
 21        work(i)=0.0
       do 23 i=1,LIWORK
 23        iwork(i)=0.0
-c      work(7) = -0.1
-c      write(*,*)NDGL,log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu))
-c      write (*,*) log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL
-c      write (*,*) ITOL, IOUT, rpar, ipar
+      write (nf12out,*) wave
+      write (nf13out,*) wave
       call DOP853(NDGL, derivs,
      .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
      .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
      .      Solout, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
-c      write (*,*) "Checkpoint F"
       d(n) = 1.0-Stokes(1)/Stokes(5)
+      write (nf11out,12345) wave,1.0-d(n),Stokes
+      write (nf12out,*) ' ' 
+      write (nf13out,*) ' '
       write (*,*) wave, 1.0-d(n),idid
       write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
-c      write (*,*) lwork, work
-c      write (*,*) liwork, iwork
-      if (idid .ne. 1) then
-c          read(*,*)
-c      endif
-c      if (1 .ne. 1) then
-c         open(nf3out)
-c         call dump_taus(d(n))
-         do 24 i=1,LWORK
-24          work(i)=0.0
-         do 25 i=1,LIWORK
-25          iwork(i)=0.0
-c         work(7) = -0.1
-c         work(5) = 0.05
-         Stokes(1) = B
-         Stokes(2) = 0.0
-         Stokes(3) = 0.0
-         Stokes(4) = 0.0
-         Stokes(5) = B
-         IOUT = 1
-         call DOP853(NDGL, derivs,
-     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
-     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
-     .      Solout, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
-         IOUT = 0
-         write (*,*) Stokes(1)/Stokes(5)
-         write (*,*) wave, idid
-         write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
-         read (*,*) 
-      endif
-      counter = counter +1
-c      read (*,*)
-c      write (nf11out,12345) wave,1.0-d(n),Stokes
-      if (1.0-d(n) .gt. 2.0) then
-         write (*,*) 'I am less than intelligent'
-         read (*,*)
-      endif
-c      write (*,*) wave,1.0-d(n), Stokes(1), Stokes(2), Stokes(3),
-c     .              Stokes(4), Stokes(5), NOK, NBAD
-c      write (*,*) wave,1.0-d(n), NOK, NBAD
-c      read (*,*)
       if (mod(n,10) .eq. 0) then
          if (iraf .eq. 1) then
             do j=1,10
@@ -248,6 +206,8 @@ c*****finish the synthesis
             write (nf1out,1114) wave
          endif
          close(nf11out)
+         close(nf12out)
+         close(nf13out)
          return 
       endif
 
@@ -277,7 +237,7 @@ c*****format statements
 1112  format (f10.7,': depths=',10f6.3)
 1113  format ('FINAL WAVELENGTH/FREQUENCY =',f10.7/)
 1114  format ('FINAL WAVELENGTH/FREQUENCY =',f10.3/)
-12345 format (f10.4,f10.7,5e10.3)
+12345 format (f10.4,f10.7,5e12.3)
 
       end                                
 
@@ -306,8 +266,8 @@ c*****format statements
       CALL LINTERPOLATE(ETA_V, 10.0**X, EV)
       CALL LINTERPOLATE(ZETA_Q, 10.0**X, ZQ)
       CALL LINTERPOLATE(ZETA_V, 10.0**X, ZV)
-      write (nf12out,322) X, EI, EQ, EV, ZQ, ZV
-c      write (nf12out,322) X, Y
+      write (nf12out,322) X, Y
+      write (nf13out,322) X, EI, EQ, EV, ZQ, ZV
 322   format (e11.3, 5e11.3)
       end 
 

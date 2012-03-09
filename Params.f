@@ -70,6 +70,7 @@ c                    to be used for some other purpose as needed`
       f10out =  'no_filename_given'
       f11out =  'no_filename_given'
       f12out =  'no_filename_given'
+      f13out =  'no_filename_given'
       nf1out =   0
       nf2out =   0
       nf3out =   0
@@ -82,6 +83,7 @@ c                    to be used for some other purpose as needed`
       nf10out =  0
       nf11out =  0
       nf12out =  0
+      nf13out =  0
       modelnum = 0
 
 
@@ -250,13 +252,17 @@ c  keyword 'hardpost_out' controls the name of a postscript plot output
       elseif (keyword .eq. 'hardpost_out') then
          read (array,*) f5out
 
-c  keyword 'opacity_out' controls the name of the output opacity file
+c  keyword 'stokes_out' controls the name of the output opacity file
       elseif (keyword .eq. 'stokes_out') then
          read (array,*) f11out
 
-c  keyword 'Atmosphere_trace_out' controls the name of atmosphere trace
-      elseif (keyword .eq. 'atm_trace_out') then
+c  keyword 'stokes_atm_out' controls the name of atmosphere trace
+      elseif (keyword .eq. 'stokes_atm_out') then
          read (array,*) f12out
+
+c  keyword 'stokes_opac_out' controls the name of atmosphere trace
+      elseif (keyword .eq. 'stokes_opac_out') then
+         read (array,*) f13out
 
 c  keyword 'speccomp_out' controls the name of a text file containing the
 c  comparisons (wavelength shifts, sigmas, etc.) between observed and
