@@ -15,6 +15,7 @@ c******************************************************************************
 
 c*****examine the parameter file
 1     call params
+      write (*,*) " This is a test.  This is only a test "
       linprintopt = linprintalt
 
 

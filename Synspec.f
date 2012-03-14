@@ -67,11 +67,11 @@ c*****calculate continuum quantities at the spectrum wavelength
       right = wave
       wavl = 0.
       nf11out=11
-      nf12out=12
-      nf13out=13
+c      nf12out=12
+c      nf13out=13
       open(unit=nf11out, file=f11out)
-      open(unit=nf12out, file=f12out)
-      open(unit=nf13out, file=f13out)
+c      open(unit=nf12out, file=f12out)
+c      open(unit=nf13out, file=f13out)
 30    if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave   
          call opacit (2,wave)    
@@ -100,25 +100,33 @@ c*****compute a spectrum depth at this point
       Stokes(3) = 0.0
       Stokes(4) = 0.0
       Stokes(5) = B
-      TOL = 1.0D-3
+      TOL = 1.0D-6
       ITOL = 0
       RTOL = TOL
       ATOL = 1e-10
-      IOUT = 1
+      IOUT = 0
       do 21 i=1,LWORK
 21        work(i)=0.0
       do 23 i=1,LIWORK
 23        iwork(i)=0.0
-      write (nf12out,*) wave
-      write (nf13out,*) wave
+c      write (nf12out,*) wave
+c      write (nf13out,*) wave
+c      call DOP853(NDGL, derivs,
+c     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
+c     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
+c     .      Solout, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
+c      call DOP853(NDGL, derivs,
+c     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
+c     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
+c     .      Junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
       call DOP853(NDGL, derivs,
-     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
-     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
-     .      Solout, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
+     .      tauref(ntau)*kaplam(ntau)/(kapref(ntau)), Stokes,
+     .      tauref(1)*kaplam(1)/(kapref(1)), RTOL, ATOL, ITOL,
+     .      Junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
       d(n) = 1.0-Stokes(1)/Stokes(5)
       write (nf11out,12345) wave,1.0-d(n),Stokes
-      write (nf12out,*) ' ' 
-      write (nf13out,*) ' '
+c      write (nf12out,*) ' ' 
+c      write (nf13out,*) ' '
       write (*,*) wave, 1.0-d(n),idid
       write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
       if (mod(n,10) .eq. 0) then
@@ -142,7 +150,7 @@ c*****compute a spectrum depth at this point
 
 c*****step in wavelength and try again 
       if (d(n).gt.0.05) then
-          stepsize = dopp(nstrong,50)*wave/2.997929e10
+          stepsize = dopp(nstrong,50)*wave/2.997929e10/5.0
 c            First step into a region with a line.  Need to reverse direction
           if (.not.prev_step) THEN
               direction = .FALSE.
@@ -163,7 +171,7 @@ c     .           /2.997929e10
           if (.not.direction) THEN
               direction = .TRUE.
               prev_step = .TRUE.
-              stepsize = stepsize/10.0
+              stepsize = stepsize/50.0
               wave = right
           ENDIF
 c          write (*,*) "continuum! - ", d(n), wave, wave*dopp(nstrong,20)
@@ -206,8 +214,8 @@ c*****finish the synthesis
             write (nf1out,1114) wave
          endif
          close(nf11out)
-         close(nf12out)
-         close(nf13out)
+c         close(nf12out)
+c         close(nf13out)
          return 
       endif
 
@@ -264,11 +272,11 @@ c*****format statements
       CALL LINTERPOLATE(ETA_I, 10.0**X, EI)
       CALL LINTERPOLATE(ETA_Q, 10.0**X, EQ)
       CALL LINTERPOLATE(ETA_V, 10.0**X, EV)
-      CALL LINTERPOLATE(ZETA_Q, 10.0**X, ZQ)
-      CALL LINTERPOLATE(ZETA_V, 10.0**X, ZV)
+      CALL LINTERPOLATE(ZET_Q, 10.0**X, ZQ)
+      CALL LINTERPOLATE(ZET_V, 10.0**X, ZV)
       write (nf12out,322) X, Y
       write (nf13out,322) X, EI, EQ, EV, ZQ, ZV
-322   format (e11.3, 5e11.3)
+322   format (e11.5, 5e13.5)
       end 
 
 

@@ -252,15 +252,15 @@ c  keyword 'hardpost_out' controls the name of a postscript plot output
       elseif (keyword .eq. 'hardpost_out') then
          read (array,*) f5out
 
-c  keyword 'stokes_out' controls the name of the output opacity file
+c  keyword 'stokes_out' controls the name of the emergent spectrum file
       elseif (keyword .eq. 'stokes_out') then
          read (array,*) f11out
 
-c  keyword 'stokes_atm_out' controls the name of atmosphere trace
+c  keyword 'stokes_atm_out' - trace of Stokes parameters thru atmosphere
       elseif (keyword .eq. 'stokes_atm_out') then
          read (array,*) f12out
 
-c  keyword 'stokes_opac_out' controls the name of atmosphere trace
+c  keyword 'stokes_opac_out' - trace of Polarized Opacities through atmosphere
       elseif (keyword .eq. 'stokes_opac_out') then
          read (array,*) f13out
 
@@ -696,6 +696,7 @@ c  if value is <= 0 then it does not do it
       
 c  any other keyword causes great grudge
       else
+         write (*,*) 'Error! Keyword not recognized!'
          write (array,1006) keyword
          call prinfo (5)
          stop
@@ -755,6 +756,7 @@ c  exit normally
       oldstop  = sstop
       oldstep  = step
       olddelta = delta
+      write (*,*) "This is only a test "
       return
 
 

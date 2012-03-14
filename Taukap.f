@@ -82,6 +82,7 @@ c               call complexVoigt(voigt_x,voigt_y,
 c     .                           new_voigt, new_fv)
                new_voigt = REAL(hui)/(1.772453851)
                new_fv = AIMAG(hui)/(1.772453851)
+c               write (*,*) i, old_voigt, new_voigt
                if (width(j) .eq. 0.0) then
                    kapnu_I(i) = kapnu_I(i)+ kapnu0(j,i)*new_voigt*
      .                 (sin(phi)**2.0)/2.0
@@ -118,6 +119,13 @@ c         eta_U(i) = kapnu_U(i)/(0.4343*kaplam(i))
          zet_Q(i) = zetnu_Q(i)/(0.4343*kaplam(i))
 c         zet_U(i) = zetnu_U(i)/(0.4343*kaplam(i))
          zet_V(i) = zetnu_V(i)/(0.4343*kaplam(i))
+c         eta_I(i) = kapnu_I(i)/(kaplam(i))!/(0.4343*kaplam(i))
+c         eta_Q(i) = kapnu_Q(i)/(kaplam(i))!/(0.4343*kaplam(i))
+cc         eta_U(i) = kapnu_U(i)/(0.4343*kaplam(i))
+c         eta_V(i) = kapnu_V(i)/(kaplam(i))!/(0.4343*kaplam(i))
+c         zet_Q(i) = zetnu_Q(i)/(kaplam(i))!/(0.4343*kaplam(i))
+cc         zet_U(i) = zetnu_U(i)/(0.4343*kaplam(i))
+c         zet_V(i) = zetnu_V(i)/(kaplam(i))!/(0.4343*kaplam(i))
       enddo      
 
 c*****compute the optical depths                                            

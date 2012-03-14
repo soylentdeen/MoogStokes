@@ -54,6 +54,7 @@ c*****invoke the overall starting routine
 
 c*****use one of the standard driver routines ("isotop" is obsolete):
       if (control .eq. 'gridsyn') then
+         write (*,*) " This is a test.  This is only a test "
          call gridsyn  
 c*****or, put in your own drivers in the form below....
       elseif (control .eq. 'mine  ') then
