@@ -150,7 +150,7 @@ c      write (nf13out,*) ' '
 
 c*****step in wavelength and try again 
       if (d(n).gt.0.05) then
-          stepsize = dopp(nstrong,50)*wave/2.997929e10/5.0
+          stepsize = dopp(nstrong,50)*wave/2.997929e10/10.0
 c            First step into a region with a line.  Need to reverse direction
           if (.not.prev_step) THEN
               direction = .FALSE.

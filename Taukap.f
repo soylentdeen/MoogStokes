@@ -40,8 +40,8 @@ c            old_voigt = voigt(a(j,i),v)
             hui = w4(Z)
 c            call complexVoigt(voigt_x,voigt_y,
 c     .                        new_voigt, new_fv)
-            new_voigt = REAL(hui)/(1.772453851)
-            new_fv = AIMAG(hui)/(1.772453851)
+            new_voigt = REAL(hui)!/(1.772453851)
+            new_fv = AIMAG(hui)!/(1.772453851)
             if (width(j) .eq. 0.0) then
                 kapnu_I(i) = kapnu_I(i) + kapnu0(j,i)*new_voigt*
      .             (sin(phi)**2.0)/2.0
@@ -67,21 +67,24 @@ c     .                        new_voigt, new_fv)
 c*****do the same for the strong lines
          if (dostrong .gt. 0) then
             do j=nlines+1,nlines+nstrong
-c               v = 2.997929d10*dabs(wave-wave1(j))/
-c     .             (wave1(j)*dopp(j,i)) 
-c               old_voigt = voigt(a(j,i),v)
+               v = 2.997929d10*dabs(wave-wave1(j))/
+     .             (wave1(j)*dopp(j,i)) 
+               old_voigt = voigt(a(j,i),v)
                gam_L = a(j,i)
                gam_D = dopp(j,i)/(2.997929d2*wave)
-               voigt_x = !sqrt(log(2.0))*
+               voigt_x = !log(2.0)*
      .                    dabs((1.0d8*(1./wave-1./wave1(j)))/
      .                    (gam_D))
-               voigt_y =(gam_L)!*sqrt(log(2.0))
+c               voigt_y =(gam_L)!*sqrt(log(2.0))
+               voigt_y =(gam_L)!*log(2.0)
                Z = cmplx(voigt_x, voigt_y)
                hui = w4(Z)
 c               call complexVoigt(voigt_x,voigt_y,
 c     .                           new_voigt, new_fv)
                new_voigt = REAL(hui)/(1.772453851)
                new_fv = AIMAG(hui)/(1.772453851)
+c               new_voigt = REAL(hui)/3.14159262
+c               new_fv = AIMAG(hui)/3.14159262
 c               write (*,*) i, old_voigt, new_voigt
                if (width(j) .eq. 0.0) then
                    kapnu_I(i) = kapnu_I(i)+ kapnu0(j,i)*new_voigt*
@@ -101,7 +104,7 @@ c     .                 (sin(phi)**2.0)*sin(2.0*zeta)/2.0
      .                 (sin(phi)**2.0)/4.0
 c                   kapnu_U(i) = kapnu_U(i)- kapnu0(j,i)*new_voigt*
 c     .                 (sin(phi)**2.0)*sin(2.0*zeta)/4.0
-                   kapnu_V(i) = kapnu_V(i)-kapnu0(j,i)*new_voigt*
+                   kapnu_V(i) = kapnu_V(i)+kapnu0(j,i)*new_voigt*
      .                 (cos(phi))/2.0*width(j)
                    zetnu_Q(i) = zetnu_Q(i) - kapnu0(j,i)*new_fv*
      .                 (sin(phi)**2.0)/4.0
@@ -112,20 +115,20 @@ c     .                 (sin(phi)**2.0)*sin(2.0*zeta)/4.0
                endif
             enddo
          endif
-         eta_I(i) = kapnu_I(i)/(0.4343*kaplam(i))
-         eta_Q(i) = kapnu_Q(i)/(0.4343*kaplam(i))
-c         eta_U(i) = kapnu_U(i)/(0.4343*kaplam(i))
-         eta_V(i) = kapnu_V(i)/(0.4343*kaplam(i))
-         zet_Q(i) = zetnu_Q(i)/(0.4343*kaplam(i))
-c         zet_U(i) = zetnu_U(i)/(0.4343*kaplam(i))
-         zet_V(i) = zetnu_V(i)/(0.4343*kaplam(i))
-c         eta_I(i) = kapnu_I(i)/(kaplam(i))!/(0.4343*kaplam(i))
-c         eta_Q(i) = kapnu_Q(i)/(kaplam(i))!/(0.4343*kaplam(i))
+c         eta_I(i) = kapnu_I(i)/(0.4343*kaplam(i))
+c         eta_Q(i) = kapnu_Q(i)/(0.4343*kaplam(i))
 cc         eta_U(i) = kapnu_U(i)/(0.4343*kaplam(i))
-c         eta_V(i) = kapnu_V(i)/(kaplam(i))!/(0.4343*kaplam(i))
-c         zet_Q(i) = zetnu_Q(i)/(kaplam(i))!/(0.4343*kaplam(i))
+c         eta_V(i) = kapnu_V(i)/(0.4343*kaplam(i))
+c         zet_Q(i) = zetnu_Q(i)/(0.4343*kaplam(i))
 cc         zet_U(i) = zetnu_U(i)/(0.4343*kaplam(i))
-c         zet_V(i) = zetnu_V(i)/(kaplam(i))!/(0.4343*kaplam(i))
+c         zet_V(i) = zetnu_V(i)/(0.4343*kaplam(i))
+         eta_I(i) = kapnu_I(i)/(kaplam(i))!/(0.4343*kaplam(i))
+         eta_Q(i) = kapnu_Q(i)/(kaplam(i))!/(0.4343*kaplam(i))
+c         eta_U(i) = kapnu_U(i)/(0.4343*kaplam(i))
+         eta_V(i) = kapnu_V(i)/(kaplam(i))!/(0.4343*kaplam(i))
+         zet_Q(i) = zetnu_Q(i)/(kaplam(i))!/(0.4343*kaplam(i))
+c         zet_U(i) = zetnu_U(i)/(0.4343*kaplam(i))
+         zet_V(i) = zetnu_V(i)/(kaplam(i))!/(0.4343*kaplam(i))
       enddo      
 
 c*****compute the optical depths                                            
