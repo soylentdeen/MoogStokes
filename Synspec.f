@@ -166,7 +166,7 @@ c          write (*,*) "line!  - ", d(n), wave, wave*dopp(nstrong,20)
 c     .           /2.997929e10
           wave = wave + factor*stepsize
       else
-          stepsize = dopp(nstrong, 50)*wave/2.997929e9
+          stepsize = dopp(nstrong, 50)*wave/2.997929e11
           prev_step = .FALSE.
           if (.not.direction) THEN
               direction = .TRUE.
@@ -245,7 +245,7 @@ c*****format statements
 1112  format (f10.7,': depths=',10f6.3)
 1113  format ('FINAL WAVELENGTH/FREQUENCY =',f10.7/)
 1114  format ('FINAL WAVELENGTH/FREQUENCY =',f10.3/)
-12345 format (f10.4,f10.7,5e12.3)
+12345 format (f10.4,f10.7,5e15.5)
 
       end                                
 

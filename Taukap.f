@@ -54,11 +54,11 @@ c     .                        new_voigt, new_fv)
      .             (1.0+cos(phi)**2.0)/4.0
                 kapnu_Q(i) = kapnu_Q(i) - kapnu0(j,i)*new_voigt*
      .             (sin(phi)**2.0)/4.0
-                kapnu_V(i) = kapnu_V(i) + kapnu0(j,i)*new_voigt*
+                kapnu_V(i) = kapnu_V(i) - kapnu0(j,i)*new_voigt*
      .             (cos(phi))/2.0*width(j)
                 zetnu_Q(i) = zetnu_Q(i) - kapnu0(j,i)*new_fv*
      .             (sin(phi)**2.0)/4.0
-                zetnu_V(i) = zetnu_V(i) + kapnu0(j,i)*new_fv*
+                zetnu_V(i) = zetnu_V(i) - kapnu0(j,i)*new_fv*
      .             (cos(phi))/2.0*width(j)
             endif
          enddo                                     
@@ -104,13 +104,13 @@ c     .                 (sin(phi)**2.0)*sin(2.0*zeta)/2.0
      .                 (sin(phi)**2.0)/4.0
 c                   kapnu_U(i) = kapnu_U(i)- kapnu0(j,i)*new_voigt*
 c     .                 (sin(phi)**2.0)*sin(2.0*zeta)/4.0
-                   kapnu_V(i) = kapnu_V(i)+kapnu0(j,i)*new_voigt*
+                   kapnu_V(i) = kapnu_V(i)-kapnu0(j,i)*new_voigt*
      .                 (cos(phi))/2.0*width(j)
                    zetnu_Q(i) = zetnu_Q(i) - kapnu0(j,i)*new_fv*
      .                 (sin(phi)**2.0)/4.0
 c                   zetnu_U(i) = zetnu_U(i) - kapnu0(j,i)*new_fv*
 c     .                 (sin(phi)**2.0)*sin(2.0*zeta)/4.0
-                   zetnu_V(i) = zetnu_V(i) + kapnu0(j,i)*new_fv*
+                   zetnu_V(i) = zetnu_V(i) - kapnu0(j,i)*new_fv*
      .                 (cos(phi))/2.0*width(j)
                endif
             enddo
@@ -122,13 +122,11 @@ c         eta_V(i) = kapnu_V(i)/(0.4343*kaplam(i))
 c         zet_Q(i) = zetnu_Q(i)/(0.4343*kaplam(i))
 cc         zet_U(i) = zetnu_U(i)/(0.4343*kaplam(i))
 c         zet_V(i) = zetnu_V(i)/(0.4343*kaplam(i))
-         eta_I(i) = kapnu_I(i)/(kaplam(i))!/(0.4343*kaplam(i))
-         eta_Q(i) = kapnu_Q(i)/(kaplam(i))!/(0.4343*kaplam(i))
-c         eta_U(i) = kapnu_U(i)/(0.4343*kaplam(i))
-         eta_V(i) = kapnu_V(i)/(kaplam(i))!/(0.4343*kaplam(i))
-         zet_Q(i) = zetnu_Q(i)/(kaplam(i))!/(0.4343*kaplam(i))
-c         zet_U(i) = zetnu_U(i)/(0.4343*kaplam(i))
-         zet_V(i) = zetnu_V(i)/(kaplam(i))!/(0.4343*kaplam(i))
+         eta_I(i) = kapnu_I(i)/(kaplam(i))
+         eta_Q(i) = kapnu_Q(i)/(kaplam(i))
+         eta_V(i) = kapnu_V(i)/(kaplam(i))
+         zet_Q(i) = zetnu_Q(i)/(kaplam(i))
+         zet_V(i) = zetnu_V(i)/(kaplam(i))
       enddo      
 
 c*****compute the optical depths                                            

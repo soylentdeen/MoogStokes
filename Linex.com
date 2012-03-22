@@ -14,7 +14,7 @@ c******************************************************************************
      .             dampnum(2500), gf1(2500), width(2500), 
      .             abundout(2500), widout(2500), strength(2500), 
      .             rdmass(2500), gambark(2500), alpbark(2500),
-     .             wid1comp(2500)
+     .             wid1comp(2500), phi_opacity(100, 3), psi_opacity(100,3)
       real*8       kapnu(100), taunu(100), cd(100), sline(100)
       real*8       eta_I(100), eta_Q(100), eta_V(100), eta_U(100)
       real*8       zet_Q(100), zet_V(100), zet_U(100)
@@ -36,7 +36,7 @@ c******************************************************************************
      .             dampnum, gf1, width, 
      .             abundout, widout, strength,
      .             rdmass, gambark, alpbark,
-     .             wid1comp,
+     .             wid1comp, phi_opacity, psi_opacity
      .             kapnu, taunu, cd, sline,
      .             eta_I, eta_Q, eta_V, eta_U,
      .             zet_Q, zet_V, zet_U,
