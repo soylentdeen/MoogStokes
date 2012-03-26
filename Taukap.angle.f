@@ -77,14 +77,18 @@ c         eta_Q(i) = kapnu_Q(i)/(kaplam(i))
 c         eta_V(i) = kapnu_V(i)/(kaplam(i))
 c         zet_Q(i) = zetnu_Q(i)/(kaplam(i))
 c         zet_V(i) = zetnu_V(i)/(kaplam(i))
-      enddo      
-      dtau = tau(i+1) - tau(i)
-      etau = 2.71828183**(-dtau)
+      enddo
+      do i=1,ntau-2
+         dtau = tau(i+1) - tau(i)
+         etau = 2.71828183**(-dtau)
 
-      alph = 1.0-etau
-      bet = (1.0-(1.0+dtau)*etau)/dtau
+         alph = 1.0-etau
+         bet = (1.0-(1.0+dtau)*etau)/dtau
+         call daxpy(16,(alph-bet),kappa(i),1,matX,1)
+         call daxpy(16,(alph-bet),kappa(i),1,matY,1)
+
+      enddo
          
-      call daxpy(16,(alph-bet),kappa(i),1,matX,1)
       matY = (etau*ones -bet*kappa(i+1)
 
 
