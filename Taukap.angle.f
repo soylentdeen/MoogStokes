@@ -16,6 +16,22 @@ c     .       zetnu_Q(100), zetnu_V(100), zetnu_U(100), sqrtpi, old_voigt
 c      complex Z, hui, w4
 
 c*****compute the total line opacity at each depth    
+      matX(1,1) = 1.0
+      matX(1,2) = 0.0
+      matX(1,3) = 0.0
+      matX(1,4) = 0.0
+      matX(2,1) = 0.0
+      matX(2,2) = 1.0
+      matX(2,3) = 0.0
+      matX(2,4) = 0.0
+      matX(3,1) = 0.0
+      matX(3,2) = 0.0
+      matX(3,3) = 1.0
+      matX(3,4) = 0.0
+      matX(4,1) = 0.0
+      matX(4,2) = 0.0
+      matX(4,3) = 0.0
+      matX(4,4) = 1.0
       
       do i=1,ntau
          phi_I=(phi_opacity(i,2)*sin(phi_angle)**2.0+
@@ -35,29 +51,42 @@ c*****compute the total line opacity at each depth
          kaptot = kaplam(i) + phi_I
          
          kappa(1,1,i)=0.0
-         kappa(1,2,i)=phi_Q/kaptot
-         kappa(1,3,i)=phi_U/kaptot
-         kappa(1,4,i)=phi_V/kaptot
          kappa(2,1,i)=phi_Q/kaptot
-         kappa(2,2,i)=0.0
-         kappa(2,3,i)=psi_V/kaptot
-         kappa(2,4,i)=(-1.0*psi_U)/kaptot
          kappa(3,1,i)=phi_U/kaptot
-         kappa(3,2,i)=(-1.0*psi_V)/kaptot
-         kappa(3,3,i)=0.0
-         kappa(3,4,i)=psi_Q/kaptot
          kappa(4,1,i)=phi_V/kaptot
-         kappa(4,2,i)=psi_U/kaptot
-         kappa(4,3,i)=(-1.0*psi_Q)/kaptot
+         kappa(1,2,i)=phi_Q/kaptot
+         kappa(2,2,i)=0.0
+         kappa(3,2,i)=psi_V/kaptot
+         kappa(4,2,i)=(-1.0*psi_U)/kaptot
+         kappa(1,3,i)=phi_U/kaptot
+         kappa(2,3,i)=(-1.0*psi_V)/kaptot
+         kappa(3,3,i)=0.0
+         kappa(4,3,i)=psi_Q/kaptot
+         kappa(1,4,i)=phi_V/kaptot
+         kappa(2,4,i)=psi_U/kaptot
+         kappa(3,4,i)=(-1.0*psi_Q)/kaptot
          kappa(4,4,i)=0.0
 
-         emission(1,1,i)=
-         eta_I(i) = kapnu_I(i)/(kaplam(i))
-         eta_Q(i) = kapnu_Q(i)/(kaplam(i))
-         eta_V(i) = kapnu_V(i)/(kaplam(i))
-         zet_Q(i) = zetnu_Q(i)/(kaplam(i))
-         zet_V(i) = zetnu_V(i)/(kaplam(i))
+         emission(1,i)=source(i)
+         emission(2,i)=source(i)*phi_Q/kaptot
+         emission(3,i)=source(i)*phi_U/kaptot
+         emission(4,i)=source(i)*phi_V/kaptot
+
+c         eta_I(i) = kapnu_I(i)/(kaplam(i))
+c         eta_Q(i) = kapnu_Q(i)/(kaplam(i))
+c         eta_V(i) = kapnu_V(i)/(kaplam(i))
+c         zet_Q(i) = zetnu_Q(i)/(kaplam(i))
+c         zet_V(i) = zetnu_V(i)/(kaplam(i))
       enddo      
+      dtau = tau(i+1) - tau(i)
+      etau = 2.71828183**(-dtau)
+
+      alph = 1.0-etau
+      bet = (1.0-(1.0+dtau)*etau)/dtau
+         
+      call daxpy(16,(alph-bet),kappa(i),1,matX,1)
+      matY = (etau*ones -bet*kappa(i+1)
+
 
       return                                              
 321   format (f11.3, e11.3, f11.1, 5e11.3)
