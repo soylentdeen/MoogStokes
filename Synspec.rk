@@ -12,24 +12,24 @@ c******************************************************************************
       include 'Dummy.com'
       real*8 dd(5000)
 c      real*8 Stokes(5)
-c      real*8 NOK, NBAD, H_MIN, H_GUESS, EPS, B
-c      real*8 factor, right
-c      PARAMETER (NDGL=5,NRD=0)
-c      PARAMETER (LWORK=11*NDGL+8*NRD+21, LIWORK=NRD+21)
+      real*8 NOK, NBAD, H_MIN, H_GUESS, EPS, B
+      real*8 factor, right
+      PARAMETER (NDGL=5,NRD=0)
+      PARAMETER (LWORK=11*NDGL+8*NRD+21, LIWORK=NRD+21)
 c      DIMENSION STOKES(NDGL),WORK(LWORK),IWORK(LIWORK)
-c      DIMENSION WORK(LWORK),IWORK(LIWORK)
-c      real*8 STOKES(NDGL), rpar, atol, rtol
+      DIMENSION WORK(LWORK),IWORK(LIWORK)
+      real*8 STOKES(NDGL), rpar, atol, rtol
 c      real*8 work(76), iwork(21)
 c      integer ipar(1), lwork, liwork
 c      real*8 rpar(1)
-c      integer ipar
+      integer ipar
       logical direction, prev_step
-c      EXTERNAL derivs, SOLOUT
+      EXTERNAL derivs, SOLOUT
 
-c      NEQS = 5
-c      RPAR=0.0
-c      ipar = 0
-c      counter = 0
+      NEQS = 5
+      RPAR=0.0
+      ipar = 0
+      counter = 0
 
 c*****initialize the synthesis
       direction = .TRUE.
@@ -93,13 +93,42 @@ c     in a new set if needed
 
 
 c*****compute a spectrum depth at this point
-      call calcopacities
-      call taukap(phi, psi, Stokes)
-c      d(n) = Stokes(1)
-      write (nf11out,12345) wave,Stokes
+      call taukap
+      call Planck(t(ntau), B)
+      Stokes(1) = B
+      Stokes(2) = 0.0
+      Stokes(3) = 0.0
+      Stokes(4) = 0.0
+      Stokes(5) = B
+      TOL = 1.0D-6
+      ITOL = 0
+      RTOL = TOL
+      ATOL = 1e-10
+      IOUT = 0
+      do 21 i=1,LWORK
+21        work(i)=0.0
+      do 23 i=1,LIWORK
+23        iwork(i)=0.0
+c      write (nf12out,*) wave
+c      write (nf13out,*) wave
+c      call DOP853(NDGL, derivs,
+c     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
+c     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
+c     .      Solout, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
+c      call DOP853(NDGL, derivs,
+c     .      log10(tauref(ntau)*kaplam(ntau)/(kapref(ntau)*mu)), Stokes,
+c     .      log10(tauref(1)*kaplam(1)/(kapref(1)*mu)), RTOL, ATOL, ITOL,
+c     .      Junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
+      call DOP853(NDGL, derivs,
+     .      tauref(ntau)*kaplam(ntau)/(kapref(ntau)), Stokes,
+     .      tauref(1)*kaplam(1)/(kapref(1)), RTOL, ATOL, ITOL,
+     .      Junk, IOUT, work, lwork, iwork, liwork, rpar, ipar, IDID)
+      d(n) = 1.0-Stokes(1)/Stokes(5)
+      write (nf11out,12345) wave,1.0-d(n),Stokes
 c      write (nf12out,*) ' ' 
 c      write (nf13out,*) ' '
       write (*,*) wave, 1.0-d(n),idid
+      write (*,*) iwork(17),iwork(18),iwork(19),iwork(20)
       if (mod(n,10) .eq. 0) then
          if (iraf .eq. 1) then
             do j=1,10
