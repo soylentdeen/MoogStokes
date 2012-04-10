@@ -11,27 +11,10 @@ c******************************************************************************
       include 'Pstuff.com'
       include 'Dummy.com'
       real*8 dd(5000)
-c      real*8 Stokes(5)
-c      real*8 NOK, NBAD, H_MIN, H_GUESS, EPS, B
-c      real*8 factor, right
-c      PARAMETER (NDGL=5,NRD=0)
-c      PARAMETER (LWORK=11*NDGL+8*NRD+21, LIWORK=NRD+21)
-c      DIMENSION STOKES(NDGL),WORK(LWORK),IWORK(LIWORK)
-c      DIMENSION WORK(LWORK),IWORK(LIWORK)
-c      real*8 STOKES(NDGL), rpar, atol, rtol
-c      real*8 work(76), iwork(21)
-c      integer ipar(1), lwork, liwork
-c      real*8 rpar(1)
-c      integer ipar
       real*8 phi, psi
       logical direction, prev_step
       real*8 Stokes(4)
-c      EXTERNAL derivs, SOLOUT
 
-c      NEQS = 5
-c      RPAR=0.0
-c      ipar = 0
-c      counter = 0
 
 c*****initialize the synthesis
       direction = .TRUE.
@@ -95,14 +78,13 @@ c     in a new set if needed
 
 
 c*****compute a spectrum depth at this point
+c
+c         Compute the opacities at this point
       call calcopacities
+c         Trace the Stokes parameters through the atmosphere
       call taukap(phi, psi, Stokes)
 c      d(n) = Stokes(1)
       write (nf11out,12345) wave,Stokes
-      write (*,*) wave,Stokes
-c      write (nf12out,*) ' ' 
-c      write (nf13out,*) ' '
-c      write (*,*) wave, 1.0-d(n),idid
       if (mod(n,10) .eq. 0) then
          if (iraf .eq. 1) then
             do j=1,10

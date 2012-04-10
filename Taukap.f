@@ -9,7 +9,7 @@ c******************************************************************************
       include 'Atmos.com'
       include 'Linex.com'
       include 'Dummy.com'
-      real*8 kappa(4, 4, 100), emission(4,100), kaptot, ones(4,4)
+      real*8 kappa(4, 4, 100), emission(4,100), kaptot(100), ones(4,4)
       real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V, dtau, etau
       real*8 matX(4,4), matY(4,4), matZ(4), old_I(4), matS1(4), matS2(4)
       real*8 alph, bet, gam, x, y, z, IPIV(4), INFO
@@ -33,60 +33,60 @@ c*****compute the total line opacity at each depth
       ones(4,3) = 0.0
       ones(4,4) = 1.0
       
+c*****   For each layer in the atmosphere, calculate each element of the
+c        opacity matrix and emission vector for the DELO algorithm
       do i=1,ntau
          phi_I=(phi_opacity(i,2)*sin(phi_angle)**2.0+
      .                (phi_opacity(i,1)+phi_opacity(i,3))*(1.0+
      .                cos(phi_angle)**2.0)/2.0)/2.0
-         phi_Q=(phi_opacity(i,2)-(phi_opacity(i,1)+phi_opacity(1,3))
+         phi_Q=(phi_opacity(i,2)-(phi_opacity(i,1)+phi_opacity(i,3))
      .                /2.0)*sin(phi_angle)**2.0*cos(2.0*chi_angle)/2.0
-         phi_U=(phi_opacity(i,2)-(phi_opacity(i,1)+phi_opacity(1,3))
+         phi_U=(phi_opacity(i,2)-(phi_opacity(i,1)+phi_opacity(i,3))
      .                /2.0)*sin(phi_angle)**2.0*sin(2.0*chi_angle)/2.0
          phi_V=(phi_opacity(i,1)-phi_opacity(i,3))*cos(phi_angle)/2.0
-         psi_Q=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(1,3))
+         psi_Q=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(i,3))
      .                /2.0)*sin(phi_angle)**2.0*cos(2.0*chi_angle)/2.0
-         psi_U=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(1,3))
+         psi_U=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(i,3))
      .                /2.0)*sin(phi_angle)**2.0*sin(2.0*chi_angle)/2.0
          psi_V=(psi_opacity(i,1)-psi_opacity(i,3))*cos(phi_angle)/2.0
 
-         kaptot = kaplam(i) + phi_I
+         kaptot(i) = kaplam(i) + phi_I
          
          kappa(1,1,i)=0.0
-         kappa(1,2,i)=phi_Q/kaptot
-         kappa(1,3,i)=phi_U/kaptot
-         kappa(1,4,i)=phi_V/kaptot
-         kappa(2,1,i)=phi_Q/kaptot
+         kappa(1,2,i)=phi_Q/kaptot(i)
+         kappa(1,3,i)=phi_U/kaptot(i)
+         kappa(1,4,i)=phi_V/kaptot(i)
+         kappa(2,1,i)=phi_Q/kaptot(i)
          kappa(2,2,i)=0.0
-         kappa(2,3,i)=psi_V/kaptot
-         kappa(2,4,i)=(-1.0*psi_U)/kaptot
-         kappa(3,1,i)=phi_U/kaptot
-         kappa(3,2,i)=(-1.0*psi_V)/kaptot
+         kappa(2,3,i)=psi_V/kaptot(i)
+         kappa(2,4,i)=(-1.0*psi_U)/kaptot(i)
+         kappa(3,1,i)=phi_U/kaptot(i)
+         kappa(3,2,i)=(-1.0*psi_V)/kaptot(i)
          kappa(3,3,i)=0.0
-         kappa(3,4,i)=psi_Q/kaptot
-         kappa(4,1,i)=phi_V/kaptot
-         kappa(4,2,i)=psi_U/kaptot
-         kappa(4,3,i)=(-1.0*psi_Q)/kaptot
+         kappa(3,4,i)=psi_Q/kaptot(i)
+         kappa(4,1,i)=phi_V/kaptot(i)
+         kappa(4,2,i)=psi_U/kaptot(i)
+         kappa(4,3,i)=(-1.0*psi_Q)/kaptot(i)
          kappa(4,4,i)=0.0
 
          source = Planck(t(i))
 
          emission(1,i)=source
-         emission(2,i)=source*phi_Q/kaptot
-         emission(3,i)=source*phi_U/kaptot
-         emission(4,i)=source*phi_V/kaptot
+         emission(2,i)=source*phi_Q/kaptot(i)
+         emission(3,i)=source*phi_U/kaptot(i)
+         emission(4,i)=source*phi_V/kaptot(i)
 
-c         eta_I(i) = kapnu_I(i)/(kaplam(i))
-c         eta_Q(i) = kapnu_Q(i)/(kaplam(i))
-c         eta_V(i) = kapnu_V(i)/(kaplam(i))
-c         zet_Q(i) = zetnu_Q(i)/(kaplam(i))
-c         zet_V(i) = zetnu_V(i)/(kaplam(i))
       enddo
+
+c*****  Trace the Stokes parameter through the atmosphere
+c             via the quadratic DELO algorithm
       old_I(1) = Planck(t(ntau))
       old_I(2) = 0.0
       old_I(3) = 0.0
       old_I(4) = 0.0
       do i=ntau-2,1,-1
-         dtau = (tauref(i+1)*kaplam(i+1)/kapref(i+1) -
-     .           tauref(i)*kaplam(i)/kapref(i))*cos(phi_angle)
+         dz = -(tauref(i+1)-tauref(i))/kapref(i)
+         dtau = -dz*kaptot(i)*cos(phi_angle)
          etau = 2.71828183**(-dtau)
 
          alph = 1.0-etau
@@ -95,23 +95,18 @@ c         zet_V(i) = zetnu_V(i)/(kaplam(i))
          call dcopy(16,ones, 1, matX, 1)
          call dcopy(16,ones, 1, matY, 1)
          call daxpy(16,dble(alph-bet),kappa(:,:,i),1,matX,1)
-c         call daxpy(16,(alph-bet),kappa((i-1)*16+1,i*16+1),1,matX,1)
          call dscal(16,etau, matY,1)
          call daxpy(16,dble(-1.0*bet),kappa(:,:,i+1),1,matY,1)
-c         call daxpy(16,(-1.0*bet),kappa(i*16+1,(i+1)*16+1),1,matY,1)
          
          x = 1 - etau
          y = dtau - x
          z = dtau**2.0 - 2 * y
-         dtau_i = (tauref(i+2)*kaplam(i+2)/kapref(i+2) - 
-     .             tauref(i+1)*kaplam(i+1)/kapref(i+1))*cos(phi_angle)
+         dz = -(tauref(i+2)-tauref(i))/kapref(i+1)
+         dtau_i = -dz*kaptot(i+1)*cos(phi_angle)
          alph = (z - dtau_i*y)/((dtau + dtau_i)*dtau)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
          gam = x+(z-(dtau + 2*dtau_i)*y)/(dtau_i*(dtau+dtau_i))
 
-c         call dcopy(4, emission((i-1)*4+1,i*4+1), 1, matS1, 1)
-c         call dcopy(4, emission(i*4+1,(i+1)*4+1), 1, matS2, 1)
-c         call dcopy(4, emission((i+1)*4+1,(i+2)*4+1), 1, matZ, 1)
          call dcopy(4, emission(:,i), 1, matS1, 1)
          call dcopy(4, emission(:,i+1), 1, matS2, 1)
          call dcopy(4, emission(:,i+2), 1, matZ, 1)
@@ -127,7 +122,6 @@ c     Calculate the right hand side of the equation.  Store in matZ
 c     Solve the system of differential equations.
          call dgesv(4,1,matX,4,IPIV, matZ,4,INFO)
 
-c         write (*,*) matZ
          call dcopy(4, matZ, 1, old_I, 1)
 
       enddo
