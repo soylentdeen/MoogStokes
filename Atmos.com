@@ -11,7 +11,7 @@ c******************************************************************************
      .             kaplamabs(100), kaplamsca(100),
      .             rho(100), rhox(100), xref(100), xdepth(100)
       real*8       elem(95), xabund(95), xabu(95), u(95,4,100)
-      real*8       flux, fudge, wavref,abscale,deltaabund,phi,mu,zeta
+      real*8       flux, fudge, wavref,abscale,deltaabund
       integer      ntau, jtau5, iunits, itru, iraf, modelnum
       integer      nfparam, nfmodel, nflines, nfslines, nfobs, nftable
       integer      nf1out, nf2out, nf3out, nf4out, nf5out, nf6out,
@@ -39,7 +39,7 @@ c******************************************************************************
      .             kaplamabs, kaplamsca,
      .             rho, rhox, xref, xdepth,
      .             elem, xabund, xabu, u,
-     .             flux, fudge, wavref,abscale,deltaabund,phi,mu,zeta,
+     .             flux, fudge, wavref, abscale, deltaabund,
      .             ntau, jtau5, iunits, itru, iraf, modelnum,
      .             nfparam, nfmodel, nflines, nfslines, nfobs, nftable,
      .             nf1out, nf2out, nf3out, nf4out, nf5out, nf6out,

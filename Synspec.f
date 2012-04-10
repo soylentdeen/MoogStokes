@@ -1,5 +1,5 @@
 
-      subroutine synspec
+      subroutine synspec (phi, psi)
 c******************************************************************************
 c     This routine does synthetic spectra                                
 c******************************************************************************
@@ -23,7 +23,9 @@ c      real*8 work(76), iwork(21)
 c      integer ipar(1), lwork, liwork
 c      real*8 rpar(1)
 c      integer ipar
+      real*8 phi, psi
       logical direction, prev_step
+      real*8 Stokes(4)
 c      EXTERNAL derivs, SOLOUT
 
 c      NEQS = 5
@@ -97,9 +99,10 @@ c*****compute a spectrum depth at this point
       call taukap(phi, psi, Stokes)
 c      d(n) = Stokes(1)
       write (nf11out,12345) wave,Stokes
+      write (*,*) wave,Stokes
 c      write (nf12out,*) ' ' 
 c      write (nf13out,*) ' '
-      write (*,*) wave, 1.0-d(n),idid
+c      write (*,*) wave, 1.0-d(n),idid
       if (mod(n,10) .eq. 0) then
          if (iraf .eq. 1) then
             do j=1,10
@@ -216,51 +219,51 @@ c*****format statements
 1112  format (f10.7,': depths=',10f6.3)
 1113  format ('FINAL WAVELENGTH/FREQUENCY =',f10.7/)
 1114  format ('FINAL WAVELENGTH/FREQUENCY =',f10.3/)
-12345 format (f10.4,f10.7,5e15.5)
+12345 format (f10.4,5e15.5)
 
       end                                
 
 
-      subroutine Planck(temperature, B)
-      
-      implicit real*8 (a-h,o-z)
-      include 'Atmos.com'
-      include 'Linex.com'
-      include 'Factor.com'
-      include 'Pstuff.com'
-      include 'Dummy.com'
-      B = ((1.19089d+25/wave**2)*1.0d+10)/(wave**3*
-     .      (dexp(1.43879d+08/(wave*temperature))-1.0d+00))
-      end
+c      subroutine Planck(temperature, B)
+c      
+c      implicit real*8 (a-h,o-z)
+c      include 'Atmos.com'
+c      include 'Linex.com'
+c      include 'Factor.com'
+c      include 'Pstuff.com'
+c      include 'Dummy.com'
+c      B = ((1.19089d+25/wave**2)*1.0d+10)/(wave**3*
+c     .      (dexp(1.43879d+08/(wave*temperature))-1.0d+00))
+c      end
+c
+c      subroutine Solout(NR,XOLD,X,Y,N,CON,ICOMP,ND,
+c     &                     RPAR,IPAR,IRTRN,XOUT)
+c      DIMENSION CON(8*ND),ICOMP(ND)
+c      real*8 X, EI, EQ, EV, ZQ, ZV
+c      real*8 Y(N)
+c      include 'Atmos.com'
+c      include 'Linex.com'
+c      CALL LINTERPOLATE(ETA_I, 10.0**X, EI)
+c      CALL LINTERPOLATE(ETA_Q, 10.0**X, EQ)
+c      CALL LINTERPOLATE(ETA_V, 10.0**X, EV)
+c      CALL LINTERPOLATE(ZET_Q, 10.0**X, ZQ)
+c      CALL LINTERPOLATE(ZET_V, 10.0**X, ZV)
+c      write (nf12out,322) X, Y
+c      write (nf13out,322) X, EI, EQ, EV, ZQ, ZV
+c322   format (e11.5, 5e13.5)
+c      end 
 
-      subroutine Solout(NR,XOLD,X,Y,N,CON,ICOMP,ND,
-     &                     RPAR,IPAR,IRTRN,XOUT)
-      DIMENSION CON(8*ND),ICOMP(ND)
-      real*8 X, EI, EQ, EV, ZQ, ZV
-      real*8 Y(N)
-      include 'Atmos.com'
-      include 'Linex.com'
-      CALL LINTERPOLATE(ETA_I, 10.0**X, EI)
-      CALL LINTERPOLATE(ETA_Q, 10.0**X, EQ)
-      CALL LINTERPOLATE(ETA_V, 10.0**X, EV)
-      CALL LINTERPOLATE(ZET_Q, 10.0**X, ZQ)
-      CALL LINTERPOLATE(ZET_V, 10.0**X, ZV)
-      write (nf12out,322) X, Y
-      write (nf13out,322) X, EI, EQ, EV, ZQ, ZV
-322   format (e11.5, 5e13.5)
-      end 
 
-
-      subroutine dump_taus(value)
-
-      implicit real*8 (a-h,o-z)
-      include 'Atmos.com'
-      include 'Linex.com'
-
-      do 56 i=1, ntau
-56      write (nf3out,321) tauref(i), eta_I(i),eta_Q(i),eta_V(i),
-     .        zet_Q(i),zet_V(i)
-      close(nf3out)
-
-321   format (f11.3, 5e11.3)
-      end
+c      subroutine dump_taus(value)
+c
+c      implicit real*8 (a-h,o-z)
+c      include 'Atmos.com'
+c      include 'Linex.com'
+c
+c      do 56 i=1, ntau
+c56      write (nf3out,321) tauref(i), eta_I(i),eta_Q(i),eta_V(i),
+c     .        zet_Q(i),zet_V(i)
+c      close(nf3out)
+c
+c321   format (f11.3, 5e11.3)
+c      end

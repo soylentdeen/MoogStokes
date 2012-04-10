@@ -135,9 +135,6 @@ c  source function with scat+abs          scatopt
       deviations   = 0
       scatopt      = 0
       gfstyle      = 0
-      mu           = 1.0
-      phi          = 0.0
-      zeta         = 0.0
  
 
 c  INITIALIZE SOME VARIABLES:
@@ -331,16 +328,16 @@ c  keyword 'observed_in' controls the name of the input observed spectrum
       elseif (keyword .eq. 'observed_in') then
          read (array,*) fobs
 
-      elseif (keyword .eq. 'mu') then
-         read (array,*) mu
-         phi = acos(mu)
+c      elseif (keyword .eq. 'mu') then
+c         read (array,*) mu
+c         phi = acos(mu)
 
-      elseif (keyword .eq. 'phi') then
-         read (array,*) phi
-         mu = cos(phi)
+c      elseif (keyword .eq. 'phi') then
+c         read (array,*) phi
+c         mu = cos(phi)
 
-      elseif (keyword .eq. 'zeta') then
-         read (array,*) zeta
+c      elseif (keyword .eq. 'zeta') then
+c         read (array,*) zeta
 
 c  keyword 'table_in' controls the name of the extra input instruction file
       elseif (keyword .eq. 'table_in   ') then

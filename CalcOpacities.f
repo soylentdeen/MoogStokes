@@ -17,12 +17,12 @@ c*****compute the total line opacity at each depth
       
       sqrtpi = 1.772453851
       do i=1,ntau     
-         phi_opacity(i,0) = 0.0
          phi_opacity(i,1) = 0.0
          phi_opacity(i,2) = 0.0
-         psi_opacity(i,0) = 0.0
+         phi_opacity(i,3) = 0.0
          psi_opacity(i,1) = 0.0
          psi_opacity(i,2) = 0.0
+         psi_opacity(i,3) = 0.0
          do j=lim1,lim2
             gam_L = a(j,i)
             gam_D = dopp(j,i)/(2.997929d2*wave)
@@ -32,10 +32,10 @@ c*****compute the total line opacity at each depth
             hui = w4(Z)
             voigt = REAL(hui)/sqrtpi
             faraday_voigt = AIMAG(hui)/sqrtpi
-            phi_opacity(i,deltaMJ(j)+2) = phi_opacity(i,deltaMJ(j)+2)+
-     .               kapnu0(j,i)*voigt
-            psi_opacity(i,deltaMJ(j)+2) = psi_opacity(i,deltaMJ(j)+2)+
-     .               kapnu0(j,i)*faraday_voigt
+            phi_opacity(i,int(deltaMJ(j)+2))=phi_opacity(i,
+     .               int(deltaMJ(j)+2))+ kapnu0(j,i)*voigt
+            psi_opacity(i,int(deltaMJ(j)+2)) = psi_opacity(i,
+     .               int(deltaMJ(j)+2))+ kapnu0(j,i)*faraday_voigt
          enddo                                     
 
                                                        
@@ -50,10 +50,10 @@ c*****do the same for the strong lines
                hui = w4(Z)
                voigt = REAL(hui)/sqrtpi
                faraday_voigt = AIMAG(hui)/sqrtpi
-               phi_opacity(i,deltaMJ(j)+2) =phi_opacity(i,deltaMJ(j)+2)+
-     .                  kapnu0(j,i)*voigt
-               psi_opacity(i,deltaMJ(j)+2) =psi_opacity(i,deltaMJ(j)+2)+
-     .                  kapnu0(j,i)*faraday_voigt
+               phi_opacity(i,int(deltaMJ(j)+2))=phi_opacity(i,
+     .                  int(deltaMJ(j)+2))+kapnu0(j,i)*voigt
+               psi_opacity(i,int(deltaMJ(j)+2))=psi_opacity(i,
+     .                  int(deltaMJ(j)+2))+kapnu0(j,i)*faraday_voigt
             enddo
          endif
       enddo      

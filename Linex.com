@@ -11,13 +11,12 @@ c******************************************************************************
       real*8       a(2500,100), dopp(2500,100), kapnu0(2500,100)
       real*8       gf(2500), wave1(2500), atom1(2500), e(2500,2),
      .             chi(2500,3), amass(2500), charge(2500), d0(2500),
-     .             dampnum(2500), gf1(2500), width(2500), 
+     .             dampnum(2500), gf1(2500), width(2500), deltamj(2500),
      .             abundout(2500), widout(2500), strength(2500), 
      .             rdmass(2500), gambark(2500), alpbark(2500),
-     .       wid1comp(2500), phi_opacity(100, 3), psi_opacity(100,3)
+     .             wid1comp(2500),
+     .             phi_opacity(100, 3), psi_opacity(100,3)
       real*8       kapnu(100), taunu(100), cd(100), sline(100)
-      real*8       eta_I(100), eta_Q(100), eta_V(100), eta_U(100)
-      real*8       zet_Q(100), zet_V(100), zet_U(100)
       real*8       d(5000), dellam(400), w(100),
      .             rwtab(3000), gftab(3000), gfhold
       real*8       delta, start, sstop, step,
@@ -33,13 +32,12 @@ c******************************************************************************
       common/linex/a, dopp, kapnu0,   
      .             gf, wave1, atom1, e,
      .             chi, amass, charge, d0,
-     .             dampnum, gf1, width, 
+     .             dampnum, gf1, width, deltamj,
      .             abundout, widout, strength,
      .             rdmass, gambark, alpbark,
-     .             wid1comp, phi_opacity, psi_opacity
+     .             wid1comp,
+     .             phi_opacity, psi_opacity,
      .             kapnu, taunu, cd, sline,
-     .             eta_I, eta_Q, eta_V, eta_U,
-     .             zet_Q, zet_V, zet_U,
      .             d, dellam, w,
      .             rwtab, gftab, gfhold,
      .             delta, start, sstop, step,   

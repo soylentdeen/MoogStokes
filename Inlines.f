@@ -13,7 +13,8 @@ c******************************************************************************
       include 'Quants.com'
       include 'Factor.com'
       real*8        swave1(400), satom1(400), se(400),sgf(400),
-     .              sdampnum(400),sd0(400),swidth(400), scharge(400)
+     .              sdampnum(400),sd0(400),swidth(400), scharge(400),
+     .              sdeltamj(400)
       integer n1, n2
       data n1,n2 /1,0/
 
@@ -82,10 +83,10 @@ c*****read in the strong lines if needed
          do j=1,401
             if (linfileopt .eq. 0) then
                read (nfslines,1002,end=340) swave1(j),satom1(j),se(j),
-     .                             sgf(j),sdampnum(j),sd0(j),swidth(j)
+     .                  sgf(j),sdampnum(j),sd0(j),swidth(j),sdeltamj(j)
             else
                read (nfslines,*,end=340) swave1(j),satom1(j),se(j),
-     .                             sgf(j),sdampnum(j),sd0(j),swidth(j)
+     .                  sgf(j),sdampnum(j),sd0(j),swidth(j),sdeltamj(j)
             endif
             nstrong = nstrong + 1
             iatom = satom1(j)
@@ -107,10 +108,10 @@ c*****read in the strong lines if needed
       j = 1
 333   if (linfileopt .eq. 0) then
          read (nflines,1002,end=311) wave1(j),atom1(j),e(j,1),gf(j),
-     .                             dampnum(j),d0(j),width(j)
+     .                   dampnum(j),d0(j),width(j),deltamj(j)
       else
          read (nflines,*,end=311) wave1(j),atom1(j),e(j,1),gf(j),
-     .                             dampnum(j),d0(j),width(j)
+     .                   dampnum(j),d0(j),width(j),deltamj(j)
       endif
       iatom = atom1(j)
       charge(j) = 1.0 + dble(int(10.0*(atom1(j) - iatom)+0.0001))
@@ -135,6 +136,7 @@ c*****append the strong lines here if necessary
             dampnum(nlines+k) = sdampnum(k)
             d0(nlines+k) = sd0(k)
             width(nlines+k) = swidth(k)
+            deltamj(nlines+k) = sdeltamj(k)
             charge(nlines+k) = scharge(k)
          enddo
       endif
@@ -273,7 +275,7 @@ c****prepare to get another chunk of line data
 
 c*****format statements
 1001  format (a80)
-1002  format (7e10.3)
+1002  format (8e10.3)
 1003  format ('INPUT STRONG LINE: LAMBDA = ', f10.3, ' AND ID = ',
      .        f6.1, ' CANNOT BE DONE!'/
      .        'NO TRIPLE OR GREATER IONS; I QUIT!')

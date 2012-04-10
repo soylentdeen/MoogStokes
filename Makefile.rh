@@ -19,7 +19,7 @@ OBJECTS = Batom.o Begin.o dop853.o \
         Rinteg.o Smooth.o Stats.o Sunder.o Synspec.o \
         Taukap.o Total.o Trudamp.o Ucalc.o Vargauss.o \
         Vmacro.o Voigt.o Wavecalc.o Weedout.o Writenumber.o \
-        complexVoigt.o Hui.o Derivs.o
+        complexVoigt.o Hui.o CalcOpacities.o
 
 
 COMMON =  Atmos.com Dummy.com Equivs.com Factor.com Kappa.com Linex.com \
@@ -33,6 +33,8 @@ FC = gfortran -Wall -g
 # the following lines point to some needed libraries
 X11LIB = /usr/X11R6/lib
 SMLIB = /opt/local/lib
+ATLASLIB = /usr/local/atlas/lib
+LAPACKLIB = /usr/lib64
 
 #        here are the compilation and linking commands
 all: MOOG ;
@@ -52,7 +54,7 @@ all: MOOG ;
 #	$(FC) $(OBJECTS) -o moog_complex -L$(X11LIB) -lX11 \
 #        -L$(SMLIB) -lplotsub -ldevices -lutils
 MOOG:  $(OBJECTS);
-	 $(FC) $(OBJECTS) -o moog_complex -L$(X11LIB) -lX11
+	 $(FC) $(OBJECTS) -o moog_complex -L$(X11LIB) -lX11 -L$(LAPACKLIB) -llapack -L$(ATLASLIB) -lf77blas -latlas
 
 $(OBJECTS): $(COMMON)
 

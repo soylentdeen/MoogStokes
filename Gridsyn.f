@@ -100,7 +100,8 @@ c*****do the syntheses
          call inlines (1)
          call eqlib
          call nearly (1)
-         call synspec
+         call synspec (dble(0.0), dble(0.0))
+c         call synspec (dble(0.7853), dble(0.7853))
       else
          do n=1,numatomsyn
             isynth = n
@@ -111,7 +112,8 @@ c*****do the syntheses
             call inlines (1)
             call eqlib
             call nearly (1)
-            call synspec
+            call synspec (dble(0.0), dble(0.0))
+c            call synspec (dble(0.7853), dble(0.7853))
             linprintopt = 0
          enddo
       endif
