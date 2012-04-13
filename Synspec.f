@@ -1,5 +1,5 @@
 
-      subroutine synspec (phi, psi)
+      subroutine synspec (phi_angle, psi_angle)
 c******************************************************************************
 c     This routine does synthetic spectra                                
 c******************************************************************************
@@ -11,7 +11,7 @@ c******************************************************************************
       include 'Pstuff.com'
       include 'Dummy.com'
       real*8 dd(5000)
-      real*8 phi, psi
+      real*8 phi_angle, psi_angle
       logical direction, prev_step
       real*8 Stokes(4)
 
@@ -82,7 +82,7 @@ c
 c         Compute the opacities at this point
       call calcopacities
 c         Trace the Stokes parameters through the atmosphere
-      call taukap(phi, psi, Stokes)
+      call taukap(phi_angle, psi_angle, Stokes)
 c      d(n) = Stokes(1)
       write (nf11out,12345) wave,Stokes
       if (mod(n,10) .eq. 0) then
