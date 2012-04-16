@@ -8,3 +8,5 @@ c     wavelength points at the locations of the spectral lines
 c*****************************************************************
 
       implicit real*8 (a-h,o-z)
+      include 'Atmos.com'
+      include 'Linex.com'

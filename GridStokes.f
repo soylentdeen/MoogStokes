@@ -65,7 +65,7 @@ c*****Read in the line list
       call inlines (1)
       call eqlib
       call nearly (1)
-      call genwave
+c      call genwave
       do i=1,nwave
          wave = wavelength(i)
          call calcopacities
@@ -81,16 +81,10 @@ c*****Read in the line list
             do k=1,ncells
                phi_angle = -3.14159262/2.0+(j-0.5)*dphi
                call delo(phi_angle, chi_angle, Stokes)
-               call appendStokes(phi_angle, chi_angle, Stokes)
+               call appendStokes(phi_angle, chi_angle, cell_a, Stokes)
             enddo
          enddo
       enddo
-
-
-
-
-
-
 
 
 c*****do the syntheses
