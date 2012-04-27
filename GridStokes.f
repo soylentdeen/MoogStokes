@@ -128,15 +128,15 @@ c*****Perform the Synthesis
 c            longitude = 0.0
 c            azimuth = 3.14159262/2.0
             call computeRotations
-            write (*,*) i, j
-            write (*,*) 'Long, Az :', longitude, azimuth, dphi
-            write (*,*) 'phi, chi, veiw :', phi_angle, chi_angle,
-     .                    viewing_angle
+c            write (*,*) i, j
+c            write (*,*) 'Long, Az :', longitude, azimuth, dphi
+c            write (*,*) 'phi, chi, veiw :', phi_angle, chi_angle,
+c     .                    viewing_angle
             call delo
-            write (*,*) Stokes
-            write (*,*) continuum
+c            write (*,*) Stokes(1)/continuum, Stokes(2)/continuum
+c            write (*,*) Stokes(3)/continuum, Stokes(4)/continuum
             call appendStokes(cell_a)
-            read (*,*)
+c            read (*,*)
 c            write (*,*) k
          enddo
 c         write (*,*) i, ncells, ring_area, cell_area
@@ -148,7 +148,7 @@ c         write (*,*) i, chi_start, chi_stop, chi_angle, dchi
       Stokes_V = Stokes_V/total_weight
 
       write (*,*) wave, Stokes_I, total_weight
-      stepsize = dopp(nstrong, 50)*wave/2.997929e11
+      stepsize = dopp(nstrong, 50)*wave/2.997929e10
       wave = wave + stepsize
       if (wave .le. sstop) then
           go to 30
@@ -222,6 +222,5 @@ c*****finish
       chi_angle = acos(B_xyz(3)/Bmag)
       phi_angle = atan(B_xyz(2)/B_xyz(1))
       viewing_angle = acos(-B_xyz(1))
-      write (*,*) B_xyz
       return
       end

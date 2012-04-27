@@ -13,7 +13,7 @@ c**********************************************************************
       include 'Angles.com'
       real*8 kappa(4,4,100), emission(4,100), kaptot(100), ones(4,4)
       real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V, dtau, etau
-      real*8 matX(4,4), matY(4,4), matZ(4), old_I(4), matS1(4), matS2(4)
+      real*8 matX(4,4), matY(4,4), matZ(4), matS1(4), matS2(4)
       real*8 alph, bet, gam, x, y, z, IPIV(4), INFO, dtau_i, dz
 
 c*****Sets up constants
@@ -137,12 +137,13 @@ c****     Now do the same thing for the continuum
          x = 1 - etau
          y = dtau - x
          z = dtau**2.0 - 2 * y
-         dz = -(tauref(i+2)-tauref(i+1))/kapref(i+1)
+         dz = -(tauref(i+2)-tauref(i))/kapref(i+1)
          dtau_i = -dz*kaplam(i+1)*cos(viewing_angle)
          alph = (z -dtau_i*y)/((dtau + dtau_i)*dtau)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
          gam = x+(z-(dtau + 2*dtau_i)*y)/(dtau_i*(dtau+dtau_i))
-         continuum=etau*continuum+alph*emission(1,i)+bet*emission(1,i+1)
+         continuum=etau*continuum+alph*emission(1,i)
+     .             +bet*emission(1,i+1)
      .             +gam*emission(1,i+2)
 
          call dcopy(4, matZ, 1, Stokes, 1)
