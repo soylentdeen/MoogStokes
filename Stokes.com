@@ -8,7 +8,11 @@ c     "kapnu0" are often over-written with plotting data,
 c     so leave them alone or suffer unspeakable programming tortures.
 c******************************************************************************
 
-      real*8       deltamj(2500), phi_opacity(100, 3), psi_opacity(100,3)
+      real*8       deltamj(2500),phi_opacity(100, 3),psi_opacity(100,3),
+     .             Stokes(4), continuum, wavelength, total_weight,
+     .             Stokes_I, Stokes_Q, Stokes_U, Stokes_V
 
-      common/linex/deltamj, phi_opacity, psi_opacity
+      common/stokesparams/deltamj, phi_opacity, psi_opacity,
+     .             Stokes, continuum, wavelength, total_weight,
+     .             Stokes_I, Stokes_Q, Stokes_U, Stokes_V
 

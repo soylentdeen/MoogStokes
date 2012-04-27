@@ -10,3 +10,4 @@ c*****************************************************************
       implicit real*8 (a-h,o-z)
       include 'Atmos.com'
       include 'Linex.com'
+      include 'Stokes.com'

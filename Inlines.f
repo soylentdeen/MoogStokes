@@ -12,6 +12,7 @@ c******************************************************************************
       include 'Pstuff.com'
       include 'Quants.com'
       include 'Factor.com'
+      include 'Stokes.com'
       real*8        swave1(400), satom1(400), se(400),sgf(400),
      .              sdampnum(400),sd0(400),swidth(400), scharge(400),
      .              sdeltamj(400)
@@ -178,13 +179,13 @@ c            go to 379
 
 c*****turn log(RW) values and EW values in mA into EW values in A.  Stuff
 c     duplicate EW values of the first line of a blend into all blend members.
-c379   do j=1,nlines+nstrong
-c         if (width(j) .lt. 0.) then
-c            width(j) = 10.**width(j)*wave1(j)
-c         else
-c            width(j) = width(j)/1000.
-c         endif
-c       enddo
+379   do j=1,nlines+nstrong
+         if (width(j) .lt. 0.) then
+            width(j) = 10.**width(j)*wave1(j)
+         else
+            width(j) = width(j)/1000.
+         endif
+       enddo
 
 
 c*****here some parameters for the lines are assigned or calculated; 

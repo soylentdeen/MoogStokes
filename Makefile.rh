@@ -19,15 +19,16 @@ OBJECTS = Batom.o Begin.o dop853.o \
         Rinteg.o Smooth.o Stats.o Sunder.o Synspec.o \
         Taukap.o Total.o Trudamp.o Ucalc.o Vargauss.o \
         Vmacro.o Voigt.o Wavecalc.o Weedout.o Writenumber.o \
-        complexVoigt.o Hui.o CalcOpacities.o
+        complexVoigt.o Hui.o CalcOpacities.o GridStokes.o \
+		AppendStokes.o Delo.o
 
 
 COMMON =  Atmos.com Dummy.com Equivs.com Factor.com Kappa.com Linex.com \
         Mol.com Multistar.com Obspars.com \
-        Quants.com Multimod.com Dampdat.com
+        Quants.com Multimod.com Dampdat.com Stokes.com Angles.com
 
 CC = cc
-FC = gfortran -Wall -g
+FC = gfortran -Wall -g -std=legacy
 #FC = f77 -Wall
 
 # the following lines point to some needed libraries

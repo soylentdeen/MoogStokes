@@ -15,7 +15,7 @@ c******************************************************************************
       integer system
       integer ntot_cells, nrings, ncells
       real*8 chi_start, chi_stop, dchi, cell_area, cell_a, ring_area
-      real*8 dphi, phi, chi_angle
+      real*8 dphi, phi_angle, chi_angle
 
 
 c*****examine the parameter file
@@ -133,8 +133,8 @@ c         call synspec (dble(0.7853), dble(-0.7853))
                   sstop = oldstop
                   mode = 3
                   call synspec (dble(phi_angle), dble(chi_angle))
-                  write (*,*) phi_angle*180.0/3.14159,chi_angle*180.0/3.14159
-c                  status = system('gnuplot gnuplot.commands')
+c                  write (*,*) phi_angle*180.0/3.14159,chi_angle*180.0/3.14159
+                  status = system('gnuplot gnuplot.commands')
                   linprintopt = 0
               enddo
             enddo

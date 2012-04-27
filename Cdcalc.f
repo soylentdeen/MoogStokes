@@ -8,11 +8,6 @@ c******************************************************************************
       implicit real*8 (a-h,o-z)
       include 'Atmos.com'
       include 'Linex.com'
-      real*8 prev_tau_I, prev_tau_Q, prev_tau_V, prev_tau_lam
-      real*8 StokesI, StokesQ, StokesV
-      real*8 exptau_I, exptau_Q, exptau_V
-      real*8 dTau_I, dTau_Q, dTau_V
-      real*8 dQ, dV, junk
 
 c*****continuum "contribution curve" calculation                           
       if (number .eq. 1) then

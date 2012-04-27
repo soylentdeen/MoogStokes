@@ -9,6 +9,7 @@ c******************************************************************************
       include 'Atmos.com'
       include 'Linex.com'
       include 'Dummy.com'
+      include 'Stokes.com'
       real*8 voigt, faraday_voigt, voigt_x, voigt_y, gam_L, gam_D,
      .       sqrtpi
       complex Z, hui, w4
@@ -32,10 +33,10 @@ c*****compute the total line opacity at each depth
             hui = w4(Z)
             voigt = REAL(hui)/sqrtpi
             faraday_voigt = AIMAG(hui)/sqrtpi
-            phi_opacity(i,int(deltaMJ(j)+2))=phi_opacity(i,
-     .               int(deltaMJ(j)+2))+ kapnu0(j,i)*voigt
-            psi_opacity(i,int(deltaMJ(j)+2)) = psi_opacity(i,
-     .               int(deltaMJ(j)+2))+ kapnu0(j,i)*faraday_voigt
+            phi_opacity(i,int(deltamj(j)+2))=phi_opacity(i,
+     .               int(deltamj(j)+2))+ kapnu0(j,i)*voigt
+            psi_opacity(i,int(deltamj(j)+2)) = psi_opacity(i,
+     .               int(deltamj(j)+2))+ kapnu0(j,i)*faraday_voigt
          enddo                                     
 
                                                        
@@ -50,17 +51,15 @@ c*****do the same for the strong lines
                hui = w4(Z)
                voigt = REAL(hui)/sqrtpi
                faraday_voigt = AIMAG(hui)/sqrtpi
-               phi_opacity(i,int(deltaMJ(j)+2))=phi_opacity(i,
-     .                  int(deltaMJ(j)+2))+kapnu0(j,i)*voigt
-               psi_opacity(i,int(deltaMJ(j)+2))=psi_opacity(i,
-     .                  int(deltaMJ(j)+2))+kapnu0(j,i)*faraday_voigt
+               phi_opacity(i,int(deltamj(j)+2))=phi_opacity(i,
+     .                  int(deltamj(j)+2))+kapnu0(j,i)*voigt
+               psi_opacity(i,int(deltamj(j)+2))=psi_opacity(i,
+     .                  int(deltamj(j)+2))+kapnu0(j,i)*faraday_voigt
             enddo
          endif
       enddo      
 
       return                                              
-321   format (f11.3, e11.3, f11.1, 5e11.3)
-c322   format (f11.3, 4e11.3)
       end                                                
 
 

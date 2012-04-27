@@ -82,9 +82,9 @@ c
 c         Compute the opacities at this point
       call calcopacities
 c         Trace the Stokes parameters through the atmosphere
-      call taukap(phi_angle, psi_angle, Stokes)
+      call taukap(phi_angle, psi_angle, Stokes, continuum)
 c      d(n) = Stokes(1)
-      write (nf11out,12345) wave,Stokes
+      write (nf11out,12345) wave,Stokes, continuum
       if (mod(n,10) .eq. 0) then
          if (iraf .eq. 1) then
             do j=1,10
