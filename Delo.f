@@ -15,6 +15,7 @@ c**********************************************************************
       real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V, dtau, etau
       real*8 matX(4,4), matY(4,4), matZ(4), matS1(4), matS2(4)
       real*8 alph, bet, gam, x, y, z, IPIV(4), INFO, dtau_i, dz
+      real*8 opmat(4,4), kapinv(4,4), WORK(4), LWORK
 
 c*****Sets up constants
 
@@ -87,12 +88,48 @@ c*****  Assembles the Emission matrix (J')
 c*****   Trace the Stokes parameters through the atmosphere
 c            via the quadratic DELO algorithm
 
-      Stokes(1) = source
+      opmat(1,1) = kaptot(ntau-2)
+      opmat(1,2) = kappa(1,2,ntau-2)*kaptot(ntau-2)
+      opmat(1,3) = kappa(1,3,ntau-2)*kaptot(ntau-2)
+      opmat(1,4) = kappa(1,4,ntau-2)*kaptot(ntau-2)
+      opmat(2,1) = kappa(2,1,ntau-2)*kaptot(ntau-2)
+      opmat(2,2) = kaptot(ntau-2)
+      opmat(2,3) = kappa(2,3,ntau-2)*kaptot(ntau-2)
+      opmat(2,4) = kappa(2,4,ntau-2)*kaptot(ntau-2)
+      opmat(3,1) = kappa(3,1,ntau-2)*kaptot(ntau-2)
+      opmat(3,2) = kappa(3,2,ntau-2)*kaptot(ntau-2)
+      opmat(3,3) = kaptot(ntau-2)
+      opmat(3,4) = kappa(3,4,ntau-2)*kaptot(ntau-2)
+      opmat(4,1) = kappa(4,1,ntau-2)*kaptot(ntau-2)
+      opmat(4,2) = kappa(4,2,ntau-2)*kaptot(ntau-2)
+      opmat(4,3) = kappa(4,3,ntau-2)*kaptot(ntau-2)
+      opmat(4,4) = kaptot(ntau-2)
+
+      call dcopy(16, ones, 1, kapinv, 1)
+
+      write (*,*) opmat
+      write (*,*) kapinv
+
+      CALL DGETRF(4,4,opmat,4,IPIV,INFO)
+
+      CALL DGETRI(4,opmat,4,IPIV,WORK,LWORK,INFO)
+      
+      write (*,*) opmat
+      write (*,*) kapinv
+      write (*,*) INFO
+      read (*,*)
+      Stokes(1) = 1.0
       Stokes(2) = 0.0
       Stokes(3) = 0.0
       Stokes(4) = 0.0
-      continuum = source
-      write (*,*) viewing_angle
+
+c      Stokes(1) = source
+      Stokes(1) = emission(1,ntau-2)
+      Stokes(2) = 0.0
+      Stokes(3) = 0.0
+      Stokes(4) = 0.0
+      continuum = Stokes(1)
+      write (*,*) Stokes(1), emission(1, ntau)
       do i=ntau-2,1,-1
          dz = -(tauref(i+1)-tauref(i))/kapref(i)
          dtau = -dz*kaptot(i)*cos(viewing_angle)
