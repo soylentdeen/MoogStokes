@@ -2,3 +2,5 @@
 *.gz
 *.tar
 moog_complex
+Makefile*
+MoogStokes
