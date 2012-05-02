@@ -55,7 +55,7 @@ all: MOOG ;
 #	$(FC) $(OBJECTS) -o moog_complex -L$(X11LIB) -lX11 \
 #        -L$(SMLIB) -lplotsub -ldevices -lutils
 MOOG:  $(OBJECTS);
-	 $(FC) $(OBJECTS) -o moog_complex -L$(X11LIB) -lX11 -L$(LAPACKLIB) -llapack -L$(ATLASLIB) -lf77blas -latlas
+	$(FC) $(OBJECTS) -o MoogStokes -L$(X11LIB) -lX11 -L$(LAPACKLIB) -llapack -L$(ATLASLIB) -lf77blas -latlas
 
 $(OBJECTS): $(COMMON)
 
