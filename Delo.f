@@ -92,6 +92,7 @@ c            via the quadratic DELO algorithm
       Stokes(3) = 0.0
       Stokes(4) = 0.0
       continuum = source
+      write (*,*) viewing_angle
       do i=ntau-2,1,-1
          dz = -(tauref(i+1)-tauref(i))/kapref(i)
          dtau = -dz*kaptot(i)*cos(viewing_angle)

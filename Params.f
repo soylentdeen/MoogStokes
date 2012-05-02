@@ -707,7 +707,8 @@ c  loop back to get another parameter
 
 c  wrap things up with a few assignments
 98    if (control .eq. 'gridsyn' .or. control .eq. 'gridplo' .or.
-     .    control .eq. 'binary ' .or. control .eq. 'abandy ') then
+     .    control .eq. 'binary ' .or. control .eq. 'abandy ' .or.
+     .    control .eq. 'gridsto') then
          control = 'gridend'
       endif
 

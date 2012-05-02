@@ -19,19 +19,18 @@ c*****************************************************************
           alpha = -0.507 + 0.441/wave
       endif
 
-      mu = cos(phi_angle)
-      phi_angle = phi_angle + 3.1415262/2.0
+      mu = cos(viewing_angle)
 
       limb_darkening = (1.0-(1.0-mu**alpha))
 
 c*****   Calculate the projected area
-      dotproduct = sin(phi_angle)*sin(chi_angle)**2.0
+      dotproduct = cos(viewing_angle)
+c      dotproduct = sin(phi_angle)*sin(chi_angle)**2.0
       
-      projected_area = cell_a*dotproduct/2.0*3.14159262
+      projected_area = cell_a*dotproduct/4.0*3.14159262
 
       weight = limb_darkening*projected_area
 
-      weight = 1.0
       Stokes_I = Stokes_I + Stokes(1)/continuum*weight
       Stokes_Q = Stokes_Q + Stokes(2)/continuum*weight
       Stokes_U = Stokes_U + Stokes(3)/continuum*weight

@@ -84,6 +84,7 @@ c*****open the line list file and the strong line list file
       B_xyz(3) = 0.0
 
       inclination = 3.1415926/2.0
+      open(unit=nf11out, file=f11out)
 
 c*****Read in the line list and calculate the equilibria
       call inlines (1)
@@ -114,47 +115,45 @@ c*****Perform the Synthesis
       nrings = 23
       ncells = 700
       cell_area = 4.0*3.14159262/ncells
-      do i=1,nrings
-         chi_start = (i-1)*3.14159262/nrings
-         chi_stop = i*3.14159262/nrings
-         azimuth = (chi_start + chi_stop)/2.0
-         dchi = -cos(chi_stop) + cos(chi_start)
-         ring_area = 3.14159262 * dchi ! total sterrad in semicircle
-         n_cells = nint(ring_area/cell_area) ! # of cells in ring
-         cell_a = ring_area/float(n_cells)
-         dphi = 3.14159262/n_cells
-         do j=1,n_cells
-            longitude = -3.14159262/2.0+(j-0.5)*dphi
-c            longitude = 0.0
-c            azimuth = 3.14159262/2.0
-            call computeRotations
-c            write (*,*) i, j
-c            write (*,*) 'Long, Az :', longitude, azimuth, dphi
-c            write (*,*) 'phi, chi, veiw :', phi_angle, chi_angle,
-c     .                    viewing_angle
-            call delo
-c            write (*,*) Stokes(1)/continuum, Stokes(2)/continuum
-c            write (*,*) Stokes(3)/continuum, Stokes(4)/continuum
-            call appendStokes(cell_a)
-c            read (*,*)
-c            write (*,*) k
-         enddo
-c         write (*,*) i, ncells, ring_area, cell_area
-c         write (*,*) i, chi_start, chi_stop, chi_angle, dchi
-      enddo
-      Stokes_I = Stokes_I/total_weight
-      Stokes_Q = Stokes_Q/total_weight
-      Stokes_U = Stokes_U/total_weight
-      Stokes_V = Stokes_V/total_weight
+c      do i=1,nrings
+c         chi_start = (i-1)*3.14159262/nrings
+c         chi_stop = i*3.14159262/nrings
+c         azimuth = (chi_start + chi_stop)/2.0
+c         dchi = -cos(chi_stop) + cos(chi_start)
+c         ring_area = 3.14159262 * dchi ! total sterrad in semicircle
+c         n_cells = nint(ring_area/cell_area) ! # of cells in ring
+c         cell_a = ring_area/float(n_cells)
+c         dphi = 3.14159262/n_cells
+c         do j=1,n_cells
+c            longitude = -3.14159262/2.0+(j-0.5)*dphi
+c            call computeRotations
+c            call delo
+c            call appendStokes(cell_a)
+c         enddo
+c      enddo
+      azimuth = 3.14159262/2.0
+      longitude = 0.0
+      call computeRotations
+c      write (*,*) phi_angle, chi_angle, viewing_angle
+      call delo
+c      Stokes_I = Stokes_I/total_weight
+c      Stokes_Q = Stokes_Q/total_weight
+c      Stokes_U = Stokes_U/total_weight
+c      Stokes_V = Stokes_V/total_weight
+      Stokes_I = Stokes(1)/continuum
+      Stokes_Q = Stokes(2)/continuum
+      Stokes_U = Stokes(3)/continuum
+      Stokes_V = Stokes(4)/continuum
 
-      write (*,*) wave, Stokes_I, total_weight
-      stepsize = dopp(nstrong, 50)*wave/2.997929e10
+c      write (*,*) wave, Stokes_I, Stokes_Q, Stokes_U, Stokes_V
+      write (nf11out,12345) wave, Stokes_I, Stokes_Q, Stokes_U, Stokes_V
+      stepsize = dopp(nstrong, 50)*wave/2.997929e10/2.0
       wave = wave + stepsize
       if (wave .le. sstop) then
           go to 30
       endif
 
-      control = 'gridend'
+c      control = 'gridend'
 
 
 c*****finish
@@ -164,8 +163,10 @@ c*****finish
       else
          call finish (0)
       endif
+      close(nf11out)
       return
 
+12345 format (f10.4,5e15.5)
       end 
 
 
@@ -219,8 +220,12 @@ c*****finish
      .           B_sph,3,dble(1.0),B_xyz,3)
 
       Bmag = sqrt(B_xyz(1)**2.0+B_xyz(2)**2.0+B_xyz(3)**2.0)
-      chi_angle = acos(B_xyz(3)/Bmag)
-      phi_angle = atan(B_xyz(2)/B_xyz(1))
+      phi_angle = acos(-B_xyz(1)/Bmag)
+      chi_angle = atan(B_xyz(2)/B_xyz(3))
+c      phi_angle = acos(B_xyz(3)/Bmag)
+c      chi_angle = atan(B_xyz(2)/B_xyz(1))
       viewing_angle = acos(-B_xyz(1))
+c      write (*,*) B_xyz, chi_angle, phi_angle, viewing_angle
+c      read (*,*)
       return
       end
