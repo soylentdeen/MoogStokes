@@ -14,8 +14,11 @@ c**********************************************************************
       real*8 kappa(4,4,100), emission(4,100), kaptot(100), ones(4,4)
       real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V, dtau, etau
       real*8 matX(4,4), matY(4,4), matZ(4), matS1(4), matS2(4)
-      real*8 alph, bet, gam, x, y, z, IPIV(4), INFO, dtau_i, dz
-      real*8 opmat(4,4), kapinv(4,4), WORK(4), LWORK
+      real*8 alph, bet, gam, x, y, z, dtau_i, dz
+      real*8 opmat(4,4), kapinv(4,4), dBdz
+      integer INFO, IPIV(4), LDA, LWORK
+      parameter (LDA=4, LWORK=64*LDA)
+      double precision WORK(LWORK)
 
 c*****Sets up constants
 
@@ -105,23 +108,17 @@ c            via the quadratic DELO algorithm
       opmat(4,3) = kappa(4,3,ntau-2)*kaptot(ntau-2)
       opmat(4,4) = kaptot(ntau-2)
 
-      call dcopy(16, ones, 1, kapinv, 1)
+c      CALL DGETRF(4,4,opmat,LDA,IPIV,INFO)
 
-      write (*,*) opmat
-      write (*,*) kapinv
+c      CALL DGETRI(4,opmat,LDA,IPIV,WORK,LWORK,INFO)
 
-      CALL DGETRF(4,4,opmat,4,IPIV,INFO)
-
-      CALL DGETRI(4,opmat,4,IPIV,WORK,LWORK,INFO)
+c      dBdz = -(emission(1,ntau)-emission(1,ntau-1))/
+c     .       (tauref(ntau)-tauref(ntau-1))/kapref(ntau)
       
-      write (*,*) opmat
-      write (*,*) kapinv
-      write (*,*) INFO
-      read (*,*)
-      Stokes(1) = 1.0
-      Stokes(2) = 0.0
-      Stokes(3) = 0.0
-      Stokes(4) = 0.0
+c      Stokes(1) = emission(1,ntau)*(1.0-opmat(1,1)*dBdZ)
+c      Stokes(2) = -dBdZ*opmat(2,1)
+c      Stokes(3) = -dBdZ*opmat(3,1)
+c      Stokes(4) = -dBdZ*opmat(4,1)
 
 c      Stokes(1) = source
       Stokes(1) = emission(1,ntau-2)
@@ -129,7 +126,7 @@ c      Stokes(1) = source
       Stokes(3) = 0.0
       Stokes(4) = 0.0
       continuum = Stokes(1)
-      write (*,*) Stokes(1), emission(1, ntau)
+c      write (*,*) Stokes(1), emission(1, ntau)
       do i=ntau-2,1,-1
          dz = -(tauref(i+1)-tauref(i))/kapref(i)
          dtau = -dz*kaptot(i)*cos(viewing_angle)
@@ -188,7 +185,7 @@ c****     Now do the same thing for the continuum
     
       enddo
 
-c      write (*,*) continuum, Stokes
+      write (*,*) continuum, Stokes
 
       return
       end
