@@ -121,7 +121,7 @@ c      Stokes(3) = -dBdZ*opmat(3,1)
 c      Stokes(4) = -dBdZ*opmat(4,1)
 
 c      Stokes(1) = source
-      Stokes(1) = emission(1,ntau-2)
+      Stokes(1) = emission(1,ntau-1)
       Stokes(2) = 0.0
       Stokes(3) = 0.0
       Stokes(4) = 0.0
