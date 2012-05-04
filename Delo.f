@@ -144,7 +144,7 @@ c      write (*,*) Stokes(1), emission(1, ntau)
          x = 1 - etau
          y = dtau - x
          z = dtau**2.0 - 2 * y
-         dz = -(tauref(i+2)-tauref(i))/kapref(i+1)
+         dz = -(tauref(i+2)-tauref(i+1))/kapref(i+1)
          dtau_i = -dz*kaptot(i+1)*cos(viewing_angle)
          alph = (z -dtau_i*y)/((dtau + dtau_i)*dtau)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
@@ -172,7 +172,7 @@ c****     Now do the same thing for the continuum
          x = 1 - etau
          y = dtau - x
          z = dtau**2.0 - 2 * y
-         dz = -(tauref(i+2)-tauref(i))/kapref(i+1)
+         dz = -(tauref(i+2)-tauref(i+1))/kapref(i+1)
          dtau_i = -dz*kaplam(i+1)*cos(viewing_angle)
          alph = (z -dtau_i*y)/((dtau + dtau_i)*dtau)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
