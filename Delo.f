@@ -91,22 +91,22 @@ c*****  Assembles the Emission matrix (J')
 c*****   Trace the Stokes parameters through the atmosphere
 c            via the quadratic DELO algorithm
 
-      opmat(1,1) = kaptot(ntau-2)
-      opmat(1,2) = kappa(1,2,ntau-2)*kaptot(ntau-2)
-      opmat(1,3) = kappa(1,3,ntau-2)*kaptot(ntau-2)
-      opmat(1,4) = kappa(1,4,ntau-2)*kaptot(ntau-2)
-      opmat(2,1) = kappa(2,1,ntau-2)*kaptot(ntau-2)
-      opmat(2,2) = kaptot(ntau-2)
-      opmat(2,3) = kappa(2,3,ntau-2)*kaptot(ntau-2)
-      opmat(2,4) = kappa(2,4,ntau-2)*kaptot(ntau-2)
-      opmat(3,1) = kappa(3,1,ntau-2)*kaptot(ntau-2)
-      opmat(3,2) = kappa(3,2,ntau-2)*kaptot(ntau-2)
-      opmat(3,3) = kaptot(ntau-2)
-      opmat(3,4) = kappa(3,4,ntau-2)*kaptot(ntau-2)
-      opmat(4,1) = kappa(4,1,ntau-2)*kaptot(ntau-2)
-      opmat(4,2) = kappa(4,2,ntau-2)*kaptot(ntau-2)
-      opmat(4,3) = kappa(4,3,ntau-2)*kaptot(ntau-2)
-      opmat(4,4) = kaptot(ntau-2)
+c      opmat(1,1) = kaptot(ntau-2)
+c      opmat(1,2) = kappa(1,2,ntau-2)*kaptot(ntau-2)
+c      opmat(1,3) = kappa(1,3,ntau-2)*kaptot(ntau-2)
+c      opmat(1,4) = kappa(1,4,ntau-2)*kaptot(ntau-2)
+c      opmat(2,1) = kappa(2,1,ntau-2)*kaptot(ntau-2)
+c      opmat(2,2) = kaptot(ntau-2)
+c      opmat(2,3) = kappa(2,3,ntau-2)*kaptot(ntau-2)
+c      opmat(2,4) = kappa(2,4,ntau-2)*kaptot(ntau-2)
+c      opmat(3,1) = kappa(3,1,ntau-2)*kaptot(ntau-2)
+c      opmat(3,2) = kappa(3,2,ntau-2)*kaptot(ntau-2)
+c      opmat(3,3) = kaptot(ntau-2)
+c      opmat(3,4) = kappa(3,4,ntau-2)*kaptot(ntau-2)
+c      opmat(4,1) = kappa(4,1,ntau-2)*kaptot(ntau-2)
+c      opmat(4,2) = kappa(4,2,ntau-2)*kaptot(ntau-2)
+c      opmat(4,3) = kappa(4,3,ntau-2)*kaptot(ntau-2)
+c      opmat(4,4) = kaptot(ntau-2)
 
 c      CALL DGETRF(4,4,opmat,LDA,IPIV,INFO)
 
@@ -121,15 +121,47 @@ c      Stokes(3) = -dBdZ*opmat(3,1)
 c      Stokes(4) = -dBdZ*opmat(4,1)
 
 c      Stokes(1) = source
-      Stokes(1) = emission(1,ntau-1)
+      Stokes(1) = emission(1,ntau)
       Stokes(2) = 0.0
       Stokes(3) = 0.0
       Stokes(4) = 0.0
       continuum = Stokes(1)
 c      write (*,*) Stokes(1), emission(1, ntau)
-      do i=ntau-2,1,-1
-         dz = -(tauref(i+1)-tauref(i))/kapref(i)
-         dtau = -dz*kaptot(i)*cos(viewing_angle)
+      call dcopy(16, kappa(:,:,ntau), 1, kappa_interp(:,:,1), 1)
+      call linterp_kappa(log10(ntau), kappa_interp(:,:,1))
+      call linterp_kappa(log10(ntau)-0.05, kappa_interp(:,:,2))
+      order(1) = 1
+      order(2) = 2
+      order(3) = 3
+      do logtau=log10(tauref(ntau)), log10(tauref(1))+0.05, -0.05
+         call calc_matricies(logtau-0.05, kappa_interp, order, matX,
+     .                matY, alph, bet, gam, etau)
+
+c****      calculate the RHS of the equation.  Store in matZ
+         call dgemv('N',4,4,dble(1.0),matY,4,Stokes,1,dble(1.0),matZ,1)
+
+c****      Solve the system of differential equations
+         call dgesv(4,1,matX,4,IPIV,matZ,4,INFO)
+
+         call dcopy(4, matZ, 1, Stokes, 1)
+
+         continuum=etau*continuum+alph+bet+gam
+      enddo
+
+      return
+      end
+
+      subroutine calc_matrices(logtau, kappas, order, matX, matY,
+     .             alph, bet, gam, etau)
+
+      return
+      end
+
+      subroutine linterp_kappa(logtau, kappas, order
+
+      do i=ntau-1,2,-1
+         dz = (tauref(i+1)-tauref(i))/kapref(i)
+         dtau = dz*kaptot(i)*cos(viewing_angle)
          etau = 2.71828183**(-dtau)
 
          alph = 1.0-etau
@@ -141,18 +173,18 @@ c      write (*,*) Stokes(1), emission(1, ntau)
          call dscal(16,etau, matY,1)
          call daxpy(16,dble(-1.0*bet),kappa(:,:,i+1),1,matY,1)
 
-         x = 1 - etau
+         x = 1.0 - etau
          y = dtau - x
          z = dtau**2.0 - 2 * y
-         dz = -(tauref(i+2)-tauref(i+1))/kapref(i+1)
-         dtau_i = -dz*kaptot(i+1)*cos(viewing_angle)
-         alph = (z -dtau_i*y)/((dtau + dtau_i)*dtau)
+         dz = (tauref(i)-tauref(i-1))/kapref(i-1)
+         dtau_i = dz*kaptot(i-1)*cos(viewing_angle)
+         alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
-         gam = x+(z-(dtau + 2*dtau_i)*y)/(dtau_i*(dtau+dtau_i))
+         gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
 
-         call dcopy(4, emission(:,i), 1, matS1, 1)
-         call dcopy(4, emission(:,i+1), 1, matS2, 1)
-         call dcopy(4, emission(:,i+2), 1, matZ, 1)
+         call dcopy(4, emission(:,i-1), 1, matS1, 1)
+         call dcopy(4, emission(:,i), 1, matS2, 1)
+         call dcopy(4, emission(:,i+1), 1, matZ, 1)
          call dscal(4, alph, matS1, 1)
          call dscal(4, bet, matS2, 1)
          call dscal(4, gam, matZ, 1)
@@ -166,20 +198,20 @@ c****     Solve the system of differential equations.
          call dgesv(4,1,matX,4,IPIV, matZ,4,INFO)
 
 c****     Now do the same thing for the continuum
-         dz = -(tauref(i+1)-tauref(i))/kapref(i)
-         dtau = -dz*kaplam(i)*cos(viewing_angle)
+         dz = (tauref(i+1)-tauref(i))/kapref(i)
+         dtau = dz*kaplam(i)*cos(viewing_angle)
          etau = 2.71828183**(-dtau)
-         x = 1 - etau
+         x = 1.0 - etau
          y = dtau - x
          z = dtau**2.0 - 2 * y
-         dz = -(tauref(i+2)-tauref(i+1))/kapref(i+1)
-         dtau_i = -dz*kaplam(i+1)*cos(viewing_angle)
-         alph = (z -dtau_i*y)/((dtau + dtau_i)*dtau)
+         dz = (tauref(i)-tauref(i-1))/kapref(i-1)
+         dtau_i = dz*kaplam(i-1)*cos(viewing_angle)
+         alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
-         gam = x+(z-(dtau + 2*dtau_i)*y)/(dtau_i*(dtau+dtau_i))
-         continuum=etau*continuum+alph*emission(1,i)
-     .             +bet*emission(1,i+1)
-     .             +gam*emission(1,i+2)
+         gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
+         continuum=etau*continuum+alph*emission(1,i-1)
+     .             +bet*emission(1,i)
+     .             +gam*emission(1,i+1)
 
          call dcopy(4, matZ, 1, Stokes, 1)
     
