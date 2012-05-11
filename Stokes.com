@@ -10,9 +10,11 @@ c******************************************************************************
 
       real*8       deltamj(2500),phi_opacity(100, 3),psi_opacity(100,3),
      .             Stokes(4), continuum, wavelength, total_weight,
-     .             Stokes_I, Stokes_Q, Stokes_U, Stokes_V
+     .             Stokes_I, Stokes_Q, Stokes_U, Stokes_V,
+     .             kappa(4,4,100), emission(4,100), kaptot(100)
 
       common/stokesparams/deltamj, phi_opacity, psi_opacity,
      .             Stokes, continuum, wavelength, total_weight,
-     .             Stokes_I, Stokes_Q, Stokes_U, Stokes_V
+     .             Stokes_I, Stokes_Q, Stokes_U, Stokes_V,
+     .             kappa, emission, kaptot
 

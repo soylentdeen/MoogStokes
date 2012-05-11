@@ -11,11 +11,12 @@ c**********************************************************************
       include 'Dummy.com'
       include 'Stokes.com'
       include 'Angles.com'
-      real*8 kappa(4,4,100), emission(4,100), kaptot(100), ones(4,4)
-      real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V, dtau, etau
-      real*8 matX(4,4), matY(4,4), matZ(4), matS1(4), matS2(4)
-      real*8 alph, bet, gam, x, y, z, dtau_i, dz
-      real*8 opmat(4,4), kapinv(4,4), dBdz
+      real*8 matX(4,4), matY(4,4), ones(4,4), matZ(4)
+      real*8 emiss_interp(4,3), kappa_interp(4,4,2)
+      real*8 tau_interp(3), tau_interp_c(3), logtau
+      real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V
+      real*8 matS1(4), matS2(4)
+      integer emiss_order(3), kappa_order(2)
       integer INFO, IPIV(4), LDA, LWORK
       parameter (LDA=4, LWORK=64*LDA)
       double precision WORK(LWORK)
@@ -91,51 +92,64 @@ c*****  Assembles the Emission matrix (J')
 c*****   Trace the Stokes parameters through the atmosphere
 c            via the quadratic DELO algorithm
 
-c      opmat(1,1) = kaptot(ntau-2)
-c      opmat(1,2) = kappa(1,2,ntau-2)*kaptot(ntau-2)
-c      opmat(1,3) = kappa(1,3,ntau-2)*kaptot(ntau-2)
-c      opmat(1,4) = kappa(1,4,ntau-2)*kaptot(ntau-2)
-c      opmat(2,1) = kappa(2,1,ntau-2)*kaptot(ntau-2)
-c      opmat(2,2) = kaptot(ntau-2)
-c      opmat(2,3) = kappa(2,3,ntau-2)*kaptot(ntau-2)
-c      opmat(2,4) = kappa(2,4,ntau-2)*kaptot(ntau-2)
-c      opmat(3,1) = kappa(3,1,ntau-2)*kaptot(ntau-2)
-c      opmat(3,2) = kappa(3,2,ntau-2)*kaptot(ntau-2)
-c      opmat(3,3) = kaptot(ntau-2)
-c      opmat(3,4) = kappa(3,4,ntau-2)*kaptot(ntau-2)
-c      opmat(4,1) = kappa(4,1,ntau-2)*kaptot(ntau-2)
-c      opmat(4,2) = kappa(4,2,ntau-2)*kaptot(ntau-2)
-c      opmat(4,3) = kappa(4,3,ntau-2)*kaptot(ntau-2)
-c      opmat(4,4) = kaptot(ntau-2)
-
-c      CALL DGETRF(4,4,opmat,LDA,IPIV,INFO)
-
-c      CALL DGETRI(4,opmat,LDA,IPIV,WORK,LWORK,INFO)
-
-c      dBdz = -(emission(1,ntau)-emission(1,ntau-1))/
-c     .       (tauref(ntau)-tauref(ntau-1))/kapref(ntau)
-      
-c      Stokes(1) = emission(1,ntau)*(1.0-opmat(1,1)*dBdZ)
-c      Stokes(2) = -dBdZ*opmat(2,1)
-c      Stokes(3) = -dBdZ*opmat(3,1)
-c      Stokes(4) = -dBdZ*opmat(4,1)
-
-c      Stokes(1) = source
       Stokes(1) = emission(1,ntau)
       Stokes(2) = 0.0
       Stokes(3) = 0.0
       Stokes(4) = 0.0
       continuum = Stokes(1)
+
+      delta_tau = -0.05
 c      write (*,*) Stokes(1), emission(1, ntau)
-      call dcopy(16, kappa(:,:,ntau), 1, kappa_interp(:,:,1), 1)
-      call linterp_kappa(log10(ntau), kappa_interp(:,:,1))
-      call linterp_kappa(log10(ntau)-0.05, kappa_interp(:,:,2))
-      order(1) = 1
-      order(2) = 2
-      order(3) = 3
-      do logtau=log10(tauref(ntau)), log10(tauref(1))+0.05, -0.05
-         call calc_matricies(logtau-0.05, kappa_interp, order, matX,
-     .                matY, alph, bet, gam, etau)
+      call dcopy(4, emission(:,ntau), 1, emiss_interp(:,1), 1)
+      tau_interp(1) = tauref(ntau)*kaptot(ntau)/kapref(ntau)
+      tau_interp_c(1) = tauref(ntau)*kaplam(ntau)/kapref(ntau)
+
+c      write (*,*) emiss_interp
+      call interp_opacities(log10(tauref(ntau)),delta_tau,kappa_interp,
+     .        1, emiss_interp, 2, tau_interp, tau_interp_c)
+      kappa_order(1) = 1
+      kappa_order(2) = 2
+      emiss_order(1) = 1
+      emiss_order(2) = 2
+      emiss_order(3) = 3
+      do logtau=log10(tauref(ntau)+delta_tau),
+     .              log10(tauref(1))-delta_tau,delta_tau
+         call interp_opacities(logtau, delta_tau, kappa_interp,
+     .        kappa_order(2), emiss_interp, emiss_order(3), tau_interp,
+     .        tau_interp_c)
+         
+         dtau = (tau_interp(emiss_order(1))-tau_interp(emiss_order(2)))
+     .              *cos(viewing_angle)
+         etau = 2.71828183**(-dtau)
+
+         alph = 1.0-etau
+         bet =(1.0-(1.0+dtau)*etau)/dtau
+
+         call dcopy(16,ones, 1, matX, 1)
+         call dcopy(16,ones, 1, matY, 1)
+         call daxpy(16,dble(alph-bet),kappa_interp(:,:,kappa_order(2)),
+     .              1,matX,1)
+         call dscal(16,etau, matY,1)
+         call daxpy(16,dble(-1.0*bet),kappa_interp(:,:,kappa_order(1)),
+     .              1,matY,1)
+
+         x = 1.0 - etau
+         y = dtau - x
+         z = dtau**2.0 - 2 * y
+         dtau_i=(tau_interp(emiss_order(2))-tau_interp(emiss_order(3)))
+     .            *cos(viewing_angle)
+         alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
+         bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
+         gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
+
+         call dcopy(4, emiss_interp(:,emiss_order(3)), 1, matS1, 1)
+         call dcopy(4, emiss_interp(:,emiss_order(2)), 1, matS2, 1)
+         call dcopy(4, emiss_interp(:,emiss_order(1)), 1, matZ, 1)
+         call dscal(4, alph, matS1, 1)
+         call dscal(4, bet, matS2, 1)
+         call dscal(4, gam, matZ, 1)
+         call daxpy(4, dble(1.0), matS1, 1, matS2, 1)
+         call daxpy(4, dble(1.0), matS2, 1, matZ, 1)
 
 c****      calculate the RHS of the equation.  Store in matZ
          call dgemv('N',4,4,dble(1.0),matY,4,Stokes,1,dble(1.0),matZ,1)
@@ -145,82 +159,170 @@ c****      Solve the system of differential equations
 
          call dcopy(4, matZ, 1, Stokes, 1)
 
-         continuum=etau*continuum+alph+bet+gam
-      enddo
-
-      return
-      end
-
-      subroutine calc_matrices(logtau, kappas, order, matX, matY,
-     .             alph, bet, gam, etau)
-
-      return
-      end
-
-      subroutine linterp_kappa(logtau, kappas, order
-
-      do i=ntau-1,2,-1
-         dz = (tauref(i+1)-tauref(i))/kapref(i)
-         dtau = dz*kaptot(i)*cos(viewing_angle)
-         etau = 2.71828183**(-dtau)
-
-         alph = 1.0-etau
-         bet =(1.0-(1.0+dtau)*etau)/dtau
-
-         call dcopy(16,ones, 1, matX, 1)
-         call dcopy(16,ones, 1, matY, 1)
-         call daxpy(16,dble(alph-bet),kappa(:,:,i),1,matX,1)
-         call dscal(16,etau, matY,1)
-         call daxpy(16,dble(-1.0*bet),kappa(:,:,i+1),1,matY,1)
-
-         x = 1.0 - etau
-         y = dtau - x
-         z = dtau**2.0 - 2 * y
-         dz = (tauref(i)-tauref(i-1))/kapref(i-1)
-         dtau_i = dz*kaptot(i-1)*cos(viewing_angle)
-         alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
-         bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
-         gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
-
-         call dcopy(4, emission(:,i-1), 1, matS1, 1)
-         call dcopy(4, emission(:,i), 1, matS2, 1)
-         call dcopy(4, emission(:,i+1), 1, matZ, 1)
-         call dscal(4, alph, matS1, 1)
-         call dscal(4, bet, matS2, 1)
-         call dscal(4, gam, matZ, 1)
-         call daxpy(4, dble(1.0), matS1, 1, matS2, 1)
-         call daxpy(4, dble(1.0), matS2, 1, matZ, 1)
-
-c****     Calculate the right hand side of the equation.  Store in matZ
-         call dgemv('N',4,4,dble(1.0),matY,4,Stokes,1,dble(1.0),matZ,1)
-
-c****     Solve the system of differential equations.
-         call dgesv(4,1,matX,4,IPIV, matZ,4,INFO)
-
 c****     Now do the same thing for the continuum
-         dz = (tauref(i+1)-tauref(i))/kapref(i)
-         dtau = dz*kaplam(i)*cos(viewing_angle)
+         dtau=(tau_interp_c(emiss_order(1))-
+     .         tau_interp_c(emiss_order(2)))*cos(viewing_angle)
          etau = 2.71828183**(-dtau)
          x = 1.0 - etau
          y = dtau - x
          z = dtau**2.0 - 2 * y
-         dz = (tauref(i)-tauref(i-1))/kapref(i-1)
-         dtau_i = dz*kaplam(i-1)*cos(viewing_angle)
+         dtau_i = (tau_interp_c(emiss_order(2))-
+     .             tau_interp_c(emiss_order(3)))*cos(viewing_angle)
          alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
          gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
-         continuum=etau*continuum+alph*emission(1,i-1)
-     .             +bet*emission(1,i)
-     .             +gam*emission(1,i+1)
+         continuum=etau*continuum+alph*emiss_interp(1,emiss_order(3))
+     .             +bet*emiss_interp(1,emiss_order(2))
+     .             +gam*emiss_interp(1,emiss_order(1))
 
-         call dcopy(4, matZ, 1, Stokes, 1)
-    
+         if (kappa_order(1).eq.1)then
+             kappa_order(1) = 2
+             kappa_order(2) = 1
+         else
+             kappa_order(1) = 1
+             kappa_order(2) = 2
+         endif
+         if (emiss_order(1).eq.1) then
+             emiss_order(1) = 2
+             emiss_order(2) = 3
+             emiss_order(3) = 1
+         elseif (emiss_order(1).eq.2) then
+             emiss_order(1) = 3
+             emiss_order(2) = 1
+             emiss_order(3) = 2
+         else
+             emiss_order(1) = 1
+             emiss_order(2) = 2
+             emiss_order(3) = 3
+         endif
+
+c         continuum=etau*continuum+alph+bet+gam
       enddo
 
-      write (*,*) continuum, Stokes
-
+      write (*,*) Stokes
       return
       end
+
+      subroutine interp_opacities(logtau, delta_tau, k_interp,
+     .       k_ord, e_interp, e_ord, tau_interp, tau_interp_c)
+c**********************************************************************
+c     interp_opacities interpolates the following quantities relevant
+c        to the DELO method:
+c      kapp_interp(kap_ord) - kappa matrix interpolated at
+c                      tau = 10.0**logtau
+c      emiss_interp(emiss_ord) - emission matrix interpolated at
+c                      tau = 10.0**(logtau+dtau)
+c      tau_interp(emiss_ord) - total line opacity calculated at:
+c                      tau = 10.0**(logtau+dtau) (reference tau)
+c      tau_interp_c(emiss_ord) - continuum opacity calculated at:
+c                      tau = 10.0**(logtau+dtau) (reference tau)
+c***********************************************************************
+      implicit real*8 (a-h,o-z)
+      include 'Atmos.com'
+      include 'Stokes.com'
+      real*8 slope, k_interp(4,4,2), e_interp(4,3)
+      real*8 tau_interp(3), tau_interp_c(3), logtau, delta_tau
+      integer k_ord, e_ord
+
+      do i=1,ntau-1
+         if (tauref(i+1)+1.0e-10.ge.10.0**logtau) then
+             goto 10
+         endif
+      enddo
+10    do j=1,4
+         do k=1,4
+            slope=(kappa(j,k,i+1)-kappa(j,k,i))/(tauref(i+1)
+     .             -tauref(i))
+            k_interp(j,k,k_ord)=kappa(j,k,i)+slope*(10.0**logtau
+     .             -tauref(i))
+         enddo
+      enddo
+
+      do i=1,ntau-1
+         if (tauref(i+1)+1.0e-10.ge.10.0**(logtau+delta_tau)) then
+             goto 20
+         endif
+      enddo
+20    do j=1,4
+         slope=(emission(j,i+1)-emission(j,i))/(tauref(i+1)-tauref(i))
+         e_interp(j,e_ord) = emission(j,i)+slope*(10.0**(logtau+
+     .       delta_tau))
+      enddo
+      slope = (tauref(i+1)*kaptot(i+1)/kapref(i+1)-
+     .         tauref(i)*kaptot(i)/kapref(i))/(tauref(i+1)-tauref(i))
+      tau_interp(e_ord) = tauref(i)*kaptot(i)/kapref(i)+
+     .        slope*(10.0**(logtau+delta_tau)-tauref(i))
+
+      slope = (tauref(i+1)*kaplam(i+1)/kapref(i+1)-
+     .         tauref(i)*kaplam(i)/kapref(i))/(tauref(i+1)-tauref(i))
+      tau_interp_c(e_ord) = tauref(i)*kaplam(i)/kapref(i)+
+     .        slope*(10.0**(logtau+delta_tau)-tauref(i))
+      
+      return
+      end
+
+c      do i=ntau-1,2,-1
+c         dz = (tauref(i+1)-tauref(i))/kapref(i)
+c         dtau = dz*kaptot(i)*cos(viewing_angle)
+c         etau = 2.71828183**(-dtau)
+c
+c         alph = 1.0-etau
+c         bet =(1.0-(1.0+dtau)*etau)/dtau
+c
+c         call dcopy(16,ones, 1, matX, 1)
+c         call dcopy(16,ones, 1, matY, 1)
+c         call daxpy(16,dble(alph-bet),kappa(:,:,i),1,matX,1)
+c         call dscal(16,etau, matY,1)
+c         call daxpy(16,dble(-1.0*bet),kappa(:,:,i+1),1,matY,1)
+c
+c         x = 1.0 - etau
+c         y = dtau - x
+c         z = dtau**2.0 - 2 * y
+c         dz = (tauref(i)-tauref(i-1))/kapref(i-1)
+c         dtau_i = dz*kaptot(i-1)*cos(viewing_angle)
+c         alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
+c         bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
+c         gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
+c
+c         call dcopy(4, emission(:,i-1), 1, matS1, 1)
+c         call dcopy(4, emission(:,i), 1, matS2, 1)
+c         call dcopy(4, emission(:,i+1), 1, matZ, 1)
+c         call dscal(4, alph, matS1, 1)
+c         call dscal(4, bet, matS2, 1)
+c         call dscal(4, gam, matZ, 1)
+c         call daxpy(4, dble(1.0), matS1, 1, matS2, 1)
+c         call daxpy(4, dble(1.0), matS2, 1, matZ, 1)
+c
+cc****     Calculate the right hand side of the equation.  Store in matZ
+c         call dgemv('N',4,4,dble(1.0),matY,4,Stokes,1,dble(1.0),matZ,1)
+c
+cc****     Solve the system of differential equations.
+c         call dgesv(4,1,matX,4,IPIV, matZ,4,INFO)
+c
+cc****     Now do the same thing for the continuum
+c         dz = (tauref(i+1)-tauref(i))/kapref(i)
+c         dtau = dz*kaplam(i)*cos(viewing_angle)
+c         etau = 2.71828183**(-dtau)
+c         x = 1.0 - etau
+c         y = dtau - x
+c         z = dtau**2.0 - 2 * y
+c         dz = (tauref(i)-tauref(i-1))/kapref(i-1)
+c         dtau_i = dz*kaplam(i-1)*cos(viewing_angle)
+c         alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
+c         bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
+c         gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
+c         continuum=etau*continuum+alph*emission(1,i-1)
+c     .             +bet*emission(1,i)
+c     .             +gam*emission(1,i+1)
+c
+c         call dcopy(4, matZ, 1, Stokes, 1)
+c    
+c      enddo
+c
+c      write (*,*) continuum, Stokes
+c
+c      return
+c      end
 
       real*8 function Planck(temperature)
       implicit real*8 (a-h,o-z)
