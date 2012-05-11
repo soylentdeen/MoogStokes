@@ -134,7 +134,8 @@ c      enddo
       azimuth = 3.14159262/2.0
       longitude = 0.0
       call computeRotations
-c      write (*,*) phi_angle, chi_angle, viewing_angle
+      chi_angle = dble(0.0)
+      write (*,*) phi_angle, chi_angle, viewing_angle
       call delo
 c      Stokes_I = Stokes_I/total_weight
 c      Stokes_Q = Stokes_Q/total_weight

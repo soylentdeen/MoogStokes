@@ -30,6 +30,49 @@ c     .   (KAPREF(I)*MU))
       RETURN
       END
 
+      SUBROUTINE MAT_DERIVS(N,X,Y,DYDX,RPAR,IPAR)
+      implicit real*8 (a-h,o-z)
+      DIMENSION Y(N), DYDX(N)
+      include 'Atmos.com'
+      include 'Linex.com'
+      include 'Stokes.com'
+      real*8 TEFF, k_interp(4,4), j_interp(4)
+
+      do i=1,ntau-1
+         if (tauref(i+1)+1.0e-10.ge.X) THEN
+             goto 10
+         endif
+      enddo
+10    do j=1,4
+         do k=1,4
+            slope=(kappa(j,k,i+1)-kappa(j,k,i))/(tauref(i+1)*kaplam(i+1)
+     .            /kapref(i+1)-tauref(i))
+            k_interp(j,k)=kappa(j,k,i)+slope*(X-tauref(i))
+         enddo
+         slope=(emission(j,i+1)-emission(j,i))/(tauref(i+1)-
+     .            tauref(i))
+         j_interp(j)=emission(j,i)+slope*(X-tauref(i))
+      enddo
+      slope=(t(i+1)-t(i))/(tauref(i+1)-tauref(i))
+      teff = t(i)+slope*(X-tauref(i))
+      call Planck(teff, B)
+
+      DYDX(1)=(k_interp(1,1)*Y(1)+k_interp(1,2)*Y(2)+
+     .         k_interp(1,3)*Y(3)+k_interp(1,4)*Y(4)) -
+     .         j_interp(1)*B
+      DYDX(2)=(k_interp(2,1)*Y(1)+k_interp(2,2)*Y(2)+
+     .         k_interp(2,3)*Y(3)+k_interp(2,4)*Y(4)) -
+     .         j_interp(2)*B
+      DYDX(3)=(k_interp(3,1)*Y(1)+k_interp(3,2)*Y(2)+
+     .         k_interp(3,3)*Y(3)+k_interp(3,4)*Y(4)) -
+     .         j_interp(3)*B
+      DYDX(4)=(k_interp(4,1)*Y(1)+k_interp(4,2)*Y(2)+
+     .         k_interp(4,3)*Y(3)+k_interp(4,4)*Y(4)) -
+     .         j_interp(4)*B
+
+
+      END
+
       SUBROUTINE DERIVS(N,X,Y,DYDX,RPAR,IPAR)
 C*****************************************************************************
 C     This subroutine calculates the derivatives of the stokes parameters at

@@ -135,7 +135,7 @@ c      write (*,*) emiss_interp
 
          x = 1.0 - etau
          y = dtau - x
-         z = dtau**2.0 - 2 * y
+         z = dtau**2.0 - 2.0 * y
          dtau_i=(tau_interp(emiss_order(2))-tau_interp(emiss_order(3)))
      .            *cos(viewing_angle)
          alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
@@ -165,7 +165,7 @@ c****     Now do the same thing for the continuum
          etau = 2.71828183**(-dtau)
          x = 1.0 - etau
          y = dtau - x
-         z = dtau**2.0 - 2 * y
+         z = dtau**2.0 - 2.0 * y
          dtau_i = (tau_interp_c(emiss_order(2))-
      .             tau_interp_c(emiss_order(3)))*cos(viewing_angle)
          alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
@@ -199,7 +199,7 @@ c****     Now do the same thing for the continuum
 c         continuum=etau*continuum+alph+bet+gam
       enddo
 
-      write (*,*) Stokes
+c      write (*,*) Stokes
       return
       end
 
@@ -246,7 +246,7 @@ c***********************************************************************
 20    do j=1,4
          slope=(emission(j,i+1)-emission(j,i))/(tauref(i+1)-tauref(i))
          e_interp(j,e_ord) = emission(j,i)+slope*(10.0**(logtau+
-     .       delta_tau))
+     .       delta_tau)-tauref(i))
       enddo
       slope = (tauref(i+1)*kaptot(i+1)/kapref(i+1)-
      .         tauref(i)*kaptot(i)/kapref(i))/(tauref(i+1)-tauref(i))
