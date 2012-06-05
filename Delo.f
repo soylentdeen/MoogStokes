@@ -40,6 +40,8 @@ c*****Sets up constants
       ones(4,3) = 0.0
       ones(4,4) = 1.0
 
+      phi_angle = dble(0.0)
+      chi_angle = dble(0.0)
 c***** For each layer in the atmosphere, calculate each element of the
 c      opacity matrix and emission vector for the DELO algorithm
       do i=1,ntau
@@ -112,7 +114,7 @@ c      write (*,*) emiss_interp
       emiss_order(1) = 1
       emiss_order(2) = 2
       emiss_order(3) = 3
-      do logtau=log10(tauref(ntau)+delta_tau),
+      do logtau=log10(tauref(ntau))+delta_tau,
      .              log10(tauref(1))-delta_tau,delta_tau
          call interp_opacities(logtau, delta_tau, kappa_interp,
      .        kappa_order(2), emiss_interp, emiss_order(3), tau_interp,
