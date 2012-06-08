@@ -12,9 +12,9 @@ c**********************************************************************
       include 'Stokes.com'
       include 'Angles.com'
       real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V
-      real*8 tau_start, tau_stop, rtol, atol, rpar
+      real*8 tau_start, tau_stop, rtol, atol, rpar, Stokes_c(5)
       integer itol, iout, lwork, liwork, ipar
-      parameter (NDGL=4, NRD=4)
+      parameter (NDGL=5, NRD=5)
       parameter (LWORK=11*NDGL+8*NRD+21,LIWORK=NRD+21)
       DIMENSION Y(NDGL),WORK(LWORK),IWORK(LIWORK)
       external mat_derivs
@@ -75,11 +75,11 @@ c*****  Assembles the Emission matrix (J')
 c*****   Trace the Stokes parameters through the atmosphere
 c            via the quadratic DELO algorithm
 
-      Stokes(1) = emission(1,ntau)
-      Stokes(2) = 0.0
-      Stokes(3) = 0.0
-      Stokes(4) = 0.0
-      continuum = Stokes(1)
+      Stokes_c(1) = emission(1,ntau)
+      Stokes_c(2) = 0.0
+      Stokes_c(3) = 0.0
+      Stokes_c(4) = 0.0
+      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
 
       iout=0
       tau_start = tauref(ntau)
@@ -92,10 +92,14 @@ c            via the quadratic DELO algorithm
 10       work(i)=0.D0
 c      iwork(5) = NDGL
 
-      call dop853(ndgl, mat_derivs, tau_start, Stokes, tau_stop,
+      call dop853(ndgl, mat_derivs, tau_start, Stokes_c, tau_stop,
      .            rtol, atol, itol, junk, iout, work, lwork, iwork,
      .            liwork, rpar, ipar, idid)
 
+      Stokes(1) = Stokes_c(1)/Stokes_c(5)
+      Stokes(2) = Stokes_c(2)/Stokes_c(5)
+      Stokes(3) = Stokes_c(3)/Stokes_c(5)
+      Stokes(4) = Stokes_c(4)/Stokes_c(5)
       write (*,*) idid, iwork(17), iwork(18), iwork(19), iwork(20)
       write (*,*) Stokes(1), Stokes(2), Stokes(3), Stokes(4)
 c      write (*,*) Stokes

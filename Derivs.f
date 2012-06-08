@@ -36,7 +36,8 @@ c     .   (KAPREF(I)*MU))
       include 'Atmos.com'
       include 'Linex.com'
       include 'Stokes.com'
-      real*8 TEFF, k_interp(4,4), j_interp(4), mu
+      real*8 TEFF, k_interp(4,4), j_interp(4), mu, eta_0, kc_lam, kc_ref
+      external Planck
 
       do i=1,ntau-1
          if (tauref(i+1)+1.0e-10.ge.X) THEN
@@ -53,6 +54,13 @@ c     .   (KAPREF(I)*MU))
          slope=(emission(j,i+1)-emission(j,i))/denom
          j_interp(j)=emission(j,i)+slope*
      .         (X-tauref(i))
+         slope=(t(i+1)-t(i))/denom
+         TEFF=t(i)+slope*(X-tauref(i))
+         slope=(kaplam(i+1)-kaplam(i))/denom
+         kc_lam = (kaplam(i)+slope*(X-tauref(i)))
+         slope=(kapref(i+1)-kapref(i))/denom
+         kc_ref = (kapref(i)+slope*(X-tauref(i)))
+         eta_0=kc_lam/kc_ref
       enddo
 
       DYDX(1)=((k_interp(1,1)*Y(1)+k_interp(1,2)*Y(2)+
@@ -67,6 +75,7 @@ c     .   (KAPREF(I)*MU))
       DYDX(4)=((k_interp(4,1)*Y(1)+k_interp(4,2)*Y(2)+
      .         k_interp(4,3)*Y(3)+k_interp(4,4)*Y(4)) -
      .         j_interp(4))
+      DYDX(5)=eta_0*(Y(5)-Planck(TEFF))
 
       RETURN
       END
@@ -107,7 +116,7 @@ c      CALL LINTERPOLATE(ZET_Q, 10.0**X, ZQ)
 c      CALL LINTERPOLATE(ZET_V, 10.0**X, ZV)
 c      CALL LINTERPOLATE(T, 10.0**X, TEFF)
       
-      CALL PLANCK(TEFF, B)
+c      CALL PLANCK(TEFF, B)
 c      DYDX(1) = (1.0+EI)*Y(1)+EQ*Y(2)+EU*Y(3)+EV*Y(4) - (1.0+EI)*B
 c      DYDX(2) = EQ*Y(1)+(1.0+EI)*Y(2)+ZV*Y(3)-ZU*Y(4) - (EQ)*B
 c      DYDX(3) = EU*Y(1)-ZV*Y(2)+(1.0+EI)*Y(3)+ZQ*Y(4) - (EU)*B

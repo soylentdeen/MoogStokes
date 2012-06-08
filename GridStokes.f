@@ -136,8 +136,8 @@ c      enddo
       call computeRotations
       chi_angle = dble(0.0)
 c      write (*,*) phi_angle, chi_angle, viewing_angle
-c      call delo
-      call rungeKutta
+      call delo
+c     call rungeKutta
 c      Stokes_I = Stokes_I/total_weight
 c      Stokes_Q = Stokes_Q/total_weight
 c      Stokes_U = Stokes_U/total_weight
