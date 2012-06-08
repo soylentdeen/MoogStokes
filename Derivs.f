@@ -39,21 +39,20 @@ c     .   (KAPREF(I)*MU))
       real*8 TEFF, k_interp(4,4), j_interp(4), mu
 
       do i=1,ntau-1
-         if (tauref(i+1)*kaptot(i+1)/kapref(i+1)+1.0e-10.ge.X) THEN
+         if (tauref(i+1)+1.0e-10.ge.X) THEN
              goto 10
          endif
       enddo
-10    denom = (tauref(i+1)*kaptot(i+1)/kapref(i+1)
-     .         -tauref(i)*kaptot(i)/kapref(i))
+10    denom = (tauref(i+1)-tauref(i))
       do j=1,4
          do k=1,4
             slope=(kappa(j,k,i+1)-kappa(j,k,i))/denom
             k_interp(j,k)=kappa(j,k,i)+slope*
-     .         (X-tauref(i)*kaptot(i)/kapref(i))
+     .         (X-tauref(i))
          enddo
          slope=(emission(j,i+1)-emission(j,i))/denom
          j_interp(j)=emission(j,i)+slope*
-     .         (X-tauref(i)*kaptot(i)/kapref(i))
+     .         (X-tauref(i))
       enddo
 
       DYDX(1)=((k_interp(1,1)*Y(1)+k_interp(1,2)*Y(2)+
