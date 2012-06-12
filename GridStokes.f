@@ -86,12 +86,12 @@ c*****open the line list file and the strong line list file
       inclination = 3.1415926/2.0
       open(unit=nf11out, file=f11out)
 
+      wave = start
 c*****Read in the line list and calculate the equilibria
       call inlines (1)
       call eqlib
       call nearly (1)
 c*****Perform the Synthesis
-      wave = start
       wavl = 0.
       mode = 3
 30    if (dabs(wave-wavl)/wave .ge. 0.001) then
