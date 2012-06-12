@@ -15,6 +15,7 @@ c**********************************************************************
       real*8 emiss_interp(4,3), kappa_interp(4,4,2)
       real*8 tau_interp(3), tau_interp_c(3), logtau
       real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V
+      real*8 h1, h2, dx
       real*8 matS1(4), matS2(4)
       integer emiss_order(3), kappa_order(2)
       integer INFO, IPIV(4), LDA, LWORK
@@ -40,6 +41,18 @@ c*****Sets up constants
       ones(4,3) = 0.0
       ones(4,4) = 1.0
 
+c*****  zdepth is the physical depth scale
+      do i=1,ntau
+         if (i.eq.1) then
+             zdepth(i) = 0.0
+         else
+             h1 = 1.0/(kapref(i-1))
+             h2 = 1.0/(kapref(i))
+             dtau = tauref(i)-tauref(i-1)
+             zdepth(i) = zdepth(i-1)+(h1+h2)/2.0*dtau
+         endif
+      enddo
+
       phi_angle = dble(0.0)
       chi_angle = dble(0.0)
 c***** For each layer in the atmosphere, calculate each element of the
@@ -58,6 +71,7 @@ c      opacity matrix and emission vector for the DELO algorithm
          psi_U=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(i,3))
      .                /2.0)*sin(phi_angle)**2.0*sin(2.0*chi_angle)/2.0
          psi_V=(psi_opacity(i,1)-psi_opacity(i,3))*cos(phi_angle)/2.0
+
 
 c*****  The total opacity (line+continuum)
          kaptot(i) = kaplam(i) + phi_I
@@ -103,6 +117,8 @@ c            via the quadratic DELO algorithm
       delta_tau = -0.05
 c      write (*,*) Stokes(1), emission(1, ntau)
       call dcopy(4, emission(:,ntau), 1, emiss_interp(:,1), 1)
+c      tau_interp(1) = zdepth(ntau)*kaptot(ntau)
+c      tau_interp_c(1) = zdepth(ntau)*kaplam(ntau)
       tau_interp(1) = tauref(ntau)*kaptot(ntau)/kapref(ntau)
       tau_interp_c(1) = tauref(ntau)*kaplam(ntau)/kapref(ntau)
 
@@ -240,23 +256,39 @@ c***********************************************************************
          enddo
       enddo
 
+      line_kappa = 0.0
+      cont_kappa = 0.0
       do i=1,ntau-1
          if (tauref(i+1)+1.0e-10.ge.10.0**(logtau+delta_tau)) then
              goto 20
          endif
+         dz = zdepth(i+1)-zdepth(i)
+         line_kappa = line_kappa + (kaptot(i)+kaptot(i+1))/2.0*dz
+         cont_kappa = cont_kappa + (kaplam(i)+kaplam(i+1))/2.0*dz
       enddo
 20    do j=1,4
          slope=(emission(j,i+1)-emission(j,i))/(tauref(i+1)-tauref(i))
          e_interp(j,e_ord) = emission(j,i)+slope*(10.0**(logtau+
      .       delta_tau)-tauref(i))
       enddo
+c      dz = zdepth(i+1)-zdepth(i)
+c      slope = (kaptot(i+1)+kaptot(i))/2.0*dz/(tauref(i+1)-tauref(i))
+c      write (*,*) 'slope: Zdepth method : ', i, slope
       slope = (tauref(i+1)*kaptot(i+1)/kapref(i+1)-
      .         tauref(i)*kaptot(i)/kapref(i))/(tauref(i+1)-tauref(i))
+c      write (*,*) tauref(i+1)/kapref(i+1)
+c      write (*,*) 'slope: tauref method : ', slope_a, slope/slope_a
+c      tau_interp(e_ord) = line_kappa+
       tau_interp(e_ord) = tauref(i)*kaptot(i)/kapref(i)+
      .        slope*(10.0**(logtau+delta_tau)-tauref(i))
 
+c      read (*,*)
+
       slope = (tauref(i+1)*kaplam(i+1)/kapref(i+1)-
      .         tauref(i)*kaplam(i)/kapref(i))/(tauref(i+1)-tauref(i))
+c      slope = (zdepth(i+1)*kaplam(i+1)-
+c     .         zdepth(i)*kaplam(i))/(tauref(i)-tauref(i))
+c      tau_interp_c(e_ord) = cont_kappa+
       tau_interp_c(e_ord) = tauref(i)*kaplam(i)/kapref(i)+
      .        slope*(10.0**(logtau+delta_tau)-tauref(i))
       
