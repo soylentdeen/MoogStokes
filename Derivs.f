@@ -37,7 +37,8 @@ c     .   (KAPREF(I)*MU))
       include 'Linex.com'
       include 'Stokes.com'
       include 'Angles.com'
-      real*8 TEFF, k_interp(4,4), j_interp(4), mu, eta_0, kc_lam, kc_ref
+      real*8 TEFF, k_interp(4,4), j_interp(4), mu, eta_0, kc_lam
+      real*8 kc_ref, run
       external Planck
 
       mu = cos(viewing_angle)
@@ -46,22 +47,21 @@ c     .   (KAPREF(I)*MU))
              goto 10
          endif
       enddo
-10    denom = (tauref(i+1)-tauref(i))
+10    denom = (log10(tauref(i+1))-log10(tauref(i)))
+      run = (log10(X) - log10(tauref(i)))
       do j=1,4
          do k=1,4
             slope=(kappa(j,k,i+1)-kappa(j,k,i))/denom
-            k_interp(j,k)=kappa(j,k,i)+slope*
-     .         (X-tauref(i))
+            k_interp(j,k)=kappa(j,k,i)+slope*run
          enddo
          slope=(emission(j,i+1)-emission(j,i))/denom
-         j_interp(j)=emission(j,i)+slope*
-     .         (X-tauref(i))
+         j_interp(j)=emission(j,i)+slope*run
          slope=(t(i+1)-t(i))/denom
-         TEFF=t(i)+slope*(X-tauref(i))
+         TEFF=t(i)+slope*run
          slope=(kaplam(i+1)-kaplam(i))/denom
-         kc_lam = (kaplam(i)+slope*(X-tauref(i)))
+         kc_lam = (kaplam(i)+slope*run)
          slope=(kapref(i+1)-kapref(i))/denom
-         kc_ref = (kapref(i)+slope*(X-tauref(i)))
+         kc_ref = (kapref(i)+slope*run)
          eta_0=kc_lam/kc_ref
       enddo
 
