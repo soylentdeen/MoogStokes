@@ -857,6 +857,7 @@ C ----  H**IORD * MAX ( NORM (F0), NORM (DER2)) = 0.01
       END IF
       H=MIN(100*ABS(H),H1,HMAX)
       HINIT=SIGN(H,POSNEG)  
+c      write (*,*) 'Initial H step is :', HINIT
       RETURN
       END 
 C

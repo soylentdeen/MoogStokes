@@ -115,49 +115,55 @@ c*****Perform the Synthesis
       nrings = 23
       ncells = 700
       cell_area = 4.0*3.14159262/ncells
-c      do i=1,nrings
-c         chi_start = (i-1)*3.14159262/nrings
-c         chi_stop = i*3.14159262/nrings
-c         azimuth = (chi_start + chi_stop)/2.0
-c         dchi = -cos(chi_stop) + cos(chi_start)
-c         ring_area = 3.14159262 * dchi ! total sterrad in semicircle
-c         n_cells = nint(ring_area/cell_area) ! # of cells in ring
-c         cell_a = ring_area/float(n_cells)
-c         dphi = 3.14159262/n_cells
-c         do j=1,n_cells
-c            longitude = -3.14159262/2.0+(j-0.5)*dphi
-c            call computeRotations
-c            call delo
-c            call appendStokes(cell_a)
-c         enddo
-c      enddo
-      azimuth = 3.14159262/2.0
-      longitude = 0.0
-      call computeRotations
-      chi_angle = dble(0.0)
+      do i=1,nrings
+         chi_start = (i-1)*3.14159262/nrings
+         chi_stop = i*3.14159262/nrings
+         azimuth = (chi_start + chi_stop)/2.0
+         dchi = -cos(chi_stop) + cos(chi_start)
+         ring_area = 3.14159262 * dchi ! total sterrad in semicircle
+         n_cells = nint(ring_area/cell_area) ! # of cells in ring
+         cell_a = ring_area/float(n_cells)
+         dphi = 3.14159262/n_cells
+c         write (*,*) wave, i
+         do j=1,n_cells
+            longitude = -3.14159262/2.0+(j-0.5)*dphi
+            call computeRotations
+c            write (*,*) wave, chi_angle, i, j
+c            call rungeKutta
+            call delo
+            call appendStokes(cell_a)
+c            write (*,*) Stokes_I, Stokes_Q
+         enddo
+      enddo
+c      azimuth = 3.14159262/2.0
+c      longitude = 0.0
+c      call computeRotations
+c      chi_angle = dble(0.0)
 c      write (*,*) phi_angle, chi_angle, viewing_angle
-      call delo
-c     call rungeKutta
-c      Stokes_I = Stokes_I/total_weight
-c      Stokes_Q = Stokes_Q/total_weight
-c      Stokes_U = Stokes_U/total_weight
-c      Stokes_V = Stokes_V/total_weight
-      Stokes_I = Stokes(1)!/continuum
-      Stokes_Q = Stokes(2)!/continuum
-      Stokes_U = Stokes(3)!/continuum
-      Stokes_V = Stokes(4)!/continuum
+c      call delo
+c      call rungeKutta
+      Stokes_I = Stokes_I/total_weight
+      Stokes_Q = Stokes_Q/total_weight
+      Stokes_U = Stokes_U/total_weight
+      Stokes_V = Stokes_V/total_weight
+c      Stokes_I = Stokes(1)/continuum
+c      Stokes_Q = Stokes(2)/continuum
+c      Stokes_U = Stokes(3)/continuum
+c      Stokes_V = Stokes(4)/continuum
 
-c      write (*,*) wave, Stokes_I, Stokes_Q, Stokes_U, Stokes_V
+      write (*,*) wave, Stokes_I, 
+     /      total_weight
       write (nf11out,12345) wave, Stokes_I, Stokes_Q, Stokes_U,Stokes_V,
      .      continuum
 c      stepsize = dopp(nstrong, 50)*wave/2.997929e10/2.0
-      stepsize = dopp(nstrong, 50)*wave/2.997929e11
+c      read (*,*)
+      stepsize = dopp(nstrong, 50)*wave/2.997929e10
       wave = wave + stepsize
       if (wave .le. sstop) then
           go to 30
       endif
 
-c      control = 'gridend'
+      control = 'gridend'
 
 
 c*****finish

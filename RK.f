@@ -17,7 +17,7 @@ c**********************************************************************
       parameter (NDGL=5, NRD=5)
       parameter (LWORK=11*NDGL+8*NRD+21,LIWORK=NRD+21)
       DIMENSION Y(NDGL),WORK(LWORK),IWORK(LIWORK)
-      external mat_derivs
+      external mat_derivs, solout
 
 c*****Sets up constants
 
@@ -85,27 +85,27 @@ c            via the quadratic DELO algorithm
       tau_start = tauref(ntau)
       tau_stop = tauref(1)
       itol = 0
-      rtol = 1.0e-9
-      atol = 1.0e-9
+      rtol = 1.0e-14
+      atol = 1.0e-4
       do 10 i=1,10
          iwork(i)=0
 10       work(i)=0.D0
 c      iwork(5) = NDGL
 
       call dop853(ndgl, mat_derivs, tau_start, Stokes_c, tau_stop,
-     .            rtol, atol, itol, junk, iout, work, lwork, iwork,
+     .            rtol, atol, itol, solout, iout, work, lwork, iwork,
      .            liwork, rpar, ipar, idid)
 
-      Stokes(1) = Stokes_c(1)/Stokes_c(5)
-      Stokes(2) = Stokes_c(2)/Stokes_c(5)
-      Stokes(3) = Stokes_c(3)/Stokes_c(5)
-      Stokes(4) = Stokes_c(4)/Stokes_c(5)
-      write (*,*) idid, iwork(17), iwork(18), iwork(19), iwork(20)
-      write (*,*) Stokes(1), Stokes(2), Stokes(3), Stokes(4)
+      Stokes(1) = Stokes_c(1)!/Stokes_c(5)
+      Stokes(2) = Stokes_c(2)!/Stokes_c(5)
+      Stokes(3) = Stokes_c(3)!/Stokes_c(5)
+      Stokes(4) = Stokes_c(4)!/Stokes_c(5)
+      continuum = Stokes_c(5)
+c      write (*,*) idid, iwork(17), iwork(18), iwork(19), iwork(20)
+c      write (*,*) Stokes(1), Stokes(2), Stokes(3), Stokes(4)
 c      write (*,*) Stokes
       return
       end
-
 
       real*8 function Planck(temperature)
       implicit real*8 (a-h,o-z)

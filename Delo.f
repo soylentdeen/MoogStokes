@@ -120,19 +120,21 @@ c            via the quadratic DELO algorithm
       tau_interp_c(1) = tauref(ntau)*kaplam(ntau)/kapref(ntau)
 
       call interp_opacities(log10(tauref(ntau)),
+     .        kappa_interp, 1, emiss_interp, 1, tau_interp,tau_interp_c)
+      call interp_opacities(log10(tauref(ntau))+delta_tau,
      .        kappa_interp, 1, emiss_interp, 2, tau_interp,tau_interp_c)
       kappa_order(1) = 1
       kappa_order(2) = 2
       emiss_order(1) = 1
       emiss_order(2) = 2
       emiss_order(3) = 3
-      do logtau=log10(tauref(ntau))+delta_tau,
-     .              log10(tauref(1))-delta_tau,delta_tau
-         call interp_opacities(logtau, delta_tau, kappa_interp,
+      do logtau=log10(tauref(ntau))+2*delta_tau,
+     .              log10(tauref(1)),delta_tau
+         call interp_opacities(logtau, kappa_interp,
      .        kappa_order(2), emiss_interp, emiss_order(3), tau_interp,
      .        tau_interp_c)
          
-         dtau = (tau_interp(emiss_order(1))-tau_interp(emiss_order(2)))
+         dtau = (tau_interp(emiss_order(2))-tau_interp(emiss_order(3)))
      .              *cos(viewing_angle)
          etau = 2.71828183**(-dtau)
 
@@ -150,7 +152,7 @@ c            via the quadratic DELO algorithm
          x = 1.0 - etau
          y = dtau - x
          z = dtau**2.0 - 2.0 * y
-         dtau_i=(tau_interp(emiss_order(2))-tau_interp(emiss_order(3)))
+         dtau_i=(tau_interp(emiss_order(1))-tau_interp(emiss_order(2)))
      .            *cos(viewing_angle)
          alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
@@ -174,14 +176,14 @@ c****      Solve the system of differential equations
          call dcopy(4, matZ, 1, Stokes, 1)
 
 c****     Now do the same thing for the continuum
-         dtau=(tau_interp_c(emiss_order(1))-
-     .         tau_interp_c(emiss_order(2)))*cos(viewing_angle)
+         dtau=(tau_interp_c(emiss_order(2))-
+     .         tau_interp_c(emiss_order(3)))*cos(viewing_angle)
          etau = 2.71828183**(-dtau)
          x = 1.0 - etau
          y = dtau - x
          z = dtau**2.0 - 2.0 * y
-         dtau_i = (tau_interp_c(emiss_order(2))-
-     .             tau_interp_c(emiss_order(3)))*cos(viewing_angle)
+         dtau_i = (tau_interp_c(emiss_order(1))-
+     .             tau_interp_c(emiss_order(2)))*cos(viewing_angle)
          alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
          gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))

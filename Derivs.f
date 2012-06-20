@@ -36,9 +36,11 @@ c     .   (KAPREF(I)*MU))
       include 'Atmos.com'
       include 'Linex.com'
       include 'Stokes.com'
+      include 'Angles.com'
       real*8 TEFF, k_interp(4,4), j_interp(4), mu, eta_0, kc_lam, kc_ref
       external Planck
 
+      mu = cos(viewing_angle)
       do i=1,ntau-1
          if (tauref(i+1)+1.0e-10.ge.X) THEN
              goto 10
@@ -65,17 +67,17 @@ c     .   (KAPREF(I)*MU))
 
       DYDX(1)=((k_interp(1,1)*Y(1)+k_interp(1,2)*Y(2)+
      .         k_interp(1,3)*Y(3)+k_interp(1,4)*Y(4)) -
-     .         j_interp(1))
+     .         j_interp(1))/mu
       DYDX(2)=((k_interp(2,1)*Y(1)+k_interp(2,2)*Y(2)+
      .         k_interp(2,3)*Y(3)+k_interp(2,4)*Y(4)) -
-     .         j_interp(2))
+     .         j_interp(2))/mu
       DYDX(3)=((k_interp(3,1)*Y(1)+k_interp(3,2)*Y(2)+
      .         k_interp(3,3)*Y(3)+k_interp(3,4)*Y(4)) -
-     .         j_interp(3))
+     .         j_interp(3))/mu
       DYDX(4)=((k_interp(4,1)*Y(1)+k_interp(4,2)*Y(2)+
      .         k_interp(4,3)*Y(3)+k_interp(4,4)*Y(4)) -
-     .         j_interp(4))
-      DYDX(5)=eta_0*(Y(5)-Planck(TEFF))
+     .         j_interp(4))/mu
+      DYDX(5)=eta_0*(Y(5)-Planck(TEFF))/mu
 
       RETURN
       END
@@ -84,59 +86,8 @@ c     .   (KAPREF(I)*MU))
       subroutine Solout(NR,XOLD,X,Y,N,CON,ICOMP,ND,
      &                     RPAR,IPAR,IRTRN,XOUT)
       DIMENSION CON(8*ND),ICOMP(ND)
-      real*8 X, EI, EQ, EV, ZQ, ZV
-      real*8 Y(N)
+      real*8 X, XOLD
       include 'Atmos.com'
       include 'Linex.com'
-      write (*,*) X, Y(1)
+      write (*,*) X, XOLD
       END
-
-      SUBROUTINE DERIVS(N,X,Y,DYDX,RPAR,IPAR)
-C*****************************************************************************
-C     This subroutine calculates the derivatives of the stokes parameters at
-C     Tau = X.
-C*****************************************************************************
-      IMPLICIT REAL*8 (A-H,O-Z)
-      DIMENSION Y(N), DYDX(N)
-      include "Atmos.com"
-      include "Linex.com"
-      real*8 TEFF,EI,EQ,EU,EV,ZQ,ZU,ZV
-      
-      CALL LINTERPOLATE(ETA_I, X, EI)
-      CALL LINTERPOLATE(ETA_Q, X, EQ)
-      CALL LINTERPOLATE(ETA_V, X, EV)
-      CALL LINTERPOLATE(ZET_Q, X, ZQ)
-      CALL LINTERPOLATE(ZET_V, X, ZV)
-      CALL LINTERPOLATE(T, X, TEFF)
-
-c      CALL LINTERPOLATE(ETA_I, 10.0**X, EI)
-c      CALL LINTERPOLATE(ETA_Q, 10.0**X, EQ)
-c      CALL LINTERPOLATE(ETA_V, 10.0**X, EV)
-c      CALL LINTERPOLATE(ZET_Q, 10.0**X, ZQ)
-c      CALL LINTERPOLATE(ZET_V, 10.0**X, ZV)
-c      CALL LINTERPOLATE(T, 10.0**X, TEFF)
-      
-c      CALL PLANCK(TEFF, B)
-c      DYDX(1) = (1.0+EI)*Y(1)+EQ*Y(2)+EU*Y(3)+EV*Y(4) - (1.0+EI)*B
-c      DYDX(2) = EQ*Y(1)+(1.0+EI)*Y(2)+ZV*Y(3)-ZU*Y(4) - (EQ)*B
-c      DYDX(3) = EU*Y(1)-ZV*Y(2)+(1.0+EI)*Y(3)+ZQ*Y(4) - (EU)*B
-c      DYDX(4) = EV*Y(1)+ZU*Y(2)-ZQ*Y(3)+(1.0+EI)*Y(4) - (EV)*B
-c      DYDX(1) = ((1.0+EI)*Y(1)+EQ*Y(2)+EV*Y(4) - (1.0+EI)*B)*10**X*2.302
-c      DYDX(2) = (EQ*Y(1)+(1.0+EI)*Y(2)+ZV*Y(3) - (EQ)*B)*10**X*2.302
-c      DYDX(3) = (-ZV*Y(2)+(1.0+EI)*Y(3)+ZQ*Y(4))*10**X*2.302
-c      DYDX(4) = (EV*Y(1)-ZQ*Y(3)+(1.0+EI)*Y(4) - (EV)*B)*10**X*2.302
-c      DYDX(5) = (Y(5)-B)*10**X*2.302
-      DYDX(1) = ((1.0+EI)*Y(1)+EQ*Y(2)+EV*Y(4) - (1.0+EI)*B)/mu
-      DYDX(2) = (EQ*Y(1)+(1.0+EI)*Y(2)+ZV*Y(3) - EQ*B)/mu
-      DYDX(3) = (-ZV*Y(2)+(1.0+EI)*Y(3)+ZQ*Y(4))/mu
-      DYDX(4) = (EV*Y(1)-ZQ*Y(3)+(1.0+EI)*Y(4) - EV*B)/mu
-      DYDX(5) = (Y(5)-B)/mu
-      RETURN
-      END
-
-c      SUBROUTINE SOLOUT(NR,XOLD,X,Y,N,CON,ICOMP,ND,
-c     .                  RPAR, IPAR, IRTRN, XOUT)
-c      DIMENSION Y(N),CON(8*ND),ICOMP(ND)
-c      DO I=1,N
-c         Y(
-c      ENDDO
