@@ -65,10 +65,10 @@ c*****  Assumes LTE for the Source Function
          source = Planck(t(i))
 
 c*****  Assembles the Emission matrix (J')
-         emission(1,i)=source*kaptot(i)/kapref(i)
-         emission(2,i)=source*phi_Q/kapref(i)
-         emission(3,i)=source*phi_U/kapref(i)
-         emission(4,i)=source*phi_V/kapref(i)
+         emission(1,i)=source!*kaptot(i)/kapref(i)
+         emission(2,i)=source!*phi_Q/kapref(i)
+         emission(3,i)=source!*phi_U/kapref(i)
+         emission(4,i)=source!*phi_V/kapref(i)
 
       enddo
 

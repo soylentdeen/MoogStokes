@@ -1,35 +1,3 @@
-      SUBROUTINE LINTERPOLATE(Y_OLD, X_NEW, Y_NEW)
-      IMPLICIT NONE
-      include "Atmos.com"
-      include "Linex.com"
-      real*8 Y_OLD(100), X_NEW, Y_NEW, SLOPE
-      integer I
-      
-c      DO I=1,NTAU-1
-c          IF ((TAUREF(I+1)*KAPLAM(I+1)/(KAPREF(I+1)*MU))+1.0e-10
-c     .         .GE.X_NEW) THEN
-c              GOTO 10
-c          ENDIF
-c      ENDDO
-c10    SLOPE=(Y_OLD(I+1)-Y_OLD(I))/(TAUREF(I+1)*KAPLAM(I+1)/
-c     .   (KAPREF(I+1)*MU)-TAUREF(I)*KAPLAM(I)/
-c     .   (KAPREF(I)*MU))
-c      Y_NEW = Y_OLD(I)+SLOPE*(X_NEW-TAUREF(I)*KAPLAM(I)/
-c     .   (KAPREF(I)*MU))
-      DO I=1,NTAU-1
-          IF ((TAUREF(I+1)*KAPLAM(I+1)/(KAPREF(I+1)))+1.0e-10
-     .         .GE.X_NEW) THEN
-              GOTO 10
-          ENDIF
-      ENDDO
-10    SLOPE=(Y_OLD(I+1)-Y_OLD(I))/(TAUREF(I+1)*KAPLAM(I+1)/
-     .   (KAPREF(I+1))-TAUREF(I)*KAPLAM(I)/
-     .   (KAPREF(I)))
-      Y_NEW = Y_OLD(I)+SLOPE*(X_NEW-TAUREF(I)*KAPLAM(I)/
-     .   (KAPREF(I)))
-      RETURN
-      END
-
       SUBROUTINE MAT_DERIVS(N,X,Y,DYDX,RPAR,IPAR)
       implicit real*8 (a-h,o-z)
       DIMENSION Y(N), DYDX(N)
@@ -67,17 +35,18 @@ c     .   (KAPREF(I)*MU))
 
       DYDX(1)=((k_interp(1,1)*Y(1)+k_interp(1,2)*Y(2)+
      .         k_interp(1,3)*Y(3)+k_interp(1,4)*Y(4)) -
-     .         j_interp(1))/mu
+     .         j_interp(1)*k_interp(1,1))/mu
       DYDX(2)=((k_interp(2,1)*Y(1)+k_interp(2,2)*Y(2)+
      .         k_interp(2,3)*Y(3)+k_interp(2,4)*Y(4)) -
-     .         j_interp(2))/mu
+     .         j_interp(2)*k_interp(1,2))/mu
       DYDX(3)=((k_interp(3,1)*Y(1)+k_interp(3,2)*Y(2)+
      .         k_interp(3,3)*Y(3)+k_interp(3,4)*Y(4)) -
-     .         j_interp(3))/mu
+     .         j_interp(3)*k_interp(1,2))/mu
       DYDX(4)=((k_interp(4,1)*Y(1)+k_interp(4,2)*Y(2)+
      .         k_interp(4,3)*Y(3)+k_interp(4,4)*Y(4)) -
      .         j_interp(4))/mu
-      DYDX(5)=eta_0*(Y(5)-Planck(TEFF))/mu
+c      DYDX(5)=eta_0*(Y(5)-Planck(TEFF))/mu
+      DYDX(5)=eta_0*(Y(5)-j_interp(1))/mu
 
       RETURN
       END
