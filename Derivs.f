@@ -41,10 +41,10 @@
      .         j_interp(2)*k_interp(1,2))/mu
       DYDX(3)=((k_interp(3,1)*Y(1)+k_interp(3,2)*Y(2)+
      .         k_interp(3,3)*Y(3)+k_interp(3,4)*Y(4)) -
-     .         j_interp(3)*k_interp(1,2))/mu
+     .         j_interp(3)*k_interp(1,3))/mu
       DYDX(4)=((k_interp(4,1)*Y(1)+k_interp(4,2)*Y(2)+
      .         k_interp(4,3)*Y(3)+k_interp(4,4)*Y(4)) -
-     .         j_interp(4))/mu
+     .         j_interp(4)*k_interp(1,4))/mu
 c      DYDX(5)=eta_0*(Y(5)-Planck(TEFF))/mu
       DYDX(5)=eta_0*(Y(5)-j_interp(1))/mu
 
@@ -54,9 +54,12 @@ c      DYDX(5)=eta_0*(Y(5)-Planck(TEFF))/mu
 
       subroutine Solout(NR,XOLD,X,Y,N,CON,ICOMP,ND,
      &                     RPAR,IPAR,IRTRN,XOUT)
+      implicit real*8 (a-h,o-z)
       DIMENSION CON(8*ND),ICOMP(ND)
-      real*8 X, XOLD
+      real*8 X, XOLD, Y(5), k_interp 
       include 'Atmos.com'
       include 'Linex.com'
-      write (*,*) X, XOLD
+      include 'Stokes.com'
+      
+      write (*,*) X, Y(1), Y(5)
       END

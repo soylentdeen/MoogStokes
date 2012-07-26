@@ -406,6 +406,7 @@ c*****Convert from logarithmic optical depth scales, or vice versa.
 c     xref will contain the log of the tauref
       if(tauref(1) .lt. 0.) then
          do i=1,ntau                                                    
+c            xref(i) = log10(exp(tauref(i)))
             xref(i) = tauref(i)
             tauref(i) = 10.0**xref(i)
          enddo

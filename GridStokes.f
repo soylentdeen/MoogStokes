@@ -140,9 +140,11 @@ c      enddo
       call computeRotations
       chi_angle = dble(0.0)
       viewing_angle = dble(0.0)
+c      viewing_angle = dble(3.141592/4.0)
 c      write (*,*) phi_angle, chi_angle, viewing_angle
-c      call delo
-      call rungeKutta
+      call delo
+c      call rungeKutta
+      read (*,*)
 c      Stokes_I = Stokes_I/total_weight
 c      Stokes_Q = Stokes_Q/total_weight
 c      Stokes_U = Stokes_U/total_weight
@@ -152,8 +154,8 @@ c      Stokes_V = Stokes_V/total_weight
       Stokes_U = Stokes(3)/continuum
       Stokes_V = Stokes(4)/continuum
 
-      write (*,*) wave, Stokes_I, 
-     /      total_weight
+c      write (*,*) wave, Stokes_I, 
+c     /      total_weight
       write (nf11out,12345) wave, Stokes_I, Stokes_Q, Stokes_U,Stokes_V,
      .      continuum
 c      stepsize = dopp(nstrong, 50)*wave/2.997929e10/2.0

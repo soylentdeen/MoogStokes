@@ -31,7 +31,7 @@ c*****compute the total line opacity at each depth
             voigt_y =(gam_L)
             Z = cmplx(voigt_x, voigt_y)
             hui = w4(Z)
-            voigt = REAL(hui)/sqrtpi
+            voigt = REAL(hui,8)/sqrtpi
             faraday_voigt = AIMAG(hui)/sqrtpi
             phi_opacity(i,int(deltamj(j)+2))=phi_opacity(i,
      .               int(deltamj(j)+2))+ kapnu0(j,i)*voigt
@@ -49,13 +49,15 @@ c*****do the same for the strong lines
                voigt_y =(gam_L)
                Z = cmplx(voigt_x, voigt_y)
                hui = w4(Z)
-               voigt = REAL(hui)/sqrtpi
+               voigt = REAL(hui,8)/sqrtpi
                faraday_voigt = AIMAG(hui)/sqrtpi
                phi_opacity(i,int(deltamj(j)+2))=phi_opacity(i,
      .                  int(deltamj(j)+2))+kapnu0(j,i)*voigt
                psi_opacity(i,int(deltamj(j)+2))=psi_opacity(i,
      .                  int(deltamj(j)+2))+kapnu0(j,i)*faraday_voigt
             enddo
+            j = nlines+1
+c            write (*,*), tauref(i), kapnu0(j,i)
          endif
       enddo      
 

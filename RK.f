@@ -11,13 +11,13 @@ c**********************************************************************
       include 'Dummy.com'
       include 'Stokes.com'
       include 'Angles.com'
-      real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V
-      real*8 tau_start, tau_stop, rtol, atol, rpar, Stokes_c(5)
+      real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V, D_bound
+      real*8 tau_start, tau_stop, rtol, atol, rpar, Stokes_c(5), tmp
       integer itol, iout, lwork, liwork, ipar
       parameter (NDGL=5, NRD=5)
       parameter (LWORK=11*NDGL+8*NRD+21,LIWORK=NRD+21)
       DIMENSION Y(NDGL),WORK(LWORK),IWORK(LIWORK)
-      external mat_derivs, solout
+      external mat_derivs, Solout
 
 c*****Sets up constants
 
@@ -42,7 +42,8 @@ c      opacity matrix and emission vector for the DELO algorithm
 
 c*****  The total opacity (line+continuum)
          kaptot(i) = kaplam(i) + phi_I
-
+c         write (*,*) tauref(i), phi_I, kaplam(i), phi_opacity(i,1),
+c     .               phi_opacity(i,2), phi_opacity(i,3), kapref(i)
 c*****  Assemble the Opacity matrix (K')
          kappa(1,1,i)=kaptot(i)/kapref(i)
          kappa(1,2,i)=phi_Q/kapref(i)
@@ -74,14 +75,34 @@ c*****  Assembles the Emission matrix (J')
 
 c*****   Trace the Stokes parameters through the atmosphere
 c            via the quadratic DELO algorithm
+      D_bound=kappa(1,1,ntau)**2*(kappa(1,1,ntau)**2-kappa(1,2,ntau)**2-
+     .  kappa(1,3,ntau)**2-kappa(1,4,ntau)**2+kappa(3,4,ntau)**2+
+     .  kappa(4,2,ntau)**2+kappa(2,3,ntau)**2)-(kappa(1,2,ntau)*
+     .  kappa(3,4,ntau)+kappa(1,3,ntau)*kappa(4,2,ntau)+kappa(1,4,ntau)*
+     .  kappa(2,3,ntau))**2
 
+      dB = (emission(1,ntau)-emission(1,ntau-2))/
+     .      (tauref(ntau)-tauref(ntau-2))
+
+      tmp = cos(viewing_angle)*dB/D_bound*
+     .     kappa(1,1,ntau)*(kappa(1,1,ntau)**2+kappa(3,4,ntau)**2+
+     .     kappa(4,2,ntau)**2+kappa(2,3,ntau)**2)
+c      Stokes_c(1) = emission(1,ntau)+cos(viewing_angle)*dB/D*
+c     .     kappa(1,1,ntau)*(kappa(1,1,ntau)**2+kappa(3,4,ntau)**2+
+c     .     kappa(4,2,ntau)**2+kappa(2,3,ntau)**2)
+c      write (*,*) 'D = ', D_bound
+c      write (*,*) 'kappa(1,1,ntau) = ', kappa(1,1,ntau)
+c      write (*,*) 'tmp = ', tmp/emission(1,ntau)
+c      write (*,*) 'viewing_angle = ', viewing_angle
+c      read (*,*)
       Stokes_c(1) = emission(1,ntau)
       Stokes_c(2) = 0.0
       Stokes_c(3) = 0.0
       Stokes_c(4) = 0.0
-      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
+      Stokes_c(5) = emission(1,ntau)
+c      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
 
-      iout=0
+      iout=1
       tau_start = tauref(ntau)
       tau_stop = tauref(1)
       itol = 0
@@ -93,7 +114,7 @@ c            via the quadratic DELO algorithm
 c      iwork(5) = NDGL
 
       call dop853(ndgl, mat_derivs, tau_start, Stokes_c, tau_stop,
-     .            rtol, atol, itol, solout, iout, work, lwork, iwork,
+     .            rtol, atol, itol, Solout, iout, work, lwork, iwork,
      .            liwork, rpar, ipar, idid)
 
       Stokes(1) = Stokes_c(1)!/Stokes_c(5)

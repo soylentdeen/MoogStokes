@@ -74,7 +74,7 @@ c      opacity matrix and emission vector for the DELO algorithm
 
 
 c*****  The total opacity (line+continuum)
-         kaptot(i) = kaplam(i) + phi_I
+         kaptot(i) = (kaplam(i) + phi_I)!/kapref(i)
 
 c*****  Assemble the Opacity matrix (K')
          kappa(1,1,i)=0.0
@@ -114,7 +114,7 @@ c            via the quadratic DELO algorithm
       Stokes(4) = 0.0
       continuum = Stokes(1)
 
-      delta_tau = -0.05
+      delta_tau = -0.001
       call dcopy(4, emission(:,ntau), 1, emiss_interp(:,1), 1)
       tau_interp(1) = tauref(ntau)*kaptot(ntau)/kapref(ntau)
       tau_interp_c(1) = tauref(ntau)*kaplam(ntau)/kapref(ntau)
@@ -130,6 +130,7 @@ c            via the quadratic DELO algorithm
       emiss_order(3) = 3
       do logtau=log10(tauref(ntau))+2*delta_tau,
      .              log10(tauref(1)),delta_tau
+         write (*,*) logtau, Stokes(1), continuum
          call interp_opacities(logtau, kappa_interp,
      .        kappa_order(2), emiss_interp, emiss_order(3), tau_interp,
      .        tau_interp_c)
