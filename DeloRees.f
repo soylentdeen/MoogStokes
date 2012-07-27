@@ -1,5 +1,5 @@
 
-      subroutine delorees
+      subroutine delo
 c**********************************************************************
 c     This routine performs the DELO integration routine through the 
 c     photosphere
@@ -12,12 +12,12 @@ c**********************************************************************
       include 'Stokes.com'
       include 'Angles.com'
       real*8 matX(4,4), matY(4,4), ones(4,4), matZ(4)
-      real*8 emiss_interp(4,3), kappa_interp(4,4,2)
-      real*8 tau_interp(3), tau_interp_c(3), logtau
+      real*8 emiss_interp(4,2), kappa_interp(4,4,2)
+      real*8 tau_interp(2), tau_interp_c(2), logtau
       real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V
       real*8 h1, h2, dx
       real*8 matS1(4), matS2(4)
-      integer emiss_order(3), kappa_order(2)
+      integer emiss_order(2), kappa_order(2)
       integer INFO, IPIV(4), LDA, LWORK
       parameter (LDA=4, LWORK=64*LDA)
       double precision WORK(LWORK)
@@ -42,16 +42,16 @@ c*****Sets up constants
       ones(4,4) = 1.0
 
 c*****  zdepth is the physical depth scale
-      do i=1,ntau
-         if (i.eq.1) then
-             zdepth(i) = 0.0
-         else
-             h1 = 1.0/(kapref(i-1))
-             h2 = 1.0/(kapref(i))
-             dtau = tauref(i)-tauref(i-1)
-             zdepth(i) = zdepth(i-1)+(h1+h2)/2.0*dtau
-         endif
-      enddo
+c      do i=1,ntau
+c         if (i.eq.1) then
+c             zdepth(i) = 0.0
+c         else
+c             h1 = 1.0/(kapref(i-1))
+c             h2 = 1.0/(kapref(i))
+c             dtau = tauref(i)-tauref(i-1)
+c             zdepth(i) = zdepth(i-1)+(h1+h2)/2.0*dtau
+c         endif
+c      enddo
 
       phi_angle = dble(0.0)
       chi_angle = dble(0.0)
@@ -74,7 +74,7 @@ c      opacity matrix and emission vector for the DELO algorithm
 
 
 c*****  The total opacity (line+continuum)
-         kaptot(i) = (kaplam(i) + phi_I)!/kapref(i)
+         kaptot(i) = (kaplam(i) + phi_I)
 
 c*****  Assemble the Opacity matrix (K')
          kappa(1,1,i)=0.0
@@ -121,21 +121,18 @@ c            via the quadratic DELO algorithm
 
       call interp_opacities(log10(tauref(ntau)),
      .        kappa_interp, 1, emiss_interp, 1, tau_interp,tau_interp_c)
-      call interp_opacities(log10(tauref(ntau))+delta_tau,
-     .        kappa_interp, 1, emiss_interp, 2, tau_interp,tau_interp_c)
       kappa_order(1) = 1
       kappa_order(2) = 2
       emiss_order(1) = 1
       emiss_order(2) = 2
-      emiss_order(3) = 3
-      do logtau=log10(tauref(ntau))+2*delta_tau,
+      do logtau=log10(tauref(ntau))+delta_tau,
      .              log10(tauref(1)),delta_tau
-         write (*,*) logtau, Stokes(1), continuum
+c         write (*,*) logtau, Stokes(1), continuum
          call interp_opacities(logtau, kappa_interp,
-     .        kappa_order(2), emiss_interp, emiss_order(3), tau_interp,
+     .        kappa_order(2), emiss_interp, emiss_order(2), tau_interp,
      .        tau_interp_c)
          
-         dtau = (tau_interp(emiss_order(2))-tau_interp(emiss_order(3)))
+         dtau = (tau_interp(emiss_order(1))-tau_interp(emiss_order(2)))
      .              *cos(viewing_angle)
          etau = 2.71828183**(-dtau)
 
@@ -150,23 +147,11 @@ c            via the quadratic DELO algorithm
          call daxpy(16,dble(-1.0*bet),kappa_interp(:,:,kappa_order(1)),
      .              1,matY,1)
 
-         x = 1.0 - etau
-         y = dtau - x
-         z = dtau**2.0 - 2.0 * y
-         dtau_i=(tau_interp(emiss_order(1))-tau_interp(emiss_order(2)))
-     .            *cos(viewing_angle)
-         alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
-         bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
-         gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
-
-         call dcopy(4, emiss_interp(:,emiss_order(3)), 1, matS1, 1)
-         call dcopy(4, emiss_interp(:,emiss_order(2)), 1, matS2, 1)
+         call dcopy(4, emiss_interp(:,emiss_order(2)), 1, matS1, 1)
          call dcopy(4, emiss_interp(:,emiss_order(1)), 1, matZ, 1)
-         call dscal(4, alph, matS1, 1)
-         call dscal(4, bet, matS2, 1)
-         call dscal(4, gam, matZ, 1)
-         call daxpy(4, dble(1.0), matS1, 1, matS2, 1)
-         call daxpy(4, dble(1.0), matS2, 1, matZ, 1)
+         call dscal(4, alph-bet, matS1, 1)
+         call dscal(4, bet, matZ, 1)
+         call daxpy(4, dble(1.0), matS1, 1, matZ, 1)
 
 c****      calculate the RHS of the equation.  Store in matZ
          call dgemv('N',4,4,dble(1.0),matY,4,Stokes,1,dble(1.0),matZ,1)
@@ -177,20 +162,14 @@ c****      Solve the system of differential equations
          call dcopy(4, matZ, 1, Stokes, 1)
 
 c****     Now do the same thing for the continuum
-         dtau=(tau_interp_c(emiss_order(2))-
-     .         tau_interp_c(emiss_order(3)))*cos(viewing_angle)
+         dtau=(tau_interp_c(emiss_order(1))-
+     .         tau_interp_c(emiss_order(2)))*cos(viewing_angle)
          etau = 2.71828183**(-dtau)
-         x = 1.0 - etau
-         y = dtau - x
-         z = dtau**2.0 - 2.0 * y
-         dtau_i = (tau_interp_c(emiss_order(1))-
-     .             tau_interp_c(emiss_order(2)))*cos(viewing_angle)
-         alph = (z -dtau*y)/((dtau + dtau_i)*dtau_i)
-         bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
-         gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
-         continuum=etau*continuum+alph*emiss_interp(1,emiss_order(3))
-     .             +bet*emiss_interp(1,emiss_order(2))
-     .             +gam*emiss_interp(1,emiss_order(1))
+         alph = 1.0 - etau
+         bet =(1.0-(1.0+dtau)*etau)/dtau
+         continuum=etau*continuum+(alph-bet)*
+     .              emiss_interp(1,emiss_order(2))
+     .             +bet*emiss_interp(1,emiss_order(1))
 
          if (kappa_order(1).eq.1)then
              kappa_order(1) = 2
@@ -201,16 +180,10 @@ c****     Now do the same thing for the continuum
          endif
          if (emiss_order(1).eq.1) then
              emiss_order(1) = 2
-             emiss_order(2) = 3
-             emiss_order(3) = 1
-         elseif (emiss_order(1).eq.2) then
-             emiss_order(1) = 3
              emiss_order(2) = 1
-             emiss_order(3) = 2
-         else
+         elseif (emiss_order(1).eq.2) then
              emiss_order(1) = 1
              emiss_order(2) = 2
-             emiss_order(3) = 3
          endif
 
       enddo

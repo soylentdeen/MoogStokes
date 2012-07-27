@@ -114,7 +114,7 @@ c            via the quadratic DELO algorithm
       Stokes(4) = 0.0
       continuum = Stokes(1)
 
-      delta_tau = -0.001
+      delta_tau = -0.05
       call dcopy(4, emission(:,ntau), 1, emiss_interp(:,1), 1)
       tau_interp(1) = tauref(ntau)*kaptot(ntau)/kapref(ntau)
       tau_interp_c(1) = tauref(ntau)*kaplam(ntau)/kapref(ntau)
@@ -245,27 +245,27 @@ c***********************************************************************
       enddo
 10    do j=1,4
          do k=1,4
-            slope=(kappa(j,k,i+1)-kappa(j,k,i))/
+            slope=(log10(kappa(j,k,i+1))-log10(kappa(j,k,i)))/
      .            (log10(tauref(i+1))-log10(tauref(i)))
-            k_interp(j,k,k_ord)=kappa(j,k,i)+
-     .             slope*(logtau-log10(tauref(i)))
+            k_interp(j,k,k_ord)=10.0**(log10(kappa(j,k,i))+
+     .             slope*(logtau-log10(tauref(i))))
          enddo
-         slope=(emission(j,i+1)-emission(j,i))/
+         slope=(log10(emission(j,i+1))-log10(emission(j,i)))/
      /         (log10(tauref(i+1))-log10(tauref(i)))
-         e_interp(j,e_ord) = emission(j,i)+
-     /          slope*(logtau-log10(tauref(i)))
+         e_interp(j,e_ord) = 10.0**(log10(emission(j,i))+
+     /          slope*(logtau-log10(tauref(i))))
       enddo
-      slope = (tauref(i+1)*kaptot(i+1)/kapref(i+1)-
-     .         tauref(i)*kaptot(i)/kapref(i))/
+      slope = (log10(tauref(i+1)*kaptot(i+1)/kapref(i+1))-
+     .         log10(tauref(i)*kaptot(i)/kapref(i)))/
      .        (log10(tauref(i+1))-log10(tauref(i)))
-      tau_interp(e_ord) = tauref(i)*kaptot(i)/kapref(i)+
-     .        slope*(logtau-log10(tauref(i)))
+      tau_interp(e_ord) = 10.0**(log10(tauref(i)*kaptot(i)/kapref(i))+
+     .        slope*(logtau-log10(tauref(i))))
 
-      slope = (tauref(i+1)*kaplam(i+1)/kapref(i+1)-
-     .         tauref(i)*kaplam(i)/kapref(i))/
+      slope = (log10(tauref(i+1)*kaplam(i+1)/kapref(i+1))-
+     .         log10(tauref(i)*kaplam(i)/kapref(i)))/
      .        (log10(tauref(i+1))-log10(tauref(i)))
-      tau_interp_c(e_ord) = tauref(i)*kaplam(i)/kapref(i)+
-     .        slope*(logtau-log10(tauref(i)))
+      tau_interp_c(e_ord) = 10.0**(log10(tauref(i)*kaplam(i)/kapref(i))+
+     .        slope*(logtau-log10(tauref(i))))
       
       return
       end
