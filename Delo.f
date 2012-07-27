@@ -130,7 +130,6 @@ c            via the quadratic DELO algorithm
       emiss_order(3) = 3
       do logtau=log10(tauref(ntau))+2*delta_tau,
      .              log10(tauref(1)),delta_tau
-         write (*,*) logtau, Stokes(1), continuum
          call interp_opacities(logtau, kappa_interp,
      .        kappa_order(2), emiss_interp, emiss_order(3), tau_interp,
      .        tau_interp_c)
@@ -215,7 +214,6 @@ c****     Now do the same thing for the continuum
 
       enddo
 
-c      write (*,*) Stokes
       return
       end
 
@@ -251,8 +249,6 @@ c***********************************************************************
      .            (log10(tauref(i+1))-log10(tauref(i)))
             k_interp(j,k,k_ord)=kappa(j,k,i)+
      .             slope*(logtau-log10(tauref(i)))
-c            write (*,*) kappa(j,k,i+1), tauref(i+1)
-c            write (*,*) kappa(j,k,i), k_interp(j,k,k_ord), slope
          enddo
          slope=(emission(j,i+1)-emission(j,i))/
      /         (log10(tauref(i+1))-log10(tauref(i)))
