@@ -416,6 +416,10 @@ c            xref(i) = log10(exp(tauref(i)))
          enddo
       endif
 
+c**** Initialize the tau and kappa splines
+      call spline(xref, tauref, ntau, 2e30, 2e30, dtref)
+      call spline(xref, kapref, ntau, 2e30, 2e30, dkref)
+
 
 c*****Write information to output files
       if (modprintopt .lt. 1) return

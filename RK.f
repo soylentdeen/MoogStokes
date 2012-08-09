@@ -1,5 +1,5 @@
 
-      subroutine rungekutta
+      subroutine traceStokes
 c**********************************************************************
 c     This routine performs the DELO integration routine through the 
 c     photosphere
@@ -13,6 +13,7 @@ c**********************************************************************
       include 'Angles.com'
       real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V, D_bound
       real*8 tau_start, tau_stop, rtol, atol, rpar, Stokes_c(5), tmp
+      real*8 bgfl
       integer itol, iout, lwork, liwork, ipar
       parameter (NDGL=5, NRD=5)
       parameter (LWORK=11*NDGL+8*NRD+21,LIWORK=NRD+21)
@@ -20,6 +21,7 @@ c**********************************************************************
       external mat_derivs, Solout
 
 c*****Sets up constants
+      bgfl = dble(2e30)
 
       phi_angle = dble(0.0)
       chi_angle = dble(0.0)
@@ -44,7 +46,7 @@ c*****  The total opacity (line+continuum)
          kaptot(i) = kaplam(i) + phi_I
 c         write (*,*) tauref(i), phi_I, kaplam(i), phi_opacity(i,1),
 c     .               phi_opacity(i,2), phi_opacity(i,3), kapref(i)
-c*****  Assemble the Opacity matrix (K')
+c*****  Assemble the Opacity matrix (K)
          kappa(1,1,i)=kaptot(i)/kapref(i)
          kappa(1,2,i)=phi_Q/kapref(i)
          kappa(1,3,i)=phi_U/kapref(i)
@@ -71,7 +73,32 @@ c*****  Assembles the Emission matrix (J')
          emission(3,i)=source!*phi_U/kapref(i)
          emission(4,i)=source!*phi_V/kapref(i)
 
+         eta0(i) = kaplam(i)/kapref(i)
+c         write (*,*) xref(i), kaplam(i), kapref(i), eta0(i)
       enddo
+
+      call spline(xref, kaplam, ntau, bgfl, bgfl, dklam)
+      call spline(xref, kappa(1,1,:), ntau, bgfl, bgfl, dk11)
+      call spline(xref, kappa(1,2,:), ntau, bgfl, bgfl, dk12)
+      call spline(xref, kappa(1,3,:), ntau, bgfl, bgfl, dk13)
+      call spline(xref, kappa(1,4,:), ntau, bgfl, bgfl, dk14)
+      call spline(xref, kappa(2,1,:), ntau, bgfl, bgfl, dk21)
+      call spline(xref, kappa(2,2,:), ntau, bgfl, bgfl, dk22)
+      call spline(xref, kappa(2,3,:), ntau, bgfl, bgfl, dk23)
+      call spline(xref, kappa(2,4,:), ntau, bgfl, bgfl, dk24)
+      call spline(xref, kappa(3,1,:), ntau, bgfl, bgfl, dk31)
+      call spline(xref, kappa(3,2,:), ntau, bgfl, bgfl, dk32)
+      call spline(xref, kappa(3,3,:), ntau, bgfl, bgfl, dk33)
+      call spline(xref, kappa(3,4,:), ntau, bgfl, bgfl, dk34)
+      call spline(xref, kappa(4,1,:), ntau, bgfl, bgfl, dk41)
+      call spline(xref, kappa(4,2,:), ntau, bgfl, bgfl, dk42)
+      call spline(xref, kappa(4,3,:), ntau, bgfl, bgfl, dk43)
+      call spline(xref, kappa(4,4,:), ntau, bgfl, bgfl, dk44)
+      call spline(xref, emission(1,:), ntau, bgfl, bgfl, de1)
+      call spline(xref, emission(2,:), ntau, bgfl, bgfl, de2)
+      call spline(xref, emission(3,:), ntau, bgfl, bgfl, de3)
+      call spline(xref, emission(4,:), ntau, bgfl, bgfl, de4)
+      call spline(xref, eta0, ntau, bgfl, bgfl, deta0)
 
 c*****   Trace the Stokes parameters through the atmosphere
 c            via the quadratic DELO algorithm
@@ -107,7 +134,7 @@ c      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
       tau_stop = tauref(1)
       itol = 0
       rtol = 1.0e-14
-      atol = 1.0e-4
+      atol = 1.0e-5
       do 10 i=1,10
          iwork(i)=0
 10       work(i)=0.D0

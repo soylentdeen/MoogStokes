@@ -129,10 +129,10 @@ c         do j=1,n_cells
 c            longitude = -3.14159262/2.0+(j-0.5)*dphi
 c            call computeRotations
 cc            write (*,*) wave, chi_angle, i, j
-cc            call rungeKutta
-c            call delo
+c            call rungeKutta
+cc            call delo
 c            call appendStokes(cell_a)
-cc            write (*,*) Stokes_I, Stokes_Q
+ccc            write (*,*) Stokes_I, Stokes_Q
 c         enddo
 c      enddo
       azimuth = 3.14159262/2.0
@@ -142,9 +142,9 @@ c      enddo
       viewing_angle = dble(0.0)
 c      viewing_angle = dble(3.141592/4.0)
 c      write (*,*) phi_angle, chi_angle, viewing_angle
-      call delo
+      call traceStokes
 c      call rungeKutta
-c      read (*,*)
+      read (*,*)
 c      Stokes_I = Stokes_I/total_weight
 c      Stokes_Q = Stokes_Q/total_weight
 c      Stokes_U = Stokes_U/total_weight
