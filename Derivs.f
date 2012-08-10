@@ -78,24 +78,24 @@ c      DYDX(5)=klam/kref*(Y(5)-e_1)/mu
       include 'Linex.com'
       include 'Stokes.com'
 
-      logtau = log10(X)
-      do i=1,ntau-1
-         if (tauref(i+1)+1.0e-10.ge.X) THEN
-             goto 10
-         endif
-      enddo
-10    denom =(log10(tauref(i+1))-log10(tauref(i)))
-      run =(logtau - log10(tauref(i)))
-
-      slope=(eta0(i+1)-eta0(i))/denom
-      e_0 = (eta0(i)+slope*run)
-      slope=(kappa(1,1,i+1)-kappa(1,1,i))/denom
-      k_11a = (kappa(1,1,i)+slope*run)
+c      logtau = log10(X)
+c      do i=1,ntau-1
+c         if (tauref(i+1)+1.0e-10.ge.X) THEN
+c             goto 10
+c         endif
+c      enddo
+c10    denom =(log10(tauref(i+1))-log10(tauref(i)))
+c      run =(logtau - log10(tauref(i)))
+c
+c      slope=(eta0(i+1)-eta0(i))/denom
+c      e_0 = (eta0(i)+slope*run)
+c      slope=(kappa(1,1,i+1)-kappa(1,1,i))/denom
+c      k_11a = (kappa(1,1,i)+slope*run)
 
 c      call splint(xref, eta0, deta0, ntau, logtau, e_0)
-      call splint(xref, kaplam, dklam, ntau, logtau, klam)
-      call splint(xref, kapref, dkref, ntau, logtau, kref)
-      call splint(xref, kappa(1,1,:), dk11, ntau, logtau, k_11)
+c      call splint(xref, kaplam, dklam, ntau, logtau, klam)
+c      call splint(xref, kapref, dkref, ntau, logtau, kref)
+c      call splint(xref, kappa(1,1,:), dk11, ntau, logtau, k_11)
 c      write (*,*) log10(X), k_tot, tau_tot, tau_c
 c      write (*,*) log10(X), k_11, k_11a
       write (*,*) log10(X), Y(1), Y(5)

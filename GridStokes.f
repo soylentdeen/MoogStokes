@@ -140,15 +140,8 @@ c      enddo
       call computeRotations
       chi_angle = dble(0.0)
       viewing_angle = dble(0.0)
-c      viewing_angle = dble(3.141592/4.0)
-c      write (*,*) phi_angle, chi_angle, viewing_angle
       call traceStokes
-c      call rungeKutta
-      read (*,*)
-c      Stokes_I = Stokes_I/total_weight
-c      Stokes_Q = Stokes_Q/total_weight
-c      Stokes_U = Stokes_U/total_weight
-c      Stokes_V = Stokes_V/total_weight
+c      read (*,*)
       Stokes_I = Stokes(1)/continuum
       Stokes_Q = Stokes(2)/continuum
       Stokes_U = Stokes(3)/continuum

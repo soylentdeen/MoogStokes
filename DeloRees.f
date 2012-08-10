@@ -233,7 +233,7 @@ c     .         emiss_interp(1,emiss_order(1))
              emiss_order(1) = 1
              emiss_order(2) = 2
          endif
-         write (*,*) logtau, Stokes(1), continuum
+c         write (*,*) logtau, Stokes(1), continuum
 
       enddo
 

@@ -102,26 +102,21 @@ c         write (*,*) xref(i), kaplam(i), kapref(i), eta0(i)
 
 c*****   Trace the Stokes parameters through the atmosphere
 c            via the quadratic DELO algorithm
-      D_bound=kappa(1,1,ntau)**2*(kappa(1,1,ntau)**2-kappa(1,2,ntau)**2-
-     .  kappa(1,3,ntau)**2-kappa(1,4,ntau)**2+kappa(3,4,ntau)**2+
-     .  kappa(4,2,ntau)**2+kappa(2,3,ntau)**2)-(kappa(1,2,ntau)*
-     .  kappa(3,4,ntau)+kappa(1,3,ntau)*kappa(4,2,ntau)+kappa(1,4,ntau)*
-     .  kappa(2,3,ntau))**2
-
-      dB = (emission(1,ntau)-emission(1,ntau-2))/
-     .      (tauref(ntau)-tauref(ntau-2))
-
-      tmp = cos(viewing_angle)*dB/D_bound*
-     .     kappa(1,1,ntau)*(kappa(1,1,ntau)**2+kappa(3,4,ntau)**2+
-     .     kappa(4,2,ntau)**2+kappa(2,3,ntau)**2)
+c      D_bound=kappa(1,1,ntau)**2*(kappa(1,1,ntau)**2-kappa(1,2,ntau)**2-
+c     .  kappa(1,3,ntau)**2-kappa(1,4,ntau)**2+kappa(3,4,ntau)**2+
+c     .  kappa(4,2,ntau)**2+kappa(2,3,ntau)**2)-(kappa(1,2,ntau)*
+c     .  kappa(3,4,ntau)+kappa(1,3,ntau)*kappa(4,2,ntau)+kappa(1,4,ntau)*
+c     .  kappa(2,3,ntau))**2
+c
+c      dB = (emission(1,ntau)-emission(1,ntau-2))/
+c     .      (tauref(ntau)-tauref(ntau-2))
+c
+c      tmp = cos(viewing_angle)*dB/D_bound*
+c     .     kappa(1,1,ntau)*(kappa(1,1,ntau)**2+kappa(3,4,ntau)**2+
+c     .     kappa(4,2,ntau)**2+kappa(2,3,ntau)**2)
 c      Stokes_c(1) = emission(1,ntau)+cos(viewing_angle)*dB/D*
 c     .     kappa(1,1,ntau)*(kappa(1,1,ntau)**2+kappa(3,4,ntau)**2+
 c     .     kappa(4,2,ntau)**2+kappa(2,3,ntau)**2)
-c      write (*,*) 'D = ', D_bound
-c      write (*,*) 'kappa(1,1,ntau) = ', kappa(1,1,ntau)
-c      write (*,*) 'tmp = ', tmp/emission(1,ntau)
-c      write (*,*) 'viewing_angle = ', viewing_angle
-c      read (*,*)
       Stokes_c(1) = emission(1,ntau)
       Stokes_c(2) = 0.0
       Stokes_c(3) = 0.0
@@ -129,16 +124,16 @@ c      read (*,*)
       Stokes_c(5) = emission(1,ntau)
 c      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
 
-      iout=1
+      iout=0
       tau_start = tauref(ntau)
       tau_stop = tauref(1)
       itol = 0
       rtol = 1.0e-14
       atol = 1.0e-5
-      do 10 i=1,10
+      do i=1,10
          iwork(i)=0
-10       work(i)=0.D0
-c      iwork(5) = NDGL
+         work(i)=0.D0
+      enddo
 
       call dop853(ndgl, mat_derivs, tau_start, Stokes_c, tau_stop,
      .            rtol, atol, itol, Solout, iout, work, lwork, iwork,
@@ -149,9 +144,7 @@ c      iwork(5) = NDGL
       Stokes(3) = Stokes_c(3)!/Stokes_c(5)
       Stokes(4) = Stokes_c(4)!/Stokes_c(5)
       continuum = Stokes_c(5)
-c      write (*,*) idid, iwork(17), iwork(18), iwork(19), iwork(20)
-c      write (*,*) Stokes(1), Stokes(2), Stokes(3), Stokes(4)
-c      write (*,*) Stokes
+
       return
       end
 
