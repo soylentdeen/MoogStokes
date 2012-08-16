@@ -143,6 +143,8 @@ c*****  Assembles the Emission matrix (J')
       call spline(xref, k43, ntau, bgfl, bgfl, dk43)
       call spline(xref, k44, ntau, bgfl, bgfl, dk44)
       call spline(xref, tautot, ntau, bgfl, bgfl, dttot)
+      call spline(xref, kaptot, ntau, bgfl, bgfl, dktot)
+      call spline(xref, kapref, ntau, bgfl, bgfl, dkref)
       call spline(xref, tlam, ntau, bgfl, bgfl, dtlam)
       call spline(xref, emission(1,:), ntau, bgfl, bgfl, de1)
       call spline(xref, emission(2,:), ntau, bgfl, bgfl, de2)
@@ -261,6 +263,7 @@ c***********************************************************************
       real*8 slope, k_interp(4,4,2), e_interp(4,3)
       real*8 tau_interp(3), tau_interp_c(3), logtau, delta_tau
       real*8 denom, run, kc_ref, t_tot, t_lam, tref, kref
+      real*8 ktot, klam
       real*8 k_ref, k_tot, k_lam, e_1, e_2, e_3, e_4
       real*8 k_11, k_12, k_13, k_14, k_21, k_22, k_23, k_24
       real*8 k_31, k_32, k_33, k_34, k_41, k_42, k_43, k_44
@@ -268,6 +271,9 @@ c***********************************************************************
 
       call splint(xref, tlam, dtlam, ntau, logtau, t_lam)
       call splint(xref, tautot, dttot, ntau, logtau, t_tot)
+      call splint(xref, kaptot, dktot, ntau, logtau, ktot)
+      call splint(xref, kaplam, dklam, ntau, logtau, klam)
+      call splint(xref, kapref, dkref, ntau, logtau, kref)
 
       call splint(xref, k11, dk11, ntau, logtau, k_11)
       call splint(xref, k12, dk12, ntau, logtau, k_12)
@@ -313,11 +319,12 @@ c***********************************************************************
       e_interp(3,e_ord) = e_3
       e_interp(4,e_ord) = e_4
 
-      tau_interp(e_ord) = t_tot
-      tau_interp_c(e_ord) = t_lam
+      tau_interp(e_ord) = ktot/kref
+      tau_interp_c(e_ord) = klam/kref
 c      tau_interp(e_ord) = 10.0**logtau * k_tot/k_ref
 c      tau_interp_c(e_ord) = 10.0**logtau * k_lam/k_ref
 
+c      write (*,*) logtau, t_lam, e_1, t_tot, kref
 c      write (*,*) logtau, tau_interp(e_ord), tau_interp_c(e_ord)
       return
       end

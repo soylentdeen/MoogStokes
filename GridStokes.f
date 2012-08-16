@@ -141,7 +141,7 @@ c      enddo
       chi_angle = dble(0.0)
       viewing_angle = dble(0.0)
       call traceStokes
-c      read (*,*)
+      read (*,*)
       Stokes_I = Stokes(1)/continuum
       Stokes_Q = Stokes(2)/continuum
       Stokes_U = Stokes(3)/continuum

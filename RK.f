@@ -1,8 +1,8 @@
 
       subroutine traceStokes
 c**********************************************************************
-c     This routine performs the DELO integration routine through the 
-c     photosphere
+c     This routine performs the Runge-Kutta integration routine through
+c     the photosphere
 c**********************************************************************
 
       implicit real*8 (a-h,o-z)
@@ -74,10 +74,11 @@ c*****  Assembles the Emission matrix (J')
          emission(4,i)=source!*phi_V/kapref(i)
 
          eta0(i) = kaplam(i)/kapref(i)
-c         write (*,*) xref(i), kaplam(i), kapref(i), eta0(i)
       enddo
 
       call spline(xref, kaplam, ntau, bgfl, bgfl, dklam)
+      call spline(xref, kaptot, ntau, bgfl, bgfl, dktot)
+      call spline(xref, kapref, ntau, bgfl, bgfl, dkref)
       call spline(xref, kappa(1,1,:), ntau, bgfl, bgfl, dk11)
       call spline(xref, kappa(1,2,:), ntau, bgfl, bgfl, dk12)
       call spline(xref, kappa(1,3,:), ntau, bgfl, bgfl, dk13)
@@ -118,13 +119,13 @@ c      Stokes_c(1) = emission(1,ntau)+cos(viewing_angle)*dB/D*
 c     .     kappa(1,1,ntau)*(kappa(1,1,ntau)**2+kappa(3,4,ntau)**2+
 c     .     kappa(4,2,ntau)**2+kappa(2,3,ntau)**2)
       Stokes_c(1) = emission(1,ntau)
-      Stokes_c(2) = 0.0
-      Stokes_c(3) = 0.0
-      Stokes_c(4) = 0.0
+      Stokes_c(2) = dble(0.0)
+      Stokes_c(3) = dble(0.0)
+      Stokes_c(4) = dble(0.0)
       Stokes_c(5) = emission(1,ntau)
-c      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
+      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
 
-      iout=0
+      iout=1
       tau_start = tauref(ntau)
       tau_stop = tauref(1)
       itol = 0
@@ -144,8 +145,14 @@ c      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
       Stokes(3) = Stokes_c(3)!/Stokes_c(5)
       Stokes(4) = Stokes_c(4)!/Stokes_c(5)
       continuum = Stokes_c(5)
+c      Stokes(1) = dble(99.9)
+c      Stokes(1) = dble(0.0)
+c      Stokes(1) = dble(0.0)
+c      Stokes(1) = dble(0.0)
+c      continuum = dble(100.0)
 
       return
+
       end
 
       real*8 function Planck(temperature)

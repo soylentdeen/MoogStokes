@@ -21,8 +21,9 @@ c******************************************************************************
      .             dk31(100), dk32(100), dk33(100), dk34(100),
      .             dk41(100), dk42(100), dk43(100), dk44(100),
      .             de1(100), de2(100), de3(100), de4(100),
-     .             eta0(100), deta0(100), tlam(100),
-     .             dttot(100), dtlam(100), tautot(100),
+     .             eta0(100), deta0(100), tlam(100), dktot(100),
+     .             dkref(100),
+     .             dttot(100), dtlam(100), tautot(100), dklam(100),
      .             zdepth(100)
 
       common/stokesparams/deltamj, phi_opacity, psi_opacity,
@@ -38,7 +39,8 @@ c******************************************************************************
      .             dk31, dk32, dk33, dk34,
      .             dk41, dk42, dk43, dk44,
      .             de1, de2, de3, de4,
-     .             eta0, deta0, tlam,
-     .             dttot, dtlam, tautot,
+     .             eta0, deta0, tlam, dktot,
+     .             dkref,
+     .             dttot, dtlam, tautot, dklam,
      .             zdepth
 
