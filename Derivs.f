@@ -95,7 +95,7 @@ c      DYDX(5)=klam/kref*(Y(5)-e_1)/mu
       call splint(xref, kapref, dkref, ntau, logtau, kref)
       call splint(xref, kappa(1,1,:), dk11, ntau, logtau, k_11)
       call splint(xref, emission(1,:), de1, ntau, logtau, e_1)
-      write (*,*) log10(X), klam, kref, e_0, e_1, ktot
+c      write (*,*) log10(X), klam, kref, e_0, e_1, ktot
 c      write (*,*) log10(X), k_11, k_11a
-c      write (*,*) log10(X), Y(1), Y(5)
+      write (*,*) log10(X), Y(1), Y(5)
       END

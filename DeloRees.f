@@ -44,16 +44,18 @@ c*****Sets up constants
       ones(4,4) = 1.0
 
 c*****  zdepth is the physical depth scale
-c      do i=1,ntau
-c         if (i.eq.1) then
-c             zdepth(i) = 0.0
-c         else
-c             h1 = 1.0/(kapref(i-1))
-c             h2 = 1.0/(kapref(i))
-c             dtau = tauref(i)-tauref(i-1)
-c             zdepth(i) = zdepth(i-1)+(h1+h2)/2.0*dtau
-c         endif
-c      enddo
+      do i=1,ntau
+         if (i.eq.1) then
+             zdepth(i) = 0.0
+         else
+             h1 = 1.0/(kapref(i-1))
+             h2 = 1.0/(kapref(i))
+             dtau = tauref(i)-tauref(i-1)
+             zdepth(i) = zdepth(i-1)+(h1+h2)/2.0*dtau
+         endif
+c         write (*,*) tauref(i), zdepth(i)
+      enddo
+
 
       phi_angle = dble(0.0)
       chi_angle = dble(0.0)
@@ -122,9 +124,23 @@ c*****  Assembles the Emission matrix (J')
          emission(3,i)=source*phi_U/kaptot(i)
          emission(4,i)=source*phi_V/kaptot(i)
 
-         tautot(i) = kaptot(i)/kapref(i)*tauref(i)
-         tlam(i) = kaplam(i)/kapref(i)*tauref(i)
+c         tautot(i) = kaptot(i)/kapref(i)*tauref(i)
+c         tlam(i) = kaplam(i)/kapref(i)*tauref(i)
       enddo
+      do i=1,ntau
+         if (i.eq.1) then
+            tautot(i) = kaptot(i)/kapref(i)*tauref(i)
+            tlam(i) = kaplam(i)/kapref(i)*tauref(i)
+         else
+            dz = zdepth(i)-zdepth(i-1)
+            dtautot = dz*(kaptot(i-1)+kaptot(i))/2.0
+            dtaulam = dz*(kaplam(i-1)+kaplam(i))/2.0
+            tautot(i) = tautot(i-1)+dtautot
+            tlam(i) = tlam(i-1)+dtaulam
+         endif
+c         write (*,*) zdepth(i), tauref(i), tautot(i), tlam(i)
+      enddo
+c      read (*,*)
 
       call spline(xref, k11, ntau, bgfl, bgfl, dk11)
       call spline(xref, k12, ntau, bgfl, bgfl, dk12)
@@ -319,8 +335,10 @@ c***********************************************************************
       e_interp(3,e_ord) = e_3
       e_interp(4,e_ord) = e_4
 
-      tau_interp(e_ord) = ktot/kref
-      tau_interp_c(e_ord) = klam/kref
+      tau_interp(e_ord) = t_tot
+      tau_interp_c(e_ord) =t_lam
+c      tau_interp(e_ord) = ktot/kref
+c      tau_interp_c(e_ord) = klam/kref
 c      tau_interp(e_ord) = 10.0**logtau * k_tot/k_ref
 c      tau_interp_c(e_ord) = 10.0**logtau * k_lam/k_ref
 
