@@ -1,5 +1,5 @@
 
-      subroutine synth                   
+      subroutine diskint
 c******************************************************************************
 c     This program synthesizes a section of spectrum and compares it
 c     to an observation file.
@@ -12,11 +12,21 @@ c******************************************************************************
       include 'Linex.com'
       include 'Pstuff.com'
       include 'Dummy.com'
+      include 'Angles.com'
 
 
 c*****examine the parameter file
       call params
 
+      B_sph(1) = 1.0
+      B_sph(2) = 0.0
+      B_sph(3) = 0.0
+
+      B_xyz(1) = 0.0
+      B_xyz(2) = 0.0
+      B_xyz(3) = 0.0
+
+      inclination = 3.1415926/2.0
 
 c*****open the files for: standard output, raw spectrum depths, smoothed 
 c     spectra, and (if desired) IRAF-style smoothed spectra
@@ -86,31 +96,42 @@ c*****open the line list file and the strong line list file
       
 
 c*****do the syntheses
-      ncall = 1
-10    if (numpecatom .eq. 0 .or. numatomsyn .eq. 0) then
-         isynth = 1
-         isorun = 1
-         nlines = 0
-         mode = 3
-         call inlines (1)
-         call eqlib
-         call nearly (1)
-         call synspec
-      else
-         do n=1,numatomsyn
-            isynth = n
-            isorun = n
-            start = oldstart
-            sstop = oldstop
-            mode = 3
-            call inlines (1)
-            call eqlib
-            call nearly (1)
-            call synspec
-            linprintopt = 0
+10    isynth = 1
+      isorun = 1
+      nlines = 0
+      mode = 3
+      call inlines (1)
+      call eqlib
+      call nearly (1)
+      nrings = 23
+      ncells = 695
+      cell_area = 4.0*3.14159262/ncells
+      radtodeg = 180.0/3.1459262
+      do i=1,nrings
+         chi_start = (i-1)*3.14159262/nrings
+         chi_stop = i*3.14159262/nrings
+         azimuth = (chi_start + chi_stop)/2.0
+         dchi = -cos(chi_stop) + cos(chi_start)
+         ring_area = 2.0*3.14159262 * dchi ! total sterrad in semicircle
+         n_cells = nint(ring_area/cell_area) ! # of cells in ring
+         cell_a = ring_area/float(n_cells)
+         dphi = 2.0*3.14159262/n_cells
+c         write (*,*) wave, azimuth*radtodeg, n_cells
+         do j=1,n_cells
+            longitude = -3.14159262+(j-0.5)*dphi
+            call computeRotations
+c            write (*,*) phi_angle*radtodeg,chi_angle*radtodeg,
+c     .                  longitude*radtodeg,viewing_angle*radtodeg
+            if (viewing_angle*radtodeg .le. 90.0) THEN
+               call synspectile
+               call appendStokes(cell_a)
+            endif
          enddo
-      endif
-         
+      enddo
+
+      do i = 1, len(spectrum)
+         spectrum(i) = spectrum(i)/total_weight
+      enddo
 
 c*****now plot the spectrum
 20    if (plotopt.eq.2 .and. specfileopt.gt.0) then
@@ -207,11 +228,105 @@ c*****format statements
      .        '         lines      = ',i1,5x,'flux/int   = ',i1)
 1107  format (/'KAPREF ARRAY:'/(6(1pd12.4)))
 
-
-
       end 
 
+      subroutine computeRotations
+
+      implicit real*8 (a-h,o-z)
+      include "Angles.com"
+      real*8 temp_A(3,3), Bmag
+
+      T_rho(1,1) = 0.0
+      T_rho(1,2) = 0.0
+      T_rho(1,3) = 1.0
+      T_rho(2,1) = -cos(longitude)
+      T_rho(2,2) = sin(longitude)
+      T_rho(2,3) = 0.0
+      T_rho(3,1) = sin(longitude)
+      T_rho(3,2) = cos(longitude)
+      T_rho(3,3) = 0.0
+
+      T_eta(1,1) = cos(azimuth+position_angle)
+      T_eta(1,2) = -sin(azimuth+position_angle)
+      T_eta(1,3) = 0.0
+      T_eta(2,1) = sin(azimuth+position_angle)
+      T_eta(2,2) = cos(azimuth+position_angle)
+      T_eta(2,3) = 0.0
+      T_eta(3,1) = 0.0
+      T_eta(3,2) = 0.0
+      T_eta(3,3) = 1.0
+
+      T_i(1,1) = 1.0
+      T_i(1,2) = 0.0
+      T_i(1,3) = 0.0
+      T_i(2,1) = 0.0
+      T_i(2,2) = cos(inclination)
+      T_i(2,3) = sin(inclination)
+      T_i(3,1) = 0.0
+      T_i(3,2) = -sin(inclination)
+      T_i(3,3) = cos(inclination)
+
+      call dcopy(9,zeros,1,temp_A,1)
+      call dcopy(9,zeros,1,rotation_matrix,1)
+      call dgemm('T','N',3,3,3,dble(1.0),T_rho,3,T_eta,
+     .           3,dble(0.0),temp_A,3)
+      call dgemm('N','N',3,3,3,dble(1.0),T_i,3,temp_A,
+     .           3,dble(0.0),rotation_matrix,3)
+
+      B_xyz(1) = 0.0
+      B_xyz(2) = 0.0
+      B_xyz(3) = 0.0
+      call dgemm('N','N',3,3,3,dble(1.0),rotation_matrix,3,
+     .           B_sph,3,dble(1.0),B_xyz,3)
+
+      Bmag = sqrt(B_xyz(1)**2.0+B_xyz(2)**2.0+B_xyz(3)**2.0)
+      phi_angle = acos(-B_xyz(1)/Bmag)
+      chi_angle = atan(B_xyz(2)/B_xyz(3))
+      viewing_angle = acos(-B_xyz(1))
+      mu = cos(viewing_angle)
+      return
+      end
 
 
+      subroutine AppendStokes(cell_a)
+c*****************************************************************
+c     Adds an emergent spectrum (calculated at angles phi, chi) to
+c     the resultant spectrum.  Calculated at a single wavelength.
+c*****************************************************************
 
+      implicit real*8 (a-h,o-z)
+      include "Atmos.com"
+      include "Linex.com"
+      include "Angles.com"
+      real*8 area, proj_area, limb_darkening
+      real*8 surface_area, weight
+
+      if ((1.0/(wave/10000.0)).lt.2.4) then
+          alpha = -0.023 + 0.292/(wave/10000.0)
+      else
+          alpha = -0.507 + 0.441/(wave/10000.0)
+      endif
+
+      mu = cos(viewing_angle)
+
+      limb_darkening = (1.0-(1.0-mu**alpha))
+
+c*****   Calculate the projected area
+      dotproduct = cos(viewing_angle)
+c      dotproduct = sin(phi_angle)*sin(chi_angle)**2.0
+      projected_area = cell_a*dotproduct/(4.0*3.14159262)
+
+      weight = limb_darkening*projected_area
+c      write (*,*) viewing_angle*180.0/3.14159262, projected_area
+c      write (*,*) viewing_angle*180.0/3.14159262, mu, limb_darkening,
+c     .            projected_area, weight
+
+      do i = 1, len(d) 
+          spectrum(i) = spectrum(i) + (1.0-d(i))*weight
+      enddo
+
+
+      total_weight = total_weight + weight
+
+      end
 

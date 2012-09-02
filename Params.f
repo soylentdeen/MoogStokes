@@ -12,9 +12,10 @@ c******************************************************************************
       include 'Obspars.com'
       include 'Mol.com'
       include 'Multistar.com'
-      real*8 deltalogab(5)
+      include 'Angles.com'
+      real*8 deltalogab(5), blah
       character keyword*20
-      character arrayz*80
+      character arrayz*80, stokes_base*20
       integer kk
       data newcount, linecount /0, 0/
 
@@ -68,9 +69,12 @@ c                    to be used for some other purpose as needed`
       f8out =   'no_filename_given'
       f9out =   'no_filename_given'
       f10out =  'no_filename_given'
-      f11out =  'no_filename_given'
-      f12out =  'no_filename_given'
-      f13out =  'no_filename_given'
+      fAngles = 'Stokes.angles'
+      fStokesI = 'Stokes.spectrum_I'
+      fStokesQ = 'Stokes.spectrum_Q'
+      fStokesU = 'Stokes.spectrum_U'
+      fStokesV = 'Stokes.spectrum_V'
+      fContinuum = 'Stokes.spectrum_continuum'
       nf1out =   0
       nf2out =   0
       nf3out =   0
@@ -81,9 +85,12 @@ c                    to be used for some other purpose as needed`
       nf8out =   0
       nf9out =   0
       nf10out =  0
-      nf11out =  0
-      nf12out =  0
-      nf13out =  0
+      nfAngles = 0
+      nfStokesI = 0
+      nfStokesQ = 0
+      nfStokesU = 0
+      nfStokesV = 0
+      nfContinuum = 0
       modelnum = 0
 
 
@@ -249,17 +256,6 @@ c  keyword 'hardpost_out' controls the name of a postscript plot output
       elseif (keyword .eq. 'hardpost_out') then
          read (array,*) f5out
 
-c  keyword 'stokes_out' controls the name of the emergent spectrum file
-      elseif (keyword .eq. 'stokes_out') then
-         read (array,*) f11out
-
-c  keyword 'stokes_atm_out' - trace of Stokes parameters thru atmosphere
-      elseif (keyword .eq. 'stokes_atm_out') then
-         read (array,*) f12out
-
-c  keyword 'stokes_opac_out' - trace of Polarized Opacities through atmosphere
-      elseif (keyword .eq. 'stokes_opac_out') then
-         read (array,*) f13out
 
 c  keyword 'speccomp_out' controls the name of a text file containing the
 c  comparisons (wavelength shifts, sigmas, etc.) between observed and
@@ -291,6 +287,22 @@ c  keyword 'smoothed_out' controls the name of the smoothed synthesis output
       elseif (keyword .eq. 'smoothed_out') then
          read (array,*) f3out
 
+c  keyword 'stokes_out' controls the base name of all the Stokes-related output
+      elseif (keyword .eq. 'stokes_out') then
+         read (array,*) stokes_base
+c         stokes_base = trim(stokes_base)
+         fAngles = trim(stokes_base)//'.angles'
+         fStokesI = trim(stokes_base)//'.spectrum_I'
+         fStokesQ = trim(stokes_base)//'.spectrum_Q'
+         fStokesU = trim(stokes_base)//'.spectrum_U'
+         fStokesV = trim(stokes_base)//'.spectrum_V'
+         fContinuum = trim(stokes_base)//'.continuum'
+
+      elseif (keyword .eq. 'nrings') then
+         read (array,*) nrings
+
+      elseif (keyword .eq. 'ncells') then
+         read (array,*) ncells
 
 c  keyword 'keeplines_out' controls the name of the list of kept lines
 c  for future synthetic spectrum runs
@@ -328,16 +340,6 @@ c  keyword 'observed_in' controls the name of the input observed spectrum
       elseif (keyword .eq. 'observed_in') then
          read (array,*) fobs
 
-c      elseif (keyword .eq. 'mu') then
-c         read (array,*) mu
-c         phi = acos(mu)
-
-c      elseif (keyword .eq. 'phi') then
-c         read (array,*) phi
-c         mu = cos(phi)
-
-c      elseif (keyword .eq. 'zeta') then
-c         read (array,*) zeta
 
 c  keyword 'table_in' controls the name of the extra input instruction file
       elseif (keyword .eq. 'table_in   ') then
@@ -491,6 +493,9 @@ c           1 = central intensity calculations
       elseif (keyword .eq. 'flux/int') then
          read (array,*) fluxintopt
 
+      elseif (keyword .eq. 'viewang') then
+         read (array,*) blah
+         mu = cos(dble(3.14159262/180.0)*blah)
 
 c           0 = use the Unsold approximation, except multiply possibly
 c                 by a factor read in for an individual line
@@ -693,7 +698,6 @@ c  if value is <= 0 then it does not do it
       
 c  any other keyword causes great grudge
       else
-         write (*,*) 'Error! Keyword not recognized!'
          write (array,1006) keyword
          call prinfo (5)
          stop
@@ -754,7 +758,6 @@ c  exit normally
       oldstop  = sstop
       oldstep  = step
       olddelta = delta
-      write (*,*) "This is only a test "
       return
 
 

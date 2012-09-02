@@ -11,12 +11,12 @@ c*****************************************************************
       include "Linex.com"
       include "Angles.com"
       real*8 area, proj_area, limb_darkening
-      real*8 surface_area, mu, weight
+      real*8 surface_area, weight
 
-      if ((1.0/wave).lt.2.4) then
-          alpha = -0.023 + 0.292/wave
+      if ((1.0/(wave/10000.0)).lt.2.4) then
+          alpha = -0.023 + 0.292/(wave/10000.0)
       else
-          alpha = -0.507 + 0.441/wave
+          alpha = -0.507 + 0.441/(wave/10000.0)
       endif
 
       mu = cos(viewing_angle)
@@ -25,9 +25,8 @@ c*****************************************************************
 
 c*****   Calculate the projected area
       dotproduct = cos(viewing_angle)
-c      dotproduct = sin(phi_angle)*sin(chi_angle)**2.0
       
-      projected_area = cell_a*dotproduct/4.0*3.14159262
+      projected_area = cell_a*dotproduct/(4.0*3.14159262)
 
       weight = limb_darkening*projected_area
 
@@ -35,12 +34,8 @@ c      dotproduct = sin(phi_angle)*sin(chi_angle)**2.0
       Stokes_Q = Stokes_Q + Stokes(2)/continuum*weight
       Stokes_U = Stokes_U + Stokes(3)/continuum*weight
       Stokes_V = Stokes_V + Stokes(4)/continuum*weight
+      
 
       total_weight = total_weight + weight
 
-c      write (*,*) 'limb darkening :', limb_darkening
-c      write (*,*) 'Projected Area :', projected_area
-c      write (*,*) weight, total_weight
-c      write (*,*) Stokes_I, Stokes_Q, Stokes_U, Stokes_V
-c      read (*,*)
       end

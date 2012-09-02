@@ -4,3 +4,6 @@
 moog_complex
 Makefile*
 MoogStokes
+DELOSILENT
+DeloStokes
+RKStokes

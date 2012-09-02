@@ -27,13 +27,21 @@ c  close the files
          if (nf9out .ne. 0)    close (unit=nf9out)
          if (nf10out .ne. 0)   close (unit=nf10out)
       endif
+      if (control .eq. 'gridsto') then
+         if (nfAngles .ne. 0) close (unit=nfAngles)
+         if (nfStokesI .ne. 0) close (unit=nfStokesI)
+         if (nfStokesQ .ne. 0) close (unit=nfStokesQ)
+         if (nfStokesU .ne. 0) close (unit=nfStokesU)
+         if (nfStokesV .ne. 0) close (unit=nfStokesV)
+         if (nfContinuum .ne. 0) close (unit=nfContinuum)
+      endif
 
 c  write the closing message
-      if (number .eq. 0) then
-         istat = ivcleof (4,1)
-         write (array,1001) 
-         istat = ivwrite (5,1,array,79)
-      endif
+c      if (number .eq. 0) then
+c         istat = ivcleof (4,1)
+c         write (array,1001) 
+c         istat = ivwrite (5,1,array,79)
+c      endif
       return
 
 

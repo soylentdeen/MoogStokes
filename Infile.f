@@ -30,13 +30,11 @@ c  write out the appropriate message about this file
          charcount = charcount + 24
          call getasci (charcount,line)
          fname = chinfo
-      elseif (fname .eq. 'command_line_parameter') then
-         call getarg (1, fname)
       else
          array(charcount+1:charcount+24) ='; here is the filename: '
          array(charcount+25:79) = fname
          charcount = 79
-         call putasci (charcount,line)
+c         call putasci (charcount,line)
          if (type .ne. 'input  ') kstat = 'unknown'
       endif
      

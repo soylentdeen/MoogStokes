@@ -30,7 +30,7 @@ c******************************************************************************
      .              iterm, iscale, maxline, histoyes, deviations,
      .              syncount, kounter
 
-      character*480 abitle
+      character*400 abitle
       character*600 isoitle
       character*80  smterm, smtotalterm, smt1, smt2
       character*80  moditle, obsitle, linitle, smitle,

@@ -19,14 +19,14 @@ c     be able to pull in auxiliary data files; executing 'make' will
 c     generate a reminder of this
       write (moogpath,1001)
       moogpath = 
-     .  '/Users/chris/CODES/moog'
+     .  '/home/deen/Code/FORTRAN/Moog2010/'
 
 
 c*****What kind of machine are you using?  Possible ones are:
 c     "mac" = Intel-based Apple Mac
 c     "pcl" = a PC or desktop running some standard linux like Redhat
 c     "uni" = a machine running Unix, specifically Sun Solaris
-      machine = "mac"
+      machine = "pcl"
 
 
 c*****for x11 terminal types, define the parameters of plotting windows;
@@ -88,6 +88,8 @@ c*****use one of the standard driver routines ("isotop" is obsolete):
          call abpop
       elseif (control .eq. 'synpop ') then
          call synpop
+      elseif (control .eq. 'gridsto') then
+         call gridstokes
 
 
 c*****or, put in your own drivers in the form below....

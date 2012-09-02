@@ -158,7 +158,7 @@ c*****now plot the spectrum, maybe iterating abundances, and end the program
          control = 'binary '
          nf2out = nf9out
          nf3out = nf10out
-         call pltspec (lscreen,ncall)
+c         call pltspec (lscreen,ncall)
          if (choice .eq. 'n') then
             do syncount=1,2
                if (numpecatom .gt. 0) then

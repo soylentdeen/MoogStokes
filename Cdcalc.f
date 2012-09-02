@@ -24,10 +24,9 @@ c*****continuum "contribution curve" calculation
          enddo
                        
 c*****line plus continuum "contribution curve" calculation    
-      elseif (number .eq. 2) then
+      else
          do i=1,ntau                                                    
             sline(i) = scont(i)   
-c            write (*,*) 'Tau nu: ', taunu(i), taulam(i)
             if (fluxintopt .eq. 1) then
                if ((taulam(i)+taunu(i))/mu .le. 50.) then
                   exptau = dexp((-taulam(i)-taunu(i))/mu)
@@ -50,4 +49,4 @@ c*****normal exit
       return
 
 
-      end                                                               
+      end

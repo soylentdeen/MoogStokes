@@ -84,10 +84,10 @@ c*****read in the strong lines if needed
          do j=1,401
             if (linfileopt .eq. 0) then
                read (nfslines,1002,end=340) swave1(j),satom1(j),se(j),
-     .                  sgf(j),sdampnum(j),sd0(j),swidth(j),sdeltamj(j)
+     .                 sgf(j),sdampnum(j),sd0(j),swidth(j),sdeltamj(j)
             else
                read (nfslines,*,end=340) swave1(j),satom1(j),se(j),
-     .                  sgf(j),sdampnum(j),sd0(j),swidth(j),sdeltamj(j)
+     .                 sgf(j),sdampnum(j),sd0(j),swidth(j),sdeltamj(j)
             endif
             nstrong = nstrong + 1
             iatom = satom1(j)
@@ -120,7 +120,7 @@ c*****read in the strong lines if needed
          write (*,1003) wave1(j), atom1(j)
          stop
       endif 
-c      if (width(j) .lt. 0.) go to 333
+      if (width(j) .lt. 0.) go to 333
       if (iunits .eq. 1) wave1(j) = 1.d+4*wave1(j)
       j = j + 1
       if (j .le. nlines) go to 333
@@ -172,7 +172,7 @@ c*****here log(gf) values are turned into gf values, if needed
             do jj=1,nlines+nstrong
                gf(jj) = 10.**gf(jj)
             enddo
-c            go to 379
+            go to 379
          endif
       enddo         
 

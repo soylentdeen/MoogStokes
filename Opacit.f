@@ -98,7 +98,7 @@ c*****compute an optical depth array at this wavelength, and exit
          do  i=1,ntau
             dummy1(i) = tauref(i)*kaplam(i)/(0.4343*kapref(i))
          enddo
-         first = tauref(1)*kaplam(1)/(kapref(1))
+         first = tauref(1)*kaplam(1)/kapref(1)
          dummy1(1) = rinteg(xref,dummy1,taulam,ntau,first)
          taulam(1) = first
          do i=2,ntau

@@ -13,14 +13,11 @@ c******************************************************************************
       include 'Pstuff.com'
       include 'Stokes.com'
       include 'Angles.com'
-      integer n_cells
-      real*8 chi_start, chi_stop, dchi
-      real*8 ring_area, cell_area, cell_a
+      integer n_cells, icell, testflag, wavecounter
+      real*8 az_start, az_stop, daz, az, long, dlong
+      real*8 ring_area, cell_area, cell_a, phi_ang, chi_ang, mu
 
-
-c*****examine the parameter file
-1     call params
-      linprintopt = linprintalt
+      testflag = 0
 
       zeros(1,1) = 0.0
       zeros(1,2) = 0.0
@@ -32,7 +29,10 @@ c*****examine the parameter file
       zeros(3,2) = 0.0
       zeros(3,3) = 0.0
 
-
+c*****examine the parameter file
+1     call params
+      linprintopt = linprintalt
+      
 c*****open the files for: standard output, raw spectrum depths, smoothed 
 c     spectra, and (if desired) IRAF-style smoothed spectra
       nf1out = 20     
@@ -42,16 +42,53 @@ c     spectra, and (if desired) IRAF-style smoothed spectra
       call infile ('output ',nf1out,'formatted  ',0,nchars,
      .             f1out,lscreen)
       nf2out = 21               
-      lscreen = lscreen + 2
+c      lscreen = lscreen + 2
       array = 'RAW SYNTHESIS OUTPUT'
       nchars = 20
       call infile ('output ',nf2out,'formatted  ',0,nchars,
      .             f2out,lscreen)
 
+c*****Open the output files for the Stokes Output
+      nfAngles = 50               
+c      lscreen = lscreen + 2
+      array = 'ANGLES OUTPUT'
+      nchars = 20
+      call infile ('output ',nfAngles,'formatted  ',0,nchars,
+     .             fAngles,lscreen)
+      nfStokesI = 51               
+c      lscreen = lscreen + 2
+      array = 'Stokes I OUTPUT'
+      nchars = 20
+      call infile ('output ',nfStokesI,'formatted  ',0,nchars,
+     .             fStokesI,lscreen)
+      nfStokesQ = 52               
+c      lscreen = lscreen + 2
+      array = 'Stokes Q OUTPUT'
+      nchars = 20
+      call infile ('output ',nfStokesQ,'formatted  ',0,nchars,
+     .             fStokesQ,lscreen)
+      nfStokesU = 53               
+c      lscreen = lscreen + 2
+      array = 'Stokes U OUTPUT'
+      nchars = 20
+      call infile ('output ',nfStokesU,'formatted  ',0,nchars,
+     .             fStokesU,lscreen)
+      nfStokesV = 54               
+c      lscreen = lscreen + 2
+      array = 'Stokes V OUTPUT'
+      nchars = 20
+      call infile ('output ',nfStokesV,'formatted  ',0,nchars,
+     .             fStokesV,lscreen)
+      nfContinuum = 55               
+c      lscreen = lscreen + 2
+      array = 'Continuum OUTPUT'
+      nchars = 20
+      call infile ('output ',nfContinuum,'formatted  ',0,nchars,
+     .             fContinuum,lscreen)
 
 c*****open and read the model atmosphere file
       nfmodel = 30
-      lscreen = lscreen + 2
+c      lscreen = lscreen + 2
       array = 'THE MODEL ATMOSPHERE'
       nchars = 20
       call infile ('input  ',nfmodel,'formatted  ',0,nchars,
@@ -61,7 +98,7 @@ c*****open and read the model atmosphere file
 
 c*****open the line list file and the strong line list file
       nflines = 31
-      lscreen = lscreen + 2
+c      lscreen = lscreen + 2
       array = 'THE LINE LIST'
       nchars = 13
       call infile ('input  ',nflines,'formatted  ',0,nchars,
@@ -84,17 +121,55 @@ c*****open the line list file and the strong line list file
       B_xyz(3) = 0.0
 
       inclination = 3.1415926/2.0
-      open(unit=nf11out, file=f11out)
+      position_angle = 0.0
+      mu = 0.0
 
-      wave = start
+      cell_area = 4.0*3.14159262/ncells
+      radtodeg = 180.0/3.1459262
+      write (*,*) nrings, ncells
+      icell = 1
+      do i=1,nrings
+         az_start = (i-1)*3.14159262/nrings
+         az_stop = i*3.14159262/nrings
+         az = (az_start + az_stop)/2.0
+         daz= -cos(az_stop) + cos(az_start)
+         ring_area = 2.0*3.14159262 * daz ! total sterrad in circular ring
+         n_cells = nint(ring_area/cell_area) ! # of cells in ring
+         cell_a = ring_area/float(n_cells)
+         dlong = 2.0*3.14159262/n_cells
+         do j=1,n_cells
+            long = -3.14159262+(j-0.5)*dlong
+            call computeRotations(az, long, phi_ang, chi_ang, mu)
+c            write (*,*) az*radtodeg, long*radtodeg, phi_ang*radtodeg,
+c     .                  chi_ang*radtodeg, mu
+c            read (*,*)
+            if (mu .ge. 0.001) THEN
+               phi_angle(icell) = phi_ang
+               chi_angle(icell) = chi_ang
+               azimuth(icell) = az
+               longitude(icell) = long
+               mus(icell) = mu
+               write (nfAngles, 12346)icell, az, az_start, az_stop,long,
+     .                dlong, phi_ang, chi_ang, mu
+               icell = icell + 1
+            endif
+         enddo
+      enddo
+
+      ncells = icell-1
+      write (*,*) 'Ncells = ', ncells
+
+      call wavegrid
 c*****Read in the line list and calculate the equilibria
       call inlines (1)
       call eqlib
       call nearly (1)
+      wavecounter = 1
 c*****Perform the Synthesis
       wavl = 0.
       mode = 3
-30    if (dabs(wave-wavl)/wave .ge. 0.001) then
+30    wave = wavelength(wavecounter)
+      if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave
          call opacit (2,wave)
       endif
@@ -104,98 +179,84 @@ c*****Perform the Synthesis
           call nearly (1)
           go to 20
       endif
-      Stokes_I = 0.0
-      Stokes_Q = 0.0
-      Stokes_U = 0.0
-      Stokes_V = 0.0
-      total_weight = 0.0
       lim1 = lim1line
       lim2 = lim2line
       call calcopacities
-      nrings = 6
-      ncells = 100
-      cell_area = 4.0*3.14159262/ncells
-c      do i=1,nrings
-c         chi_start = (i-1)*3.14159262/nrings
-c         chi_stop = i*3.14159262/nrings
-c         azimuth = (chi_start + chi_stop)/2.0
-c         dchi = -cos(chi_stop) + cos(chi_start)
-c         ring_area = 3.14159262 * dchi ! total sterrad in semicircle
-c         n_cells = nint(ring_area/cell_area) ! # of cells in ring
-c         cell_a = ring_area/float(n_cells)
-c         dphi = 3.14159262/n_cells
-cc         write (*,*) wave, i
-c         do j=1,n_cells
-c            longitude = -3.14159262/2.0+(j-0.5)*dphi
-c            call computeRotations
-cc            write (*,*) wave, chi_angle, i, j
-c            call traceStokes
-c            call appendStokes(cell_a)
-ccc            write (*,*) Stokes_I, Stokes_Q
-c         enddo
-c      enddo
-c      azimuth = 3.14159262/2.0
-c      longitude = 0.0
-c      call computeRotations
-      chi_angle = dble(0.0)
-      viewing_angle = dble(0.0)
-      call traceStokes
-c      read (*,*)
-      Stokes_I = Stokes(1)/continuum
-      Stokes_Q = Stokes(2)/continuum
-      Stokes_U = Stokes(3)/continuum
-      Stokes_V = Stokes(4)/continuum
+      write (*,*) wave
+      write (nfStokesI, 6520, advance='no') wave
+      write (nfStokesQ, 6520, advance='no') wave
+      write (nfStokesU, 6520, advance='no') wave
+      write (nfStokesV, 6520, advance='no') wave
+      write (nfContinuum, 6520, advance='no') wave
+      if (testflag .eq. 1) then
+         call traceStokes(dble(0.001), dble(0.0), dble(1.0))
+         write (nfStokesI, 6521, advance='no') Stokes(1)
+         write (nfStokesQ, 6521, advance='no') Stokes(2)
+         write (nfStokesU, 6521, advance='no') Stokes(3)
+         write (nfStokesV, 6521, advance='no') Stokes(4)
+         write (nfContinuum, 6521, advance='no') continuum
+      else
+         do i = 1, ncells
+            call traceStokes(phi_angle(i), chi_angle(i), mus(i))
+            write (nfStokesI, 6521, advance='no') Stokes(1)
+            write (nfStokesQ, 6521, advance='no') Stokes(2)
+            write (nfStokesU, 6521, advance='no') Stokes(3)
+            write (nfStokesV, 6521, advance='no') Stokes(4)
+            write (nfContinuum, 6521, advance='no') continuum
+         enddo
+      endif
+      write (nfStokesI, *) ''
+      write (nfStokesQ, *) ''
+      write (nfStokesU, *) ''
+      write (nfStokesV, *) ''
+      write (nfContinuum, *) ''
 
-      write (*,*) wave, Stokes_I 
-c     /      total_weight
-      write (nf11out,12345) wave, Stokes_I, Stokes_Q, Stokes_U,Stokes_V,
-     .      continuum
-c      stepsize = dopp(nstrong, 50)*wave/2.997929e10/2.0
-c      read (*,*)
       stepsize = dopp(nstrong, 50)*wave/2.997929e11
-      wave = wave + stepsize
-      if (wave .le. sstop) then
+      wavecounter = wavecounter + 1
+      if (wavecounter .le. nwave) then
           go to 30
       endif
 
-c      control = 'gridend'
 
 
 c*****finish
       if (control .ne. 'gridend') then
+         write (*,*), 'junk'
          call finish (1)
          go to 1
       else
          call finish (0)
       endif
-      close(nf11out)
       return
 
 12345 format (f10.4,5e15.5)
+12346 format (i5,8e15.5)
+6520  format (f10.4)
+6521  format (e15.8)
       end 
 
 
-      subroutine computeRotations
+      subroutine computeRotations (az, long, phi_ang, chi_ang, mu)
 
       implicit real*8 (a-h,o-z)
       include "Angles.com"
-      real*8 temp_A(3,3), Bmag
-
+      real*8 temp_A(3,3), Bmag, az, long, phi_ang, chi_ang, mu
+      
       T_rho(1,1) = 0.0
       T_rho(1,2) = 0.0
       T_rho(1,3) = 1.0
-      T_rho(2,1) = -cos(longitude)
-      T_rho(2,2) = sin(longitude)
+      T_rho(2,1) = -cos(az)
+      T_rho(2,2) = sin(az)
       T_rho(2,3) = 0.0
-      T_rho(3,1) = sin(longitude)
-      T_rho(3,2) = cos(longitude)
+      T_rho(3,1) = sin(az)
+      T_rho(3,2) = cos(az)
       T_rho(3,3) = 0.0
 
-      T_eta(1,1) = cos(azimuth+position_angle)
-      T_eta(1,2) = -sin(azimuth+position_angle)
+      T_eta(1,1) = cos(long+position_angle)
+      T_eta(1,2) = -sin(long+position_angle)
       T_eta(1,3) = 0.0
-      T_eta(2,1) = sin(azimuth+position_angle)
-      T_eta(2,2) = cos(azimuth+position_angle)
+      T_eta(2,1) = sin(long+position_angle)
+      T_eta(2,2) = cos(long+position_angle)
       T_eta(2,3) = 0.0
       T_eta(3,1) = 0.0
       T_eta(3,2) = 0.0
@@ -225,12 +286,12 @@ c*****finish
      .           B_sph,3,dble(1.0),B_xyz,3)
 
       Bmag = sqrt(B_xyz(1)**2.0+B_xyz(2)**2.0+B_xyz(3)**2.0)
-      phi_angle = acos(-B_xyz(1)/Bmag)
-      chi_angle = atan(B_xyz(2)/B_xyz(3))
-c      phi_angle = acos(B_xyz(3)/Bmag)
-c      chi_angle = atan(B_xyz(2)/B_xyz(1))
-      viewing_angle = acos(-B_xyz(1))
-c      write (*,*) B_xyz, chi_angle, phi_angle, viewing_angle
-c      read (*,*)
+      phi_ang = acos(-B_xyz(3)/Bmag)
+      chi_ang = atan(B_xyz(2)/B_xyz(1))
+      mu = -B_xyz(3)
+      radtodeg = 180.0/3.14159
+      write (*,'(7f12.7)') Bmag, B_xyz, phi_ang*radtodeg,
+     .                     chi_ang*radtodeg, mu
+      read (*,*)
       return
       end
