@@ -131,7 +131,7 @@ c      lscreen = lscreen + 2
       do i=1,nrings
          az_start = (i-1)*3.14159262/nrings
          az_stop = i*3.14159262/nrings
-         az = (az_start + az_stop)/2.0
+         az = -(((az_start + az_stop)/2.0)-3.14159262/2.0)
          daz= -cos(az_stop) + cos(az_start)
          ring_area = 2.0*3.14159262 * daz ! total sterrad in circular ring
          n_cells = nint(ring_area/cell_area) ! # of cells in ring
@@ -274,8 +274,9 @@ c*****finish
 
       call dcopy(9,zeros,1,temp_A,1)
       call dcopy(9,zeros,1,rotation_matrix,1)
-      call dgemm('T','N',3,3,3,dble(1.0),T_rho,3,T_eta,
+      call dgemm('N','N',3,3,3,dble(1.0),T_eta,3,T_rho,
      .           3,dble(0.0),temp_A,3)
+
       call dgemm('N','N',3,3,3,dble(1.0),T_i,3,temp_A,
      .           3,dble(0.0),rotation_matrix,3)
 
@@ -286,12 +287,21 @@ c*****finish
      .           B_sph,3,dble(1.0),B_xyz,3)
 
       Bmag = sqrt(B_xyz(1)**2.0+B_xyz(2)**2.0+B_xyz(3)**2.0)
-      phi_ang = acos(-B_xyz(3)/Bmag)
-      chi_ang = atan(B_xyz(2)/B_xyz(1))
-      mu = -B_xyz(3)
-      radtodeg = 180.0/3.14159
-      write (*,'(7f12.7)') Bmag, B_xyz, phi_ang*radtodeg,
-     .                     chi_ang*radtodeg, mu
-      read (*,*)
+      phi_ang = acos(B_xyz(3)/Bmag)
+      if (B_xyz(1) .gt. 0.0) then
+          if (B_xyz(2) .gt. 0.0) then
+              chi_ang = atan(B_xyz(2)/B_xyz(1))
+          else
+              chi_ang = 2.0*3.1415926+atan(B_xyz(2)/B_xyz(1))
+          endif
+      else
+          chi_ang = 3.1415926+atan(B_xyz(2)/B_xyz(1))
+      endif
+      mu = B_xyz(3)
+c      radtodeg = 180.0/3.14159
+c      write (*,'(5f10.4)') az*radtodeg, long*radtodeg,
+c     .           phi_ang*radtodeg, chi_ang*radtodeg, mu
+c      write (*,'(3f10.4)') B_xyz
+c      read (*,*)
       return
       end

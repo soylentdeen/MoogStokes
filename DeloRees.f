@@ -157,7 +157,7 @@ c            via the quadratic DELO algorithm
       tau_interp_c(1) = tauref(ntau)*kaplam(ntau)/kapref(ntau)
 
       call interp_opacities(log10(tauref(ntau)),
-     .        kappa_interp, 1, emiss_interp, 1, tau_interp,tau_interp_c)
+     .   kappa_interp, 1, emiss_interp, 1, tau_interp,tau_interp_c, mu)
       kappa_order(1) = 1
       kappa_order(2) = 2
       emiss_order(1) = 1
@@ -166,7 +166,7 @@ c            via the quadratic DELO algorithm
      .              log10(tauref(1)),delta_tau
          call interp_opacities(logtau, kappa_interp,
      .        kappa_order(2), emiss_interp, emiss_order(2), tau_interp,
-     .        tau_interp_c)
+     .        tau_interp_c, mu)
          dtau = (tau_interp(emiss_order(1))-tau_interp(emiss_order(2)))
          etau = 2.71828183**(-dtau)
 
@@ -226,7 +226,7 @@ c****     Now do the same thing for the continuum
       end
 
       subroutine interp_opacities(logtau, k_interp,
-     .       k_ord, e_interp, e_ord, tau_interp, tau_interp_c)
+     .       k_ord, e_interp, e_ord, tau_interp, tau_interp_c, mu)
 c**********************************************************************
 c     interp_opacities interpolates the following quantities relevant
 c        to the DELO method:
@@ -245,7 +245,7 @@ c***********************************************************************
       real*8 slope, k_interp(4,4,2), e_interp(4,3)
       real*8 tau_interp(3), tau_interp_c(3), logtau, delta_tau
       real*8 denom, run, kc_ref, t_tot, t_lam, tref, kref
-      real*8 ktot, klam
+      real*8 ktot, klam, mu
       real*8 k_ref, k_tot, k_lam, e_1, e_2, e_3, e_4
       real*8 k_11, k_12, k_13, k_14, k_21, k_22, k_23, k_24
       real*8 k_31, k_32, k_33, k_34, k_41, k_42, k_43, k_44
