@@ -276,22 +276,22 @@ c***********************************************************************
       call splint(xref, emission(3,:), de3, ntau, logtau, e_3)
       call splint(xref, emission(4,:), de4, ntau, logtau, e_4)
 
-      k_interp(1,1,k_ord)=k_11/mu
-      k_interp(1,2,k_ord)=k_12/mu
-      k_interp(1,3,k_ord)=k_13/mu
-      k_interp(1,4,k_ord)=k_14/mu
-      k_interp(2,1,k_ord)=k_21/mu
-      k_interp(2,2,k_ord)=k_22/mu
-      k_interp(2,3,k_ord)=k_23/mu
-      k_interp(2,4,k_ord)=k_24/mu
-      k_interp(3,1,k_ord)=k_31/mu
-      k_interp(3,2,k_ord)=k_32/mu
-      k_interp(3,3,k_ord)=k_33/mu
-      k_interp(3,4,k_ord)=k_34/mu
-      k_interp(4,1,k_ord)=k_41/mu
-      k_interp(4,2,k_ord)=k_42/mu
-      k_interp(4,3,k_ord)=k_43/mu
-      k_interp(4,4,k_ord)=k_44/mu
+      k_interp(1,1,k_ord)=k_11
+      k_interp(1,2,k_ord)=k_12
+      k_interp(1,3,k_ord)=k_13
+      k_interp(1,4,k_ord)=k_14
+      k_interp(2,1,k_ord)=k_21
+      k_interp(2,2,k_ord)=k_22
+      k_interp(2,3,k_ord)=k_23
+      k_interp(2,4,k_ord)=k_24
+      k_interp(3,1,k_ord)=k_31
+      k_interp(3,2,k_ord)=k_32
+      k_interp(3,3,k_ord)=k_33
+      k_interp(3,4,k_ord)=k_34
+      k_interp(4,1,k_ord)=k_41
+      k_interp(4,2,k_ord)=k_42
+      k_interp(4,3,k_ord)=k_43
+      k_interp(4,4,k_ord)=k_44
 
       e_interp(1,e_ord) = e_1/mu
       e_interp(2,e_ord) = e_2/mu

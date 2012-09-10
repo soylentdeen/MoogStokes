@@ -129,10 +129,10 @@ c      lscreen = lscreen + 2
       write (*,*) nrings, ncells
       icell = 1
       do i=1,nrings
-         az_start = (i-1)*3.14159262/nrings
-         az_stop = i*3.14159262/nrings
-         az = -(((az_start + az_stop)/2.0)-3.14159262/2.0)
-         daz= -cos(az_stop) + cos(az_start)
+         az_start = (i-1)*3.14159262/nrings - 3.14159262/2.0
+         az_stop = i*3.14159262/nrings - 3.14159262/2.0
+         az = (az_start + az_stop)/2.0
+         daz= sin(az_stop) - sin(az_start)
          ring_area = 2.0*3.14159262 * daz ! total sterrad in circular ring
          n_cells = nint(ring_area/cell_area) ! # of cells in ring
          cell_a = ring_area/float(n_cells)
@@ -140,9 +140,6 @@ c      lscreen = lscreen + 2
          do j=1,n_cells
             long = -3.14159262+(j-0.5)*dlong
             call computeRotations(az, long, phi_ang, chi_ang, mu)
-c            write (*,*) az*radtodeg, long*radtodeg, phi_ang*radtodeg,
-c     .                  chi_ang*radtodeg, mu
-c            read (*,*)
             if (mu .ge. 0.001) THEN
                phi_angle(icell) = phi_ang
                chi_angle(icell) = chi_ang
@@ -189,7 +186,7 @@ c*****Perform the Synthesis
       write (nfStokesV, 6520, advance='no') wave
       write (nfContinuum, 6520, advance='no') wave
       if (testflag .eq. 1) then
-         call traceStokes(dble(0.001), dble(0.0), dble(1.0))
+         call traceStokes(dble(0.0), dble(0.0), dble(0.5))
          write (nfStokesI, 6521, advance='no') Stokes(1)
          write (nfStokesQ, 6521, advance='no') Stokes(2)
          write (nfStokesU, 6521, advance='no') Stokes(3)
@@ -230,9 +227,9 @@ c*****finish
       return
 
 12345 format (f10.4,5e15.5)
-12346 format (i5,8e15.5)
+12346 format (i5,8e16.5)
 6520  format (f10.4)
-6521  format (e15.8)
+6521  format (e16.8)
       end 
 
 
