@@ -492,10 +492,11 @@ c           0 = integrated flux calculations
 c           1 = central intensity calculations
       elseif (keyword .eq. 'flux/int') then
          read (array,*) fluxintopt
+         viewang = 0.0
 
       elseif (keyword .eq. 'viewang') then
          read (array,*) blah
-         mu = cos(dble(3.14159262/180.0)*blah)
+         viewang = dble(3.14159262/180.0)*blah
 
 c           0 = use the Unsold approximation, except multiply possibly
 c                 by a factor read in for an individual line

@@ -186,7 +186,7 @@ c*****Perform the Synthesis
       write (nfStokesV, 6520, advance='no') wave
       write (nfContinuum, 6520, advance='no') wave
       if (testflag .eq. 1) then
-         call traceStokes(dble(0.0), dble(0.0), dble(0.5))
+         call traceStokes(dble(0.0), dble(1.50708), dble(1.0))
          write (nfStokesI, 6521, advance='no') Stokes(1)
          write (nfStokesQ, 6521, advance='no') Stokes(2)
          write (nfStokesU, 6521, advance='no') Stokes(3)

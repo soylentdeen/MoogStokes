@@ -6,9 +6,11 @@ c     contribution functions
 c******************************************************************************
 
       implicit real*8 (a-h,o-z)
+      real*8 mu
       include 'Atmos.com'
       include 'Linex.com'
 
+      mu = cos(viewang)
 c*****continuum "contribution curve" calculation                           
       if (number .eq. 1) then
          do i=1,ntau                                                    
