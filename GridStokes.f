@@ -17,7 +17,7 @@ c******************************************************************************
       real*8 az_start, az_stop, daz, az, long, dlong
       real*8 ring_area, cell_area, cell_a, phi_ang, chi_ang, mu
 
-      testflag = 0
+      testflag = 1
 
       zeros(1,1) = 0.0
       zeros(1,2) = 0.0
@@ -105,7 +105,7 @@ c      lscreen = lscreen + 2
      .              flines,lscreen)
       if (dostrong .gt. 0) then
          nfslines = 32
-         lscreen = lscreen + 2
+c         lscreen = lscreen + 2
          array = 'THE STRONG LINE LIST'
          nchars = 20
          call infile ('input  ',nfslines,'formatted  ',0,nchars,
@@ -126,7 +126,6 @@ c      lscreen = lscreen + 2
 
       cell_area = 4.0*3.14159262/ncells
       radtodeg = 180.0/3.1459262
-      write (*,*) nrings, ncells
       icell = 1
       do i=1,nrings
          az_start = (i-1)*3.14159262/nrings - 3.14159262/2.0
@@ -154,7 +153,6 @@ c      lscreen = lscreen + 2
       enddo
 
       ncells = icell-1
-      write (*,*) 'Ncells = ', ncells
 
       call wavegrid
 c*****Read in the line list and calculate the equilibria
@@ -186,7 +184,7 @@ c*****Perform the Synthesis
       write (nfStokesV, 6520, advance='no') wave
       write (nfContinuum, 6520, advance='no') wave
       if (testflag .eq. 1) then
-         call traceStokes(dble(0.0), dble(1.50708), dble(1.0))
+         call traceStokes(dble(0.17365), dble(1.50708), dble(0.17365))
          write (nfStokesI, 6521, advance='no') Stokes(1)
          write (nfStokesQ, 6521, advance='no') Stokes(2)
          write (nfStokesU, 6521, advance='no') Stokes(3)
@@ -218,7 +216,6 @@ c*****Perform the Synthesis
 
 c*****finish
       if (control .ne. 'gridend') then
-         write (*,*), 'junk'
          call finish (1)
          go to 1
       else

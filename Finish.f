@@ -20,7 +20,8 @@ c  close the files
       if (nf3out .ne. 0)       close (unit=nf3out)
       if (nf4out .ne. 0)       close (unit=nf4out)
       if (nf5out .ne. 0)       close (unit=nf5out)
-      if (control .ne. 'gridsyn' .and. control .ne. 'gridplo') then
+      if (control .ne. 'gridsyn' .and. control .ne. 'gridplo' .and.
+     .    control .ne. 'gridsto') then
          if (nf6out .ne. 0)    close (unit=nf6out)
          if (nf7out .ne. 0)    close (unit=nf7out)
          if (nf8out .ne. 0)    close (unit=nf8out)

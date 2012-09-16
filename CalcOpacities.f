@@ -57,7 +57,6 @@ c*****do the same for the strong lines
      .                  int(deltamj(j)+2))+kapnu0(j,i)*faraday_voigt
             enddo
             j = nlines+1
-c            write (*,*), tauref(i), kapnu0(j,i)
          endif
       enddo      
 
