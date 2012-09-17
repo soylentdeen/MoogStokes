@@ -26,7 +26,7 @@ c******************************************************************************
      .             f7out, f8out, f9out, f10out, f11out, f12out, f13out,
      .             fparam, fmodel, flines, fslines, fobs, ftable,
      .             fbarklem, fbarklemUV, fAngles, fStokesI, fStokesQ,
-     .             fStokesU, fStokesV, fContinuum
+     .             fStokesU, fStokesV, fContinuum, AtmosDir, OutDir
       character*60 moogpath
       character*2  names(95)
       character*10 modtype
@@ -56,7 +56,7 @@ c******************************************************************************
      .                  f7out,f8out,f9out,f10out,f11out,f12out,f13out,
      .                  fparam, fmodel, flines, fslines, fobs, ftable,
      .               fbarklem, fbarklemUV, fAngles, fStokesI, fStokesQ,
-     .                  fStokesU, fStokesV, fContinuum,
+     .                fStokesU, fStokesV, fContinuum, AtmosDir, OutDir,
      .                  moogpath,
      .                  names,
      .                  modtype,

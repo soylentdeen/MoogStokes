@@ -14,8 +14,8 @@ c******************************************************************************
       include 'Multistar.com'
       include 'Angles.com'
       real*8 deltalogab(5), blah
-      character keyword*20
-      character arrayz*80, stokes_base*20
+      character keyword*20, sandbox*80, junk*80
+      character arrayz*80, stokes_base*80
       integer kk
       data newcount, linecount /0, 0/
 
@@ -210,6 +210,8 @@ c  key word, which is always within the first 20 characters;  dump the
 c  rest of arrayz into "array"
 5     write (array,1007)
       read (nfparam,1001,end=98) arrayz
+c      write (*,*) arrayz, newcount, oldcount, syncount
+c      read (*,*)
       linecount = linecount + 1
       i=index(arrayz,' ')
       keyword = arrayz(1:i-1)
@@ -287,16 +289,26 @@ c  keyword 'smoothed_out' controls the name of the smoothed synthesis output
       elseif (keyword .eq. 'smoothed_out') then
          read (array,*) f3out
 
+c  keyword 'atmos_dir' specifies the location of the model atmosphere'
+      elseif (keyword .eq. 'atmos_dir') then
+         read (array,*) sandbox
+         AtmosDir = trim(sandbox)
+
+c  keyword 'out_dir' specifies the location of the model atmosphere'
+      elseif (keyword .eq. 'out_dir') then
+         read (array,*) sandbox
+         OutDir = trim(sandbox)
+
 c  keyword 'stokes_out' controls the base name of all the Stokes-related output
       elseif (keyword .eq. 'stokes_out') then
          read (array,*) stokes_base
-c         stokes_base = trim(stokes_base)
-         fAngles = trim(stokes_base)//'.angles'
-         fStokesI = trim(stokes_base)//'.spectrum_I'
-         fStokesQ = trim(stokes_base)//'.spectrum_Q'
-         fStokesU = trim(stokes_base)//'.spectrum_U'
-         fStokesV = trim(stokes_base)//'.spectrum_V'
-         fContinuum = trim(stokes_base)//'.continuum'
+         sandbox = trim(OutDir)//trim(stokes_base)
+         fAngles = trim(sandbox)//'.angles'
+         fStokesI = trim(sandbox)//'.spectrum_I'
+         fStokesQ = trim(sandbox)//'.spectrum_Q'
+         fStokesU = trim(sandbox)//'.spectrum_U'
+         fStokesV = trim(sandbox)//'.spectrum_V'
+         fContinuum = trim(sandbox)//'.continuum'
 
       elseif (keyword .eq. 'nrings') then
          read (array,*) nrings
@@ -733,6 +745,7 @@ c  parameter file, then ask for it
      .          control .eq. 'isoplot' .or.
      .          control .eq. 'gridsyn' .or.
      .          control .eq. 'gridplo' .or.
+     .          control .eq. 'gridsto' .or.
      .          control .eq. 'doflux ' .or.
      .          control .eq. 'cogsyn ' .or.
      .          control .eq. 'cog    ' .or.

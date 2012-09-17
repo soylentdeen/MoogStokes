@@ -14,10 +14,11 @@ c******************************************************************************
       include 'Stokes.com'
       include 'Angles.com'
       integer n_cells, icell, testflag, wavecounter
+      character sandbox*80
       real*8 az_start, az_stop, daz, az, long, dlong
       real*8 ring_area, cell_area, cell_a, phi_ang, chi_ang, mu
 
-      testflag = 1
+      testflag = 0
 
       zeros(1,1) = 0.0
       zeros(1,2) = 0.0
@@ -31,6 +32,7 @@ c******************************************************************************
 
 c*****examine the parameter file
 1     call params
+      write (*,*) fmodel
       linprintopt = linprintalt
       
 c*****open the files for: standard output, raw spectrum depths, smoothed 
@@ -49,37 +51,37 @@ c      lscreen = lscreen + 2
      .             f2out,lscreen)
 
 c*****Open the output files for the Stokes Output
-      nfAngles = 50               
+      nfAngles = 60               
 c      lscreen = lscreen + 2
       array = 'ANGLES OUTPUT'
       nchars = 20
       call infile ('output ',nfAngles,'formatted  ',0,nchars,
      .             fAngles,lscreen)
-      nfStokesI = 51               
+      nfStokesI = 61               
 c      lscreen = lscreen + 2
       array = 'Stokes I OUTPUT'
       nchars = 20
       call infile ('output ',nfStokesI,'formatted  ',0,nchars,
      .             fStokesI,lscreen)
-      nfStokesQ = 52               
+      nfStokesQ = 62               
 c      lscreen = lscreen + 2
       array = 'Stokes Q OUTPUT'
       nchars = 20
       call infile ('output ',nfStokesQ,'formatted  ',0,nchars,
      .             fStokesQ,lscreen)
-      nfStokesU = 53               
+      nfStokesU = 63               
 c      lscreen = lscreen + 2
       array = 'Stokes U OUTPUT'
       nchars = 20
       call infile ('output ',nfStokesU,'formatted  ',0,nchars,
      .             fStokesU,lscreen)
-      nfStokesV = 54               
+      nfStokesV = 64               
 c      lscreen = lscreen + 2
       array = 'Stokes V OUTPUT'
       nchars = 20
       call infile ('output ',nfStokesV,'formatted  ',0,nchars,
      .             fStokesV,lscreen)
-      nfContinuum = 55               
+      nfContinuum = 65               
 c      lscreen = lscreen + 2
       array = 'Continuum OUTPUT'
       nchars = 20
@@ -92,7 +94,7 @@ c      lscreen = lscreen + 2
       array = 'THE MODEL ATMOSPHERE'
       nchars = 20
       call infile ('input  ',nfmodel,'formatted  ',0,nchars,
-     .             fmodel,lscreen)
+     .             trim(AtmosDir)//fmodel,lscreen)
       call inmodel
 
 
@@ -122,8 +124,9 @@ c         lscreen = lscreen + 2
 
       inclination = 3.1415926/2.0
       position_angle = 0.0
-      mu = 0.0
 
+      write (nfAngles, 12347) ncells, nrings, inclination,
+     .                        position_angle
       cell_area = 4.0*3.14159262/ncells
       radtodeg = 180.0/3.1459262
       icell = 1
@@ -152,7 +155,7 @@ c         lscreen = lscreen + 2
          enddo
       enddo
 
-      ncells = icell-1
+      icell = icell-1
 
       call wavegrid
 c*****Read in the line list and calculate the equilibria
@@ -177,7 +180,7 @@ c*****Perform the Synthesis
       lim1 = lim1line
       lim2 = lim2line
       call calcopacities
-      write (*,*) wave
+c      write (*,*) wave
       write (nfStokesI, 6520, advance='no') wave
       write (nfStokesQ, 6520, advance='no') wave
       write (nfStokesU, 6520, advance='no') wave
@@ -191,7 +194,7 @@ c*****Perform the Synthesis
          write (nfStokesV, 6521, advance='no') Stokes(4)
          write (nfContinuum, 6521, advance='no') continuum
       else
-         do i = 1, ncells
+         do i = 1, icell
             call traceStokes(phi_angle(i), chi_angle(i), mus(i))
             write (nfStokesI, 6521, advance='no') Stokes(1)
             write (nfStokesQ, 6521, advance='no') Stokes(2)
@@ -212,8 +215,6 @@ c*****Perform the Synthesis
           go to 30
       endif
 
-
-
 c*****finish
       if (control .ne. 'gridend') then
          call finish (1)
@@ -223,8 +224,10 @@ c*****finish
       endif
       return
 
+1001  format (a80)
 12345 format (f10.4,5e15.5)
 12346 format (i5,8e16.5)
+12347 format (2i5,2e16.5)
 6520  format (f10.4)
 6521  format (e16.8)
       end 
