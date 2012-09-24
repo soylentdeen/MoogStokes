@@ -1,27 +1,42 @@
-      SUBROUTINE CPF12(X, Y, WR, WI)
-C ROUTINE COMPUTES THE REAL (WR) AND IMAGINARY (WI) PARTS OF THE COMPLEX
-C PROBABILITY FUNCTION W(Z)=EXP(-Z**2)*ERF(-I*Z) IN THE UPPER HALF PLANE
-C Z=X+I*Y (I.E. FOR Y>=0)
-C MAXIMUM RELATIVE ERROR OF WR IS <2*10**(-6), THAT OF WI <5*10**(-6)
-      DIMENSION T(6),C(6),S(6)
-      DATA(T(I),I=1,6)/.31424076,.947788391,1.59768264,2.27950708,3.020
-     *63703,3.8897249/,(C(I),I=1,6)/1.01172805,-.75197147,1.2557727E-2,
-     *1.00220082E-2,-2.42068135E-4,5.00848061E-7/,(S(I),I=1,6)/1.393237,
-     *.231152406,-.155351466,6.21836624E-3,9.19082986E-5,-6.27525958E-7/
-      WR=0
-      WI=0
-      Y1=Y+1.5
-      Y2=Y1*Y1
-C IF HIGH RELATIVE ACCURACY IN REGION ii IS NOT REQUIRED, THE FOLLOWING
-C 19 LINES MAY BE DELETED
-      IF(Y.GT.0.85.OR.ABS(X).LT.18.1*Y+1.65)GOTO 2
-C REGION II
-      IF(ABS(X).LT.12.)WR=EXP(-X*X)
-      Y3=Y+3
-      DO 1 I=1,6
-      R=X-T(I)
-      R2=R*R
-      D=1./(R2+Y2)
-      D1=Y1*D
-      D2=R*D
-      WR=WR+Y*(C(I)*(R*D2
+      function W4(Z)
+c******************************************************************************
+c     This routine calculates the complex voigt function using the
+c     algorithm of Humlicek 1982.
+c******************************************************************************
+
+      COMPLEX W4,Z, T, U
+      REAL*8 X, Y, S
+c      z = cmplx(x, y)
+      X=REAL(Z)
+      Y=AIMAG(Z)
+      T=CMPLX(Y,-X)
+      S=ABS(X)+Y
+      IF (S.LT.15.) GOTO 1
+C********  REGION 1
+c      write (*,*) "Region 1"
+c      write (*,*) Z, X, Y, T
+      W4=T*.5641896/(.5+T*T)
+      RETURN
+1     IF(S.LT.5.5)GOTO 2
+C********  REGION 2
+c      write (*,*) "Region 2"
+      U=T*T
+      W4=T*(1.410474+U*.5641896)/(.75+U*(3.+U))
+      RETURN
+2     IF(Y.LT..195*ABS(X)-.176)GOTO 3
+C********  REGION 3
+c      write (*,*) "Region 3"
+      W4=(16.4955+T*(20.20933+T*(11.96482+T*(3.778987+T*.5642236))))/
+     /(16.4955+T*(38.82363+T*(39.27121+T*(21.69274+T*(6.699398+T)))))
+      RETURN
+C********  REGION 4
+3     U=T*T
+c      write (*,*) "Region 4"
+      W4=CEXP(U)-T*(36183.31-U*(3321.9905-U*(1540.787-U*(219.0313-U*
+     *(35.76683-U*(1.320522-U*.56419))))))/(32066.6-U*(24322.84-U*
+     *(9022.229-U*(2186.181-U*(364.2191-U*(61.57037-U*(1.841439-U)))))))
+      
+      RETURN
+
+      END
+

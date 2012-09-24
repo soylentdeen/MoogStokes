@@ -12,7 +12,7 @@ c******************************************************************************
       include 'Stokes.com'
       real*8 voigt, faraday_voigt, voigt_x, voigt_y, gam_L, gam_D,
      .       sqrtpi
-      complex Z, hui, w4
+      complex Z, humlicek, w4
 
 c*****compute the total line opacity at each depth    
       
@@ -30,9 +30,9 @@ c*****compute the total line opacity at each depth
             voigt_x = dabs((1.0d8*(1./wave-1./wave1(j)))/(gam_D))
             voigt_y =(gam_L)
             Z = cmplx(voigt_x, voigt_y)
-            hui = w4(Z)
-            voigt = REAL(hui,8)/sqrtpi
-            faraday_voigt = AIMAG(hui)/sqrtpi
+            humlicek = w4(Z)
+            voigt = REAL(humlicek,8)/sqrtpi
+            faraday_voigt = AIMAG(humlicek)/sqrtpi
             phi_opacity(i,int(deltamj(j)+2))=phi_opacity(i,
      .               int(deltamj(j)+2))+ kapnu0(j,i)*voigt
             psi_opacity(i,int(deltamj(j)+2)) = psi_opacity(i,
@@ -48,9 +48,9 @@ c*****do the same for the strong lines
                voigt_x = dabs((1.0d8*(1./wave-1./wave1(j)))/(gam_D))
                voigt_y =(gam_L)
                Z = cmplx(voigt_x, voigt_y)
-               hui = w4(Z)
-               voigt = REAL(hui,8)/sqrtpi
-               faraday_voigt = AIMAG(hui)/sqrtpi
+               humlicek = w4(Z)
+               voigt = REAL(humlicek,8)/sqrtpi
+               faraday_voigt = AIMAG(humlicek)/sqrtpi
                phi_opacity(i,int(deltamj(j)+2))=phi_opacity(i,
      .                  int(deltamj(j)+2))+kapnu0(j,i)*voigt
                psi_opacity(i,int(deltamj(j)+2))=psi_opacity(i,

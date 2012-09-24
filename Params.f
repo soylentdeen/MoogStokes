@@ -287,7 +287,9 @@ c  created previously, that will be read in for plotting purposes
 
 c  keyword 'smoothed_out' controls the name of the smoothed synthesis output
       elseif (keyword .eq. 'smoothed_out') then
-         read (array,*) f3out
+         read (array,*) stokes_base
+         sandbox = trim(OutDir)//trim(stokes_base)
+         f3out = trim(sandbox)//'.moog'
 
 c  keyword 'atmos_dir' specifies the location of the model atmosphere'
       elseif (keyword .eq. 'atmos_dir') then

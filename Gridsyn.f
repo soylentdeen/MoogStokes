@@ -70,7 +70,7 @@ c*****open and read the model atmosphere file
       array = 'THE MODEL ATMOSPHERE'
       nchars = 20
       call infile ('input  ',nfmodel,'formatted  ',0,nchars,
-     .             fmodel,lscreen)
+     .             trim(AtmosDir)//fmodel,lscreen)
       call inmodel
 
 
