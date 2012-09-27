@@ -256,9 +256,9 @@ c*****here are the calculations specific to atomic lines
 
 
 c*****quit the routine normally
-      if (nlines+nstrong .lt. 2500) then
-         if (sstop .gt. wave1(nlines)+10.) sstop = wave1(nlines)+10.
-      endif
+c      if (nlines+nstrong .lt. 2500) then
+c         if (sstop .gt. wave1(nlines)+10.) sstop = wave1(nlines)+10.
+c      endif
       lim1line = 1
       return  
 

@@ -18,7 +18,7 @@ c******************************************************************************
       real*8 az_start, az_stop, daz, az, long, dlong
       real*8 ring_area, cell_area, cell_a, phi_ang, chi_ang, mu
 
-      testflag = 0
+      testflag = 1
 
       zeros(1,1) = 0.0
       zeros(1,2) = 0.0
@@ -167,6 +167,7 @@ c*****Perform the Synthesis
       wavl = 0.
       mode = 3
 30    wave = wavelength(wavecounter)
+      wave = 11991.6
       if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave
          call opacit (2,wave)
@@ -208,7 +209,8 @@ c      write (*,*) wave
       write (nfStokesU, *) ''
       write (nfStokesV, *) ''
       write (nfContinuum, *) ''
-
+      
+      read (*,*)
       stepsize = dopp(nstrong, 50)*wave/2.997929e11
       wavecounter = wavecounter + 1
       if (wavecounter .le. nwave) then

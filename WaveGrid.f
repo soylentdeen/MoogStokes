@@ -20,7 +20,7 @@ c******************************************************************************
 c*****examine the parameter file
 
 c      array = 'GIVE THE MINIMUM LINE/CONTINUUM OPACITY RATIO TO KEEP: '
-      xratio = 0.01
+      xratio = 0.1
       
 
 c*****compute the line opacities
@@ -101,9 +101,9 @@ c****   Now, go through and purge duplicates and very close together points
       temp(1) = wavelength(1)
       I=1
       do J=2,nwave
-         if(abs(wavelength(J)-temp(I)) .gt. 0.001) THEN
+         if(abs(wavelength(J)-temp(I)) .gt. 0.005) THEN
             I = I+1
-            temp(I) = wavelength(J)
+            temp(I) = (wavelength(J)+temp(I-1))/2.0
             wavelength(J) = 0.0
          endif
       enddo
