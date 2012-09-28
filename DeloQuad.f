@@ -157,9 +157,8 @@ c            via the quadratic DELO algorithm
       tau_interp_c(1) = tauref(ntau)*kaplam(ntau)/kapref(ntau)
 
       call interp_opacities(log10(tauref(ntau)),
-     .   kappa_interp, 1, emiss_interp, 1, tau_interp,tau_interp_c, mu)
-      call interp_opacities(log10(tauref(ntau))+delta_tau,
-     .   kappa_interp, 1, emiss_interp, 2, tau_interp,tau_interp_c, mu)
+     .   kappa_interp, 1, emiss_interp, 2, tau_interp,tau_interp_c,
+     .   mu, delta_tau)
       kappa_order(1) = 1
       kappa_order(2) = 2
       emiss_order(1) = 1
@@ -169,8 +168,8 @@ c            via the quadratic DELO algorithm
      .              log10(tauref(1)),delta_tau
          call interp_opacities(logtau, kappa_interp,
      .        kappa_order(2), emiss_interp, emiss_order(3), tau_interp,
-     .        tau_interp_c, mu)
-         dtau = (tau_interp(emiss_order(2))-tau_interp(emiss_order(3)))
+     .        tau_interp_c, mu, delta_tau)
+         dtau = (tau_interp(emiss_order(1))-tau_interp(emiss_order(2)))
          etau = 2.71828183**(-dtau)
 
          alph = 1.0-etau
@@ -188,7 +187,7 @@ c            via the quadratic DELO algorithm
          x = 1.0-etau
          y = dtau - x
          z = dtau**2.0 - 2.0 * y
-         dtau_i =(tau_interp(emiss_order(1))-tau_interp(emiss_order(2)))
+         dtau_i =(tau_interp(emiss_order(2))-tau_interp(emiss_order(3)))
          alph = (z - dtau*y)/((dtau + dtau_i)*dtau_i)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
          gam = x+(z-(dtau_i+2*dtau)*y)/(dtau*(dtau+dtau_i))
@@ -211,14 +210,14 @@ c****      Solve the system of differential equations
          call dcopy(4, matZ, 1, Stokes, 1)
 
 c****     Now do the same thing for the continuum
-         dtau=(tau_interp_c(emiss_order(2))-
-     .         tau_interp_c(emiss_order(3)))
+         dtau=(tau_interp_c(emiss_order(1))-
+     .         tau_interp_c(emiss_order(2)))
          etau = 2.71828183**(-dtau)
          x = 1.0 - etau
          y = dtau - x
          z = dtau**2.0 - 2.0*y
-         dtau_i = (tau_interp_c(emiss_order(1))-
-     .             tau_interp_c(emiss_order(2)))
+         dtau_i = (tau_interp_c(emiss_order(2))-
+     .             tau_interp_c(emiss_order(3)))
          alph = (z-dtau*y)/((dtau+dtau_i)*dtau_i)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
          gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
@@ -254,7 +253,7 @@ c****     Now do the same thing for the continuum
       end
 
       subroutine interp_opacities(logtau, k_interp,
-     .       k_ord, e_interp, e_ord, tau_interp, tau_interp_c, mu)
+     .       k_ord, e_interp, e_ord, tau_interp, tau_interp_c, mu, dtau)
 c**********************************************************************
 c     interp_opacities interpolates the following quantities relevant
 c        to the DELO method:
@@ -279,8 +278,8 @@ c***********************************************************************
       real*8 k_31, k_32, k_33, k_34, k_41, k_42, k_43, k_44
       integer k_ord, e_ord
 
-      call splint(xref, tlam, dtlam, ntau, logtau, t_lam)
-      call splint(xref, tautot, dttot, ntau, logtau, t_tot)
+      call splint(xref, tlam, dtlam, ntau, logtau+dtau, t_lam)
+      call splint(xref, tautot, dttot, ntau, logtau+dtau, t_tot)
 
       call splint(xref, k11, dk11, ntau, logtau, k_11)
       call splint(xref, k12, dk12, ntau, logtau, k_12)
@@ -299,10 +298,10 @@ c***********************************************************************
       call splint(xref, k43, dk43, ntau, logtau, k_43)
       call splint(xref, k44, dk44, ntau, logtau, k_44)
 
-      call splint(xref, emission(1,:), de1, ntau, logtau, e_1)
-      call splint(xref, emission(2,:), de2, ntau, logtau, e_2)
-      call splint(xref, emission(3,:), de3, ntau, logtau, e_3)
-      call splint(xref, emission(4,:), de4, ntau, logtau, e_4)
+      call splint(xref, emission(1,:), de1, ntau, logtau+dtau, e_1)
+      call splint(xref, emission(2,:), de2, ntau, logtau+dtau, e_2)
+      call splint(xref, emission(3,:), de3, ntau, logtau+dtau, e_3)
+      call splint(xref, emission(4,:), de4, ntau, logtau+dtau, e_4)
 
       k_interp(1,1,k_ord)=k_11
       k_interp(1,2,k_ord)=k_12
