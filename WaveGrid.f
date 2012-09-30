@@ -50,10 +50,14 @@ c*****   Generate original wavelength grid
 c*****divide the lines into keepers and discards
       do j=1,nlines+nstrong
          if (strength(j)/kaplam(jtau5) .ge. xratio) then
-             do k=-20,20
-                 wavelength(nwave) = wave1(j)+0.5*asin(real(k/20.0))
+             do k=-10,10
+                 wavelength(nwave) = wave1(j)+0.5*asin(real(k/10.0))
                  nwave = nwave+1
              enddo
+             wavelength(nwave) = wave1(j)+ 0.001
+             nwave = nwave+1
+             wavelength(nwave) = wave1(j)- 0.001
+             nwave = nwave+1
          endif
       enddo
       if (nlines +nstrong .eq. 2500) then

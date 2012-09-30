@@ -17,6 +17,7 @@ c**********************************************************************
       real*8 phi_I, phi_3, phi_U, phi_V, psi_Q, psi_U, psi_V
       real*8 h1, h2, dx, dtau, etau, alph, bet, gam
       real*8 matS1(4), matS2(4), bgfl
+      real*8 blah, k1, k2, z1, z2, deltaz(100), qmax
       real*8 phi_ang, chi_ang, mu
       integer emiss_order(3), kappa_order(2)
       integer INFO, IPIV(4), LDA, LWORK
@@ -142,6 +143,10 @@ c*****  Assembles the Emission matrix (J')
       call spline(xref, emission(3,:), ntau, bgfl, bgfl, de3)
       call spline(xref, emission(4,:), ntau, bgfl, bgfl, de4)
 
+      call spline(xref, kaplam, ntau, bgfl, bgfl, dklam)
+      call spline(xref, kaptot, ntau, bgfl, bgfl, dktot)
+      call spline(xref, zdepth, ntau, bgfl, bgfl, deltaz)
+
 c*****   Trace the Stokes parameters through the atmosphere
 c            via the quadratic DELO algorithm
 
@@ -201,6 +206,19 @@ c            via the quadratic DELO algorithm
          call daxpy(4, dble(1.0), matS1, 1, matS2, 1)
          call daxpy(4, dble(1.0), matS2, 1, matZ, 1)
 
+         call splint(xref, kaptot, dktot, ntau, logtau, k1)
+         call splint(xref, kaptot, dktot, ntau, logtau+delta_tau,k2)
+         call splint(xref, zdepth, deltaz, ntau, logtau, z1)
+         call splint(xref, zdepth, deltaz, ntau, logtau+delta_tau,z2)
+
+         do k=1, 4
+             qmax = 0.5*(emiss_interp(k,emiss_order(1))*k1 +
+     .               emiss_interp(k,emiss_order(2))*k2)*(z1-z2)
+c             write (*,*) k,qmax,matZ(k),emiss_interp(k,emiss_order(1)),
+c     .               k1, k2
+             matZ(k) = max(min(qmax, matZ(k)), dble(0.0))
+         enddo
+c         read (*,*)
 c****      calculate the RHS of the equation.  Store in matZ
          call dgemv('N',4,4,dble(1.0),matY,4,Stokes,1,dble(1.0),matZ,1)
 
@@ -221,11 +239,21 @@ c****     Now do the same thing for the continuum
          alph = (z-dtau*y)/((dtau+dtau_i)*dtau_i)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
          gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
-         continuum=etau*continuum+alph*emiss_interp(1,emiss_order(3))+
-     .              bet*emiss_interp(1,emiss_order(2))+
-     .              gam*emiss_interp(1,emiss_order(1))
+c         continuum=etau*continuum+alph*emiss_interp(1,emiss_order(3))+
+c     .              bet*emiss_interp(1,emiss_order(2))+
+c     .              gam*emiss_interp(1,emiss_order(1))
 
-         write (*,*) logtau, Stokes(1), continuum
+         blah = alph*emiss_interp(1,emiss_order(3))+
+     .          bet*emiss_interp(1,emiss_order(2))+
+     .          gam*emiss_interp(1,emiss_order(1))
+         call splint(xref, kaplam, dklam, ntau, logtau, k1)
+         call splint(xref, kaplam, dklam, ntau, logtau+delta_tau,k2)
+
+         qmax = 0.5*(emiss_interp(1,emiss_order(1))*k1 +
+     .               emiss_interp(1,emiss_order(2))*k2)*(z1-z2)
+c         write (*,*) logtau, blah, qmax, z1, z2
+         continuum = etau*continuum+max(min(blah, qmax), dble(0.0))
+c         write (*,*) logtau, Stokes(1), continuum, blah, qmax
          if (kappa_order(1).eq.1)then
              kappa_order(1) = 2
              kappa_order(2) = 1
