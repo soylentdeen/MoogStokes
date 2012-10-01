@@ -158,8 +158,8 @@ c            via the quadratic DELO algorithm
 
       delta_tau = -0.05
       call dcopy(4, emission(:,ntau), 1, emiss_interp(:,1), 1)
-      tau_interp(1) = tauref(ntau)*kaptot(ntau)/kapref(ntau)
-      tau_interp_c(1) = tauref(ntau)*kaplam(ntau)/kapref(ntau)
+      tau_interp(1) = tautot(ntau)
+      tau_interp_c(1) = tlam(ntau)
 
       call interp_opacities(log10(tauref(ntau)),
      .   kappa_interp, 1, emiss_interp, 2, tau_interp,tau_interp_c,
@@ -206,16 +206,19 @@ c            via the quadratic DELO algorithm
          call daxpy(4, dble(1.0), matS1, 1, matS2, 1)
          call daxpy(4, dble(1.0), matS2, 1, matZ, 1)
 
-         call splint(xref, kaptot, dktot, ntau, logtau, k1)
-         call splint(xref, kaptot, dktot, ntau, logtau+delta_tau,k2)
-         call splint(xref, zdepth, deltaz, ntau, logtau, z1)
-         call splint(xref, zdepth, deltaz, ntau, logtau+delta_tau,z2)
+         call splint(xref, kaptot, dktot, ntau, logtau-delta_tau, k1)
+         call splint(xref, kaptot, dktot, ntau, logtau, k2)
+         call splint(xref, zdepth, deltaz, ntau, logtau-delta_tau, z1)
+         call splint(xref, zdepth, deltaz, ntau, logtau, z2)
 
          do k=1, 4
              qmax = 0.5*(emiss_interp(k,emiss_order(1))*k1 +
      .               emiss_interp(k,emiss_order(2))*k2)*(z1-z2)
 c             write (*,*) k,qmax,matZ(k),emiss_interp(k,emiss_order(1)),
 c     .               k1, k2
+c             if (matZ(k) .gt. qmax) then
+c                 write(*,*) 'Stokes overshoot!'
+c             endif
              matZ(k) = max(min(qmax, matZ(k)), dble(0.0))
          enddo
 c         read (*,*)
@@ -246,14 +249,20 @@ c     .              gam*emiss_interp(1,emiss_order(1))
          blah = alph*emiss_interp(1,emiss_order(3))+
      .          bet*emiss_interp(1,emiss_order(2))+
      .          gam*emiss_interp(1,emiss_order(1))
-         call splint(xref, kaplam, dklam, ntau, logtau, k1)
-         call splint(xref, kaplam, dklam, ntau, logtau+delta_tau,k2)
+         call splint(xref, kaplam, dklam, ntau, logtau-delta_tau, k1)
+         call splint(xref, kaplam, dklam, ntau, logtau, k2)
 
          qmax = 0.5*(emiss_interp(1,emiss_order(1))*k1 +
      .               emiss_interp(1,emiss_order(2))*k2)*(z1-z2)
 c         write (*,*) logtau, blah, qmax, z1, z2
+c         if (blah .gt. qmax) then
+c             write(*,*) 'Continuum overshoot!'
+c         endif
+c         continuum = etau*continuum+blah
          continuum = etau*continuum+max(min(blah, qmax), dble(0.0))
-c         write (*,*) logtau, Stokes(1), continuum, blah, qmax
+c         write (*,*) logtau, Stokes(1), continuum
+c         write (*,*) logtau, tau_interp_c(emiss_order(1)),
+c     .               tau_interp_c(emiss_order(2)), dtau, etau
          if (kappa_order(1).eq.1)then
              kappa_order(1) = 2
              kappa_order(2) = 1

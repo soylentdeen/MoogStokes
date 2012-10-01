@@ -66,7 +66,15 @@ c*****divide the lines into keepers and discards
       endif
       nwave = nwave -1
 
+      do i=1, nwave
+          write (*,*) wavelength(i)
+      enddo
+      read (*,*)
       call sortwave
+      do i=1, nwave
+          write (*,*) wavelength(i)
+      enddo
+      read (*,*)
 
 c*****format statements
 1001  format (/'DESIRED LINE-TO-CONTINUUM MINIMUM OPACITY RATIO: ', 

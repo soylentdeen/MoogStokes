@@ -1,5 +1,5 @@
 
-      subroutine traceStokes
+      subroutine traceStokes (phi_ang, chi_ang, mu)
 c**********************************************************************
 c     This routine performs the Runge-Kutta integration routine through
 c     the photosphere
@@ -11,9 +11,10 @@ c**********************************************************************
       include 'Dummy.com'
       include 'Stokes.com'
       include 'Angles.com'
+      include 'RungeKutta.com'
       real*8 phi_I, phi_Q, phi_U, phi_V, psi_Q, psi_U, psi_V, D_bound
       real*8 tau_start, tau_stop, rtol, atol, rpar, Stokes_c(5), tmp
-      real*8 bgfl
+      real*8 bgfl, phi_ang, chi_ang, mu
       integer itol, iout, lwork, liwork, ipar
       parameter (NDGL=5, NRD=5)
       parameter (LWORK=11*NDGL+8*NRD+21,LIWORK=NRD+21)
@@ -23,24 +24,25 @@ c**********************************************************************
 c*****Sets up constants
       bgfl = dble(2e30)
 
-      phi_angle = dble(0.0)
-      chi_angle = dble(0.0)
+
+      vewing_angle = acos(mu)
+
 c***** For each layer in the atmosphere, calculate each element of the
 c      opacity matrix and emission vector for the DELO algorithm
       do i=1,ntau
-         phi_I=(phi_opacity(i,2)*sin(phi_angle)**2.0+
+         phi_I=(phi_opacity(i,2)*sin(phi_ang)**2.0+
      .                (phi_opacity(i,1)+phi_opacity(i,3))*(1.0+
-     .                cos(phi_angle)**2.0)/2.0)/2.0
+     .                cos(phi_ang)**2.0)/2.0)/2.0
          phi_Q=(phi_opacity(i,2)-(phi_opacity(i,1)+phi_opacity(i,3))
-     .                /2.0)*sin(phi_angle)**2.0*cos(2.0*chi_angle)/2.0
+     .                /2.0)*sin(phi_ang)**2.0*cos(2.0*chi_ang)/2.0
          phi_U=(phi_opacity(i,2)-(phi_opacity(i,1)+phi_opacity(i,3))
-     .                /2.0)*sin(phi_angle)**2.0*sin(2.0*chi_angle)/2.0
-         phi_V=(phi_opacity(i,1)-phi_opacity(i,3))*cos(phi_angle)/2.0
+     .                /2.0)*sin(phi_ang)**2.0*sin(2.0*chi_ang)/2.0
+         phi_V=(phi_opacity(i,1)-phi_opacity(i,3))*cos(phi_ang)/2.0
          psi_Q=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(i,3))
-     .                /2.0)*sin(phi_angle)**2.0*cos(2.0*chi_angle)/2.0
+     .                /2.0)*sin(phi_ang)**2.0*cos(2.0*chi_ang)/2.0
          psi_U=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(i,3))
-     .                /2.0)*sin(phi_angle)**2.0*sin(2.0*chi_angle)/2.0
-         psi_V=(psi_opacity(i,1)-psi_opacity(i,3))*cos(phi_angle)/2.0
+     .                /2.0)*sin(phi_ang)**2.0*sin(2.0*chi_ang)/2.0
+         psi_V=(psi_opacity(i,1)-psi_opacity(i,3))*cos(phi_ang)/2.0
 
 c*****  The total opacity (line+continuum)
          kaptot(i) = kaplam(i) + phi_I
@@ -123,9 +125,9 @@ c     .     kappa(4,2,ntau)**2+kappa(2,3,ntau)**2)
       Stokes_c(3) = dble(0.0)
       Stokes_c(4) = dble(0.0)
       Stokes_c(5) = emission(1,ntau)
-      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
+c      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
 
-      iout=1
+      iout=0
       tau_start = tauref(ntau)
       tau_stop = tauref(1)
       itol = 0

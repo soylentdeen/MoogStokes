@@ -18,7 +18,7 @@ c******************************************************************************
       real*8 az_start, az_stop, daz, az, long, dlong
       real*8 ring_area, cell_area, cell_a, phi_ang, chi_ang, mu
 
-      testflag = 0
+      testflag = 1
 
       zeros(1,1) = 0.0
       zeros(1,2) = 0.0
@@ -181,18 +181,19 @@ c      wave = 11991.6
       lim1 = lim1line
       lim2 = lim2line
       call calcopacities
-      write (*,*) wave
+c      write (*,*) wave
       write (nfStokesI, 6520, advance='no') wave
       write (nfStokesQ, 6520, advance='no') wave
       write (nfStokesU, 6520, advance='no') wave
       write (nfStokesV, 6520, advance='no') wave
       write (nfContinuum, 6520, advance='no') wave
       if (testflag .eq. 1) then
-         call traceStokes(dble(0.0), dble(1.50708), dble(1.0))
-         write (nfStokesI, 6521, advance='no') Stokes(1)
-         write (nfStokesQ, 6521, advance='no') Stokes(2)
-         write (nfStokesU, 6521, advance='no') Stokes(3)
-         write (nfStokesV, 6521, advance='no') Stokes(4)
+         call traceStokes(dble(0.0), dble(1.712), dble(1.0))
+c         call traceStokes(dble(1.5025), dble(4.712), dble(0.0682))
+         write (nfStokesI, 6521, advance='no') Stokes(1)/continuum
+         write (nfStokesQ, 6521, advance='no') Stokes(2)/continuum
+         write (nfStokesU, 6521, advance='no') Stokes(3)/continuum
+         write (nfStokesV, 6521, advance='no') Stokes(4)/continuum
          write (nfContinuum, 6521, advance='no') continuum
       else
          do i = 1, icell
@@ -210,13 +211,14 @@ c      wave = 11991.6
       write (nfStokesV, *) ''
       write (nfContinuum, *) ''
       
-c      read (*,*)
+      write (*,*) wave, Stokes(1)/continuum
       stepsize = dopp(nstrong, 50)*wave/2.997929e11
       wavecounter = wavecounter + 1
       if (wavecounter .le. nwave) then
           go to 30
       endif
 
+c      read (*,*)
 c*****finish
       if (control .ne. 'gridend') then
          call finish (1)

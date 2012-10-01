@@ -205,7 +205,7 @@ c****     Now do the same thing for the continuum
      .              emiss_interp(1,emiss_order(2))
      .             +bet*emiss_interp(1,emiss_order(1))
 
-         write (*,*) logtau, Stokes(1), continuum
+c         write (*,*) logtau, Stokes(1), continuum
          if (kappa_order(1).eq.1)then
              kappa_order(1) = 2
              kappa_order(2) = 1
