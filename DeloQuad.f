@@ -219,7 +219,12 @@ c     .               k1, k2
 c             if (matZ(k) .gt. qmax) then
 c                 write(*,*) 'Stokes overshoot!'
 c             endif
-             matZ(k) = max(min(qmax, matZ(k)), dble(0.0))
+             if (matZ(k) .gt. 0.0) then
+                 matZ(k) = max(min(qmax, matZ(k)), dble(0.0))
+             else
+                 matZ(k) = min(max(qmax, matZ(k)), dble(0.0))
+             endif
+
          enddo
 c         read (*,*)
 c****      calculate the RHS of the equation.  Store in matZ

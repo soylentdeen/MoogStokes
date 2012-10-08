@@ -10,8 +10,8 @@ c******************************************************************************
       include 'Linex.com'
       include 'Dummy.com'
       include 'Stokes.com'
-      real*8 voigt, faraday_voigt, voigt_x, voigt_y, gam_L, gam_D,
-     .       sqrtpi
+      real*8 voigt_val, faraday_voigt_val,voigt_x,voigt_y,gam_L, gam_D,
+     .       sqrtpi, v
       complex Z, humlicek, w4
 
 c*****compute the total line opacity at each depth    
@@ -31,12 +31,12 @@ c*****compute the total line opacity at each depth
             voigt_y =(gam_L)
             Z = cmplx(voigt_x, voigt_y)
             humlicek = w4(Z)
-            voigt = REAL(humlicek,8)/sqrtpi
-            faraday_voigt = AIMAG(humlicek)/sqrtpi
+            voigt_val = REAL(humlicek,8)/sqrtpi
+            faraday_voigt_val = AIMAG(humlicek)/sqrtpi
             phi_opacity(i,int(deltamj(j)+2))=phi_opacity(i,
-     .               int(deltamj(j)+2))+ kapnu0(j,i)*voigt
+     .               int(deltamj(j)+2))+ kapnu0(j,i)*voigt_val
             psi_opacity(i,int(deltamj(j)+2)) = psi_opacity(i,
-     .               int(deltamj(j)+2))+ kapnu0(j,i)*faraday_voigt
+     .               int(deltamj(j)+2))+ kapnu0(j,i)*faraday_voigt_val
          enddo                                     
 
                                                        
@@ -49,12 +49,24 @@ c*****do the same for the strong lines
                voigt_y =(gam_L)
                Z = cmplx(voigt_x, voigt_y)
                humlicek = w4(Z)
-               voigt = REAL(humlicek,8)/sqrtpi
-               faraday_voigt = AIMAG(humlicek)/sqrtpi
+c               voigt_val = REAL(humlicek,8)/sqrtpi
+               v = 2.997929d10*dabs(wave-wave1(j))/(wave1(j)*dopp(j,i))
+               voigt_val = voigt(a(j,i),v)
+               faraday_voigt_val = AIMAG(humlicek)/sqrtpi
+c               x = real(Z)
+c               y = aimag(Z)
+c               S = abs(X)+Y
+c               if (S.GT.15.) then             ! Region 1
+c               if ((S.LT.15.).AND.(S.GT.5.5)) then   ! Region 2
+c               if ((S.LT.5.5).AND.(Y.GT..195*abs(X)-.176)) then !Region 3
+c               if ((S.LT.5.5).AND.(Y.LT..195*abs(X)-.176)) then !Region 4
+c                   write (*,*) wave, i, a(j,i), v,
+c     .                    voigt_val, voigt(a(j,i),v)
+c               endif
                phi_opacity(i,int(deltamj(j)+2))=phi_opacity(i,
-     .                  int(deltamj(j)+2))+kapnu0(j,i)*voigt
+     .                  int(deltamj(j)+2))+kapnu0(j,i)*voigt_val
                psi_opacity(i,int(deltamj(j)+2))=psi_opacity(i,
-     .                  int(deltamj(j)+2))+kapnu0(j,i)*faraday_voigt
+     .                  int(deltamj(j)+2))+kapnu0(j,i)*faraday_voigt_val
             enddo
             j = nlines+1
          endif

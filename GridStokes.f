@@ -211,7 +211,7 @@ c         call traceStokes(dble(1.5025), dble(4.712), dble(0.0682))
       write (nfStokesV, *) ''
       write (nfContinuum, *) ''
       
-      write (*,*) wave, Stokes(1)/continuum
+c      write (*,*) wave, Stokes(1)/continuum
       stepsize = dopp(nstrong, 50)*wave/2.997929e11
       wavecounter = wavecounter + 1
       if (wavecounter .le. nwave) then

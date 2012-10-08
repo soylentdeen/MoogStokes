@@ -50,8 +50,8 @@ c*****   Generate original wavelength grid
 c*****divide the lines into keepers and discards
       do j=1,nlines+nstrong
          if (strength(j)/kaplam(jtau5) .ge. xratio) then
-             do k=-10,10
-                 wavelength(nwave) = wave1(j)+0.5*asin(real(k/10.0))
+             do k=-40,40
+                 wavelength(nwave) = wave1(j)+0.25*asin(real(k/40.0))
                  nwave = nwave+1
              enddo
              wavelength(nwave) = wave1(j)+ 0.001
@@ -66,15 +66,7 @@ c*****divide the lines into keepers and discards
       endif
       nwave = nwave -1
 
-      do i=1, nwave
-          write (*,*) wavelength(i)
-      enddo
-      read (*,*)
       call sortwave
-      do i=1, nwave
-          write (*,*) wavelength(i)
-      enddo
-      read (*,*)
 
 c*****format statements
 1001  format (/'DESIRED LINE-TO-CONTINUUM MINIMUM OPACITY RATIO: ', 
@@ -113,9 +105,12 @@ c****   Now, go through and purge duplicates and very close together points
       temp(1) = wavelength(1)
       I=1
       do J=2,nwave
-         if(abs(wavelength(J)-temp(I)) .gt. 0.005) THEN
+         if(abs(wavelength(J)-temp(I)) .lt. 0.001) THEN
+            temp(I) = (wavelength(J)+temp(I))/2.0
+            wavelength(J) = 0.0
+         else
             I = I+1
-            temp(I) = (wavelength(J)+temp(I-1))/2.0
+            temp(I) = wavelength(J)
             wavelength(J) = 0.0
          endif
       enddo
