@@ -16,9 +16,9 @@ c**********************************************************************
       real*8 tau_interp(3), tau_interp_c(3), logtau
       real*8 phi_I, phi_3, phi_U, phi_V, psi_Q, psi_U, psi_V
       real*8 h1, h2, dx, dtau, etau, alph, bet, gam
-      real*8 matS1(4), matS2(4), bgfl
+      real*8 matS1(4), matS2(4), bgfl, p_i(100), dphiI(100)
       real*8 blah, k1, k2, z1, z2, deltaz(100), qmax
-      real*8 phi_ang, chi_ang, mu
+      real*8 phi_ang, chi_ang, mu, midpoint
       integer emiss_order(3), kappa_order(2)
       integer INFO, IPIV(4), LDA, LWORK
       parameter (LDA=4, LWORK=64*LDA)
@@ -46,14 +46,18 @@ c*****Sets up constants
       ones(4,4) = 1.0
 
 c*****  zdepth is the physical depth scale
+      call spline(xref, kapref, ntau, bgfl, bgfl, dkref)
       do i=1,ntau
          if (i.eq.1) then
              zdepth(i) = 0.0
          else
-             h1 = 1.0/(kapref(i-1))
-             h2 = 1.0/(kapref(i))
-             dtau = (tauref(i)-tauref(i-1))/mu
-             zdepth(i) = zdepth(i-1)+(h1+h2)/2.0*dtau
+             h1 = 1.0/kapref(i-1)
+             midpoint = log10((tauref(i)+tauref(i-1))/2.0)
+             call splint(xref, kapref, dkref, ntau, midpoint, k1)
+             h2 = 4.0/k1
+             h3 = 1.0/kapref(i)
+             dtau = (tauref(i)-tauref(i-1))/(6.0*mu)
+             zdepth(i) = zdepth(i-1)+(h1+h2+h3)*dtau
          endif
       enddo
 
@@ -77,7 +81,10 @@ c      opacity matrix and emission vector for the DELO algorithm
 
 
 c*****  The total opacity (line+continuum)
+c         write (*,*) tauref(i), phi_I
+c         write (*,*) tauref(i), phi_opacity(i,1)
          kaptot(i) = (kaplam(i) + phi_I)
+         p_i(i) = phi_I
 
 C*****   Assemble the elements of the opacity matrix (K')
          k11(i)=0.0
@@ -107,18 +114,37 @@ c*****  Assembles the Emission matrix (J')
          emission(4,i)=source*phi_V/kaptot(i)
       enddo
 
+      call spline(xref, kaplam, ntau, bgfl, bgfl, dklam)
+      call spline(xref, kaptot, ntau, bgfl, bgfl, dktot)
+      call spline(xref, zdepth, ntau, bgfl, bgfl, deltaz)
+      call spline(xref, p_I, ntau, bgfl, bgfl, dphiI)
+
       do i=1,ntau
          if (i.eq.1) then
-            tautot(i) = kaptot(i)/kapref(i)*tauref(i)
             tlam(i) = kaplam(i)/kapref(i)*tauref(i)
+            tautot(i) = kaptot(i)/kapref(i)*tauref(i)
+c            tautot(i) = p_I(i)/kapref(i)*tauref(i)
          else
-            dz = zdepth(i)-zdepth(i-1)
-            dtautot = dz*(kaptot(i-1)+kaptot(i))/2.0
-            dtaulam = dz*(kaplam(i-1)+kaplam(i))/2.0
+            dz = (zdepth(i)-zdepth(i-1))/6.0
+            h1 = kaptot(i-1)
+            midpoint = log10((tauref(i)+tauref(i-1))/2.0)
+            call splint(xref, kaptot, dktot, ntau, midpoint, h2)
+            h3 = kaptot(i)
+c            h1 = p_I(i-1)
+c            midpoint = log10((tauref(i)+tauref(i-1))/2.0)
+c            call splint(xref, p_I, dphiI, ntau, midpoint, h2)
+c            h3 = p_I(i)
+            dtautot = dz*(h1+4.0*h2+h3)
+            h1 = kaplam(i-1)
+            call splint(xref, kaplam, dklam, ntau, midpoint, h2)
+            h3 = kaplam(i)
+            dtaulam = dz*(h1+4.0*h2+h3)
             tautot(i) = tautot(i-1)+dtautot
             tlam(i) = tlam(i-1)+dtaulam
          endif
+c         write (*,*) tauref(i), kaptot(i), kaplam(i)
       enddo
+c      read (*,*)
 
       call spline(xref, k11, ntau, bgfl, bgfl, dk11)
       call spline(xref, k12, ntau, bgfl, bgfl, dk12)
@@ -143,9 +169,6 @@ c*****  Assembles the Emission matrix (J')
       call spline(xref, emission(3,:), ntau, bgfl, bgfl, de3)
       call spline(xref, emission(4,:), ntau, bgfl, bgfl, de4)
 
-      call spline(xref, kaplam, ntau, bgfl, bgfl, dklam)
-      call spline(xref, kaptot, ntau, bgfl, bgfl, dktot)
-      call spline(xref, zdepth, ntau, bgfl, bgfl, deltaz)
 
 c*****   Trace the Stokes parameters through the atmosphere
 c            via the quadratic DELO algorithm
@@ -208,6 +231,8 @@ c            via the quadratic DELO algorithm
 
          call splint(xref, kaptot, dktot, ntau, logtau-delta_tau, k1)
          call splint(xref, kaptot, dktot, ntau, logtau, k2)
+c         call splint(xref, p_I, dktot, ntau, logtau-delta_tau, k1)
+c         call splint(xref, p_I, dktot, ntau, logtau, k2)
          call splint(xref, zdepth, deltaz, ntau, logtau-delta_tau, z1)
          call splint(xref, zdepth, deltaz, ntau, logtau, z2)
 

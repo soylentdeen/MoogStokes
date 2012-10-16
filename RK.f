@@ -127,7 +127,7 @@ c     .     kappa(4,2,ntau)**2+kappa(2,3,ntau)**2)
       Stokes_c(5) = emission(1,ntau)
 c      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
 
-      iout=0
+      iout=1
       tau_start = tauref(ntau)
       tau_stop = tauref(1)
       itol = 0
