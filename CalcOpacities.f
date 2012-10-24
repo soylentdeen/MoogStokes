@@ -49,9 +49,9 @@ c*****do the same for the strong lines
                voigt_y =(gam_L)
                Z = cmplx(voigt_x, voigt_y)
                humlicek = w4(Z)
-c               voigt_val = REAL(humlicek,8)/sqrtpi
-               v = 2.997929d10*dabs(wave-wave1(j))/(wave1(j)*dopp(j,i))
-               voigt_val = voigt(a(j,i),v)
+               voigt_val = REAL(humlicek,8)/sqrtpi
+c               v = 2.997929d10*dabs(wave-wave1(j))/(wave1(j)*dopp(j,i))
+c               voigt_val = voigt(a(j,i),v)
                faraday_voigt_val = AIMAG(humlicek)/sqrtpi
 c               x = real(Z)
 c               y = aimag(Z)

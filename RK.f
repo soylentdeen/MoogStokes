@@ -37,12 +37,12 @@ c      opacity matrix and emission vector for the DELO algorithm
      .                /2.0)*sin(phi_ang)**2.0*cos(2.0*chi_ang)/2.0
          phi_U=(phi_opacity(i,2)-(phi_opacity(i,1)+phi_opacity(i,3))
      .                /2.0)*sin(phi_ang)**2.0*sin(2.0*chi_ang)/2.0
-         phi_V=(phi_opacity(i,1)-phi_opacity(i,3))*cos(phi_ang)/2.0
+         phi_V=(phi_opacity(i,3)-phi_opacity(i,1))*cos(phi_ang)/2.0
          psi_Q=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(i,3))
      .                /2.0)*sin(phi_ang)**2.0*cos(2.0*chi_ang)/2.0
          psi_U=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(i,3))
      .                /2.0)*sin(phi_ang)**2.0*sin(2.0*chi_ang)/2.0
-         psi_V=(psi_opacity(i,1)-psi_opacity(i,3))*cos(phi_ang)/2.0
+         psi_V=(psi_opacity(i,3)-psi_opacity(i,1))*cos(phi_ang)/2.0
 
 c*****  The total opacity (line+continuum)
          kaptot(i) = kaplam(i) + phi_I
@@ -127,7 +127,7 @@ c     .     kappa(4,2,ntau)**2+kappa(2,3,ntau)**2)
       Stokes_c(5) = emission(1,ntau)
 c      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
 
-      iout=1
+      iout=0
       tau_start = tauref(ntau)
       tau_stop = tauref(1)
       itol = 0
@@ -147,11 +147,6 @@ c      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
       Stokes(3) = Stokes_c(3)!/Stokes_c(5)
       Stokes(4) = Stokes_c(4)!/Stokes_c(5)
       continuum = Stokes_c(5)
-c      Stokes(1) = dble(99.9)
-c      Stokes(1) = dble(0.0)
-c      Stokes(1) = dble(0.0)
-c      Stokes(1) = dble(0.0)
-c      continuum = dble(100.0)
 
       return
 

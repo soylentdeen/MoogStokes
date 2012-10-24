@@ -65,6 +65,9 @@ c*****  zdepth is the physical depth scale
 c***** For each layer in the atmosphere, calculate each element of the
 c      opacity matrix and emission vector for the DELO algorithm
       do i=1,ntau
+c         phi_opacity(i,1) = 0.0
+c         phi_opacity(i,2) = 0.0
+c         phi_opacity(i,3) = 0.0
          phi_I=(phi_opacity(i,2)*sin(phi_ang)**2.0+
      .                (phi_opacity(i,1)+phi_opacity(i,3))*(1.0+
      .                cos(phi_ang)**2.0)/2.0)/2.0
@@ -146,22 +149,22 @@ c         write (*,*) tauref(i), kaptot(i), kaplam(i)
       enddo
 c      read (*,*)
 
-      call spline(xref, k11, ntau, bgfl, bgfl, dk11)
+c      call spline(xref, k11, ntau, bgfl, bgfl, dk11)
       call spline(xref, k12, ntau, bgfl, bgfl, dk12)
       call spline(xref, k13, ntau, bgfl, bgfl, dk13)
       call spline(xref, k14, ntau, bgfl, bgfl, dk14)
       call spline(xref, k21, ntau, bgfl, bgfl, dk21)
-      call spline(xref, k22, ntau, bgfl, bgfl, dk22)
+c      call spline(xref, k22, ntau, bgfl, bgfl, dk22)
       call spline(xref, k23, ntau, bgfl, bgfl, dk23)
       call spline(xref, k24, ntau, bgfl, bgfl, dk24)
       call spline(xref, k31, ntau, bgfl, bgfl, dk31)
       call spline(xref, k32, ntau, bgfl, bgfl, dk32)
-      call spline(xref, k33, ntau, bgfl, bgfl, dk33)
+c      call spline(xref, k33, ntau, bgfl, bgfl, dk33)
       call spline(xref, k34, ntau, bgfl, bgfl, dk34)
       call spline(xref, k41, ntau, bgfl, bgfl, dk41)
       call spline(xref, k42, ntau, bgfl, bgfl, dk42)
       call spline(xref, k43, ntau, bgfl, bgfl, dk43)
-      call spline(xref, k44, ntau, bgfl, bgfl, dk44)
+c      call spline(xref, k44, ntau, bgfl, bgfl, dk44)
       call spline(xref, tautot, ntau, bgfl, bgfl, dttot)
       call spline(xref, tlam, ntau, bgfl, bgfl, dtlam)
       call spline(xref, emission(1,:), ntau, bgfl, bgfl, de1)
@@ -179,7 +182,7 @@ c            via the quadratic DELO algorithm
       Stokes(4) = dble(0.0)
       continuum = Stokes(1)
 
-      delta_tau = -0.05
+      delta_tau = -0.01
       call dcopy(4, emission(:,ntau), 1, emiss_interp(:,1), 1)
       tau_interp(1) = tautot(ntau)
       tau_interp_c(1) = tlam(ntau)
@@ -231,19 +234,12 @@ c            via the quadratic DELO algorithm
 
          call splint(xref, kaptot, dktot, ntau, logtau-delta_tau, k1)
          call splint(xref, kaptot, dktot, ntau, logtau, k2)
-c         call splint(xref, p_I, dktot, ntau, logtau-delta_tau, k1)
-c         call splint(xref, p_I, dktot, ntau, logtau, k2)
          call splint(xref, zdepth, deltaz, ntau, logtau-delta_tau, z1)
          call splint(xref, zdepth, deltaz, ntau, logtau, z2)
 
          do k=1, 4
              qmax = 0.5*(emiss_interp(k,emiss_order(1))*k1 +
      .               emiss_interp(k,emiss_order(2))*k2)*(z1-z2)
-c             write (*,*) k,qmax,matZ(k),emiss_interp(k,emiss_order(1)),
-c     .               k1, k2
-c             if (matZ(k) .gt. qmax) then
-c                 write(*,*) 'Stokes overshoot!'
-c             endif
              if (matZ(k) .gt. 0.0) then
                  matZ(k) = max(min(qmax, matZ(k)), dble(0.0))
              else
@@ -348,44 +344,48 @@ c***********************************************************************
       call splint(xref, tlam, dtlam, ntau, logtau+dtau, t_lam)
       call splint(xref, tautot, dttot, ntau, logtau+dtau, t_tot)
 
-      call splint(xref, k11, dk11, ntau, logtau, k_11)
+c      call splint(xref, k11, dk11, ntau, logtau, k_11)
       call splint(xref, k12, dk12, ntau, logtau, k_12)
       call splint(xref, k13, dk13, ntau, logtau, k_13)
       call splint(xref, k14, dk14, ntau, logtau, k_14)
       call splint(xref, k21, dk21, ntau, logtau, k_21)
-      call splint(xref, k22, dk22, ntau, logtau, k_22)
+c      call splint(xref, k22, dk22, ntau, logtau, k_22)
       call splint(xref, k23, dk23, ntau, logtau, k_23)
       call splint(xref, k24, dk24, ntau, logtau, k_24)
       call splint(xref, k31, dk31, ntau, logtau, k_31)
       call splint(xref, k32, dk32, ntau, logtau, k_32)
-      call splint(xref, k33, dk33, ntau, logtau, k_33)
+c      call splint(xref, k33, dk33, ntau, logtau, k_33)
       call splint(xref, k34, dk34, ntau, logtau, k_34)
       call splint(xref, k41, dk41, ntau, logtau, k_41)
       call splint(xref, k42, dk42, ntau, logtau, k_42)
       call splint(xref, k43, dk43, ntau, logtau, k_43)
-      call splint(xref, k44, dk44, ntau, logtau, k_44)
+c      call splint(xref, k44, dk44, ntau, logtau, k_44)
 
       call splint(xref, emission(1,:), de1, ntau, logtau+dtau, e_1)
       call splint(xref, emission(2,:), de2, ntau, logtau+dtau, e_2)
       call splint(xref, emission(3,:), de3, ntau, logtau+dtau, e_3)
       call splint(xref, emission(4,:), de4, ntau, logtau+dtau, e_4)
 
-      k_interp(1,1,k_ord)=k_11
+c      k_interp(1,1,k_ord)=k_11
+      k_interp(1,1,k_ord)=0.0
       k_interp(1,2,k_ord)=k_12
       k_interp(1,3,k_ord)=k_13
       k_interp(1,4,k_ord)=k_14
       k_interp(2,1,k_ord)=k_21
-      k_interp(2,2,k_ord)=k_22
+c      k_interp(2,2,k_ord)=k_22
+      k_interp(2,2,k_ord)=0.0
       k_interp(2,3,k_ord)=k_23
       k_interp(2,4,k_ord)=k_24
       k_interp(3,1,k_ord)=k_31
       k_interp(3,2,k_ord)=k_32
-      k_interp(3,3,k_ord)=k_33
+c      k_interp(3,3,k_ord)=k_33
+      k_interp(3,3,k_ord)=0.0
       k_interp(3,4,k_ord)=k_34
       k_interp(4,1,k_ord)=k_41
       k_interp(4,2,k_ord)=k_42
       k_interp(4,3,k_ord)=k_43
-      k_interp(4,4,k_ord)=k_44
+c      k_interp(4,4,k_ord)=k_44
+      k_interp(4,4,k_ord)=0.0
 
       e_interp(1,e_ord) = e_1/mu
       e_interp(2,e_ord) = e_2/mu

@@ -181,15 +181,25 @@ c      wave = 22062.710
       lim1 = lim1line
       lim2 = lim2line
       call calcopacities
-c      write (*,*) wave
+      write (*,*) wave
       write (nfStokesI, 6520, advance='no') wave
       write (nfStokesQ, 6520, advance='no') wave
       write (nfStokesU, 6520, advance='no') wave
       write (nfStokesV, 6520, advance='no') wave
       write (nfContinuum, 6520, advance='no') wave
       if (testflag .eq. 1) then
-         call traceStokes(dble(0.0), dble(1.712), dble(1.0))
+c         call traceStokes(dble(0.0), dble(0.0), dble(1.0))
+c         call traceStokes(dble(1.3002), dble(0.0), dble(0.2673))
 c         call traceStokes(dble(1.5025), dble(4.712), dble(0.0682))
+
+         call traceStokes(dble(0.27064), dble(0.0), dble(0.9636))
+c         call traceStokes(dble(0.481286), dble(0.0), dble(0.88634))
+c         call traceStokes(dble(0.640495), dble(0.0), dble(0.8018))
+c         call traceStokes(dble(0.785389), dble(0.0), dble(0.7071))
+c         call traceStokes(dble(0.929793), dble(0.0), dble(0.5979998))
+c         call traceStokes(dble(1.089532), dble(0.0), dble(0.4629))
+c         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
+
          write (nfStokesI, 6521, advance='no') Stokes(1)/continuum
          write (nfStokesQ, 6521, advance='no') Stokes(2)/continuum
          write (nfStokesU, 6521, advance='no') Stokes(3)/continuum
