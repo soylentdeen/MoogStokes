@@ -35,7 +35,7 @@ c*****calculate continuum quantities at the line list wavelength middle
       
 c*****   Generate original wavelength grid
 
-      deltawave = 0.5
+      deltawave = 0.25
       nwave = 1
 
       wave = start

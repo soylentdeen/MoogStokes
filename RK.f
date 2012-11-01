@@ -37,12 +37,12 @@ c      opacity matrix and emission vector for the DELO algorithm
      .                /2.0)*sin(phi_ang)**2.0*cos(2.0*chi_ang)/2.0
          phi_U=(phi_opacity(i,2)-(phi_opacity(i,1)+phi_opacity(i,3))
      .                /2.0)*sin(phi_ang)**2.0*sin(2.0*chi_ang)/2.0
-         phi_V=(phi_opacity(i,3)-phi_opacity(i,1))*cos(phi_ang)/2.0
+         phi_V=(phi_opacity(i,1)-phi_opacity(i,3))*cos(phi_ang)/2.0
          psi_Q=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(i,3))
      .                /2.0)*sin(phi_ang)**2.0*cos(2.0*chi_ang)/2.0
          psi_U=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(i,3))
      .                /2.0)*sin(phi_ang)**2.0*sin(2.0*chi_ang)/2.0
-         psi_V=(psi_opacity(i,3)-psi_opacity(i,1))*cos(phi_ang)/2.0
+         psi_V=(psi_opacity(i,1)-psi_opacity(i,3))*cos(phi_ang)/2.0
 
 c*****  The total opacity (line+continuum)
          kaptot(i) = kaplam(i) + phi_I
@@ -131,7 +131,7 @@ c      Stokes_c(5) = Planck(t(ntau))*kaplam(ntau)/kapref(ntau)
       tau_start = tauref(ntau)
       tau_stop = tauref(1)
       itol = 0
-      rtol = 1.0e-14
+      rtol = 1.0e-13
       atol = 1.0e-5
       do i=1,10
          iwork(i)=0

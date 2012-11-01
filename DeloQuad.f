@@ -68,26 +68,34 @@ c      opacity matrix and emission vector for the DELO algorithm
 c         phi_opacity(i,1) = 0.0
 c         phi_opacity(i,2) = 0.0
 c         phi_opacity(i,3) = 0.0
-         phi_I=(phi_opacity(i,2)*sin(phi_ang)**2.0+
+c         psi_opacity(i,1) = 0.0
+c         psi_opacity(i,2) = 0.0
+c         psi_opacity(i,3) = 0.0
+         phi_I=(2.0*phi_opacity(i,2)*sin(phi_ang)**2.0+
      .                (phi_opacity(i,1)+phi_opacity(i,3))*(1.0+
      .                cos(phi_ang)**2.0)/2.0)/2.0
          phi_Q=(phi_opacity(i,2)-(phi_opacity(i,1)+phi_opacity(i,3))
-     .                /2.0)*sin(phi_ang)**2.0*cos(2.0*chi_ang)/2.0
+     .                /2.0)*sin(phi_ang)**2.0*
+     .                      cos(2.0*chi_ang)/2.0
          phi_U=(phi_opacity(i,2)-(phi_opacity(i,1)+phi_opacity(i,3))
-     .                /2.0)*sin(phi_ang)**2.0*sin(2.0*chi_ang)/2.0
-         phi_V=(phi_opacity(i,1)-phi_opacity(i,3))*cos(phi_ang)/2.0
+     .                /2.0)*sin(phi_ang)**2.0*
+     .                      sin(2.0*chi_ang)/2.0
+         phi_V=(phi_opacity(i,1)-phi_opacity(i,3))*
+     .                cos(phi_ang)/2.0
          psi_Q=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(i,3))
-     .                /2.0)*sin(phi_ang)**2.0*cos(2.0*chi_ang)/2.0
+     .                /2.0)*sin(phi_ang)**2.0*
+     .                cos(2.0*chi_ang)/2.0
          psi_U=(psi_opacity(i,2)-(psi_opacity(i,1)+psi_opacity(i,3))
-     .                /2.0)*sin(phi_ang)**2.0*sin(2.0*chi_ang)/2.0
-         psi_V=(psi_opacity(i,1)-psi_opacity(i,3))*cos(phi_ang)/2.0
+     .                /2.0)*sin(phi_ang)**2.0*
+     .                sin(2.0*chi_ang)/2.0
+         psi_V=(psi_opacity(i,1)-psi_opacity(i,3))*
+     .                cos(phi_ang)/2.0
 
 
+c         write (*,*) tauref(i), phi_I, phi_Q, phi_U, phi_V, psi_Q,
+c     .                          psi_U, psi_V
 c*****  The total opacity (line+continuum)
-c         write (*,*) tauref(i), phi_I
-c         write (*,*) tauref(i), phi_opacity(i,1)
          kaptot(i) = (kaplam(i) + phi_I)
-         p_i(i) = phi_I
 
 C*****   Assemble the elements of the opacity matrix (K')
          k11(i)=0.0
@@ -117,6 +125,7 @@ c*****  Assembles the Emission matrix (J')
          emission(4,i)=source*phi_V/kaptot(i)
       enddo
 
+c      read (*,*)
       call spline(xref, kaplam, ntau, bgfl, bgfl, dklam)
       call spline(xref, kaptot, ntau, bgfl, bgfl, dktot)
       call spline(xref, zdepth, ntau, bgfl, bgfl, deltaz)
@@ -240,7 +249,7 @@ c            via the quadratic DELO algorithm
          do k=1, 4
              qmax = 0.5*(emiss_interp(k,emiss_order(1))*k1 +
      .               emiss_interp(k,emiss_order(2))*k2)*(z1-z2)
-             if (matZ(k) .gt. 0.0) then
+             if (qmax .gt. 0.0) then
                  matZ(k) = max(min(qmax, matZ(k)), dble(0.0))
              else
                  matZ(k) = min(max(qmax, matZ(k)), dble(0.0))

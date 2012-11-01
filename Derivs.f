@@ -74,29 +74,33 @@ c      DYDX(5)=klam/kref*(Y(5)-e_1)/mu
       implicit real*8 (a-h,o-z)
       DIMENSION CON(8*ND),ICOMP(ND)
       real*8 X, XOLD, Y(5), tau_c, tau_tot, kc_ref, ktot, slope
-      real*8 denom, run, klam, kref, logtau, e_0, k_11, k_11a, e_1
+      real*8 denom, run, klam, kref, logtau, e_0, k_11, k_14, e_1
+      real*8 k_41
       include 'Atmos.com'
       include 'Linex.com'
       include 'Stokes.com'
 
       logtau = log10(X)
-      do i=1,ntau-1
-         if (tauref(i+1)+1.0e-10.ge.X) THEN
-             goto 10
-         endif
-      enddo
-10    denom =(log10(tauref(i+1))-log10(tauref(i)))
-      run =(logtau - log10(tauref(i)))
-
-      slope=(eta0(i+1)-eta0(i))/denom
-      e_0 = (eta0(i)+slope*run)
-
-      call splint(xref, kaptot, dktot, ntau, logtau, ktot)
-      call splint(xref, kaplam, dklam, ntau, logtau, klam)
-      call splint(xref, kapref, dkref, ntau, logtau, kref)
-      call splint(xref, kappa(1,1,:), dk11, ntau, logtau, k_11)
-      call splint(xref, emission(1,:), de1, ntau, logtau, e_1)
+c      do i=1,ntau-1
+c         if (tauref(i+1)+1.0e-10.ge.X) THEN
+c             goto 10
+c         endif
+c      enddo
+c10    denom =(log10(tauref(i+1))-log10(tauref(i)))
+c      run =(logtau - log10(tauref(i)))
+c
+c      slope=(eta0(i+1)-eta0(i))/denom
+c      e_0 = (eta0(i)+slope*run)
+c
+c      call splint(xref, kaptot, dktot, ntau, logtau, ktot)
+c      call splint(xref, kaplam, dklam, ntau, logtau, klam)
+c      call splint(xref, kapref, dkref, ntau, logtau, kref)
+c      call splint(xref, kappa(4,1,:), dk41, ntau, logtau, k_41)
+c      call splint(xref, kappa(1,4,:), dk14, ntau, logtau, k_14)
+c      call splint(xref, kappa(1,1,:), dk11, ntau, logtau, k_11)
+c      call splint(xref, emission(1,:), de1, ntau, logtau, e_1)
 c      write (*,*) log10(X), klam, kref, e_0, e_1, ktot
 c      write (*,*) log10(X), k_11, k_11a
-      write (*,*) X, ktot, klam
+c      write (*,*) logtau, k_11, k_14, k_41, Y(1), Y(4)
+      write (*,*) logtau, Y(1), Y(2), Y(3), Y(4)
       END

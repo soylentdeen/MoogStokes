@@ -167,7 +167,7 @@ c*****Perform the Synthesis
       wavl = 0.
       mode = 3
 30    wave = wavelength(wavecounter)
-c      wave = 22062.710
+c      wave = 11828.100
       if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave
          call opacit (2,wave)
@@ -181,7 +181,7 @@ c      wave = 22062.710
       lim1 = lim1line
       lim2 = lim2line
       call calcopacities
-      write (*,*) wave
+c      write (*,*) wave
       write (nfStokesI, 6520, advance='no') wave
       write (nfStokesQ, 6520, advance='no') wave
       write (nfStokesU, 6520, advance='no') wave
@@ -221,8 +221,9 @@ c         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
       write (nfStokesV, *) ''
       write (nfContinuum, *) ''
       
+c      write (*,*) wave, Stokes(1)/continuum, Stokes(2)/continuum,
+c     .           Stokes(3)/continuum, Stokes(4)/continuum
 c      read (*,*)
-c      write (*,*) wave, Stokes(1)/continuum
       stepsize = dopp(nstrong, 50)*wave/2.997929e11
       wavecounter = wavecounter + 1
       if (wavecounter .le. nwave) then

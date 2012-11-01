@@ -51,8 +51,11 @@ c*****do the same for the strong lines
                humlicek = w4(Z)
                voigt_val = REAL(humlicek,8)/sqrtpi
 c               v = 2.997929d10*dabs(wave-wave1(j))/(wave1(j)*dopp(j,i))
-c               voigt_val = voigt(a(j,i),v)
-               faraday_voigt_val = AIMAG(humlicek)/sqrtpi
+c               voigt_val = voigt(a(j,i),v
+               faraday_voigt_val = REAL(AIMAG(humlicek)/sqrtpi,8)
+c               if ((i.eq.30).AND.(j.eq.nlines+1)) then
+c                   write (*,*) wave, faraday_voigt_val
+c               endif
 c               x = real(Z)
 c               y = aimag(Z)
 c               S = abs(X)+Y
@@ -68,7 +71,7 @@ c               endif
                psi_opacity(i,int(deltamj(j)+2))=psi_opacity(i,
      .                  int(deltamj(j)+2))+kapnu0(j,i)*faraday_voigt_val
             enddo
-            j = nlines+1
+c            j = nlines+1
          endif
       enddo      
 
