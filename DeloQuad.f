@@ -71,7 +71,7 @@ c         phi_opacity(i,3) = 0.0
 c         psi_opacity(i,1) = 0.0
 c         psi_opacity(i,2) = 0.0
 c         psi_opacity(i,3) = 0.0
-         phi_I=(2.0*phi_opacity(i,2)*sin(phi_ang)**2.0+
+         phi_I=(phi_opacity(i,2)*sin(phi_ang)**2.0+
      .                (phi_opacity(i,1)+phi_opacity(i,3))*(1.0+
      .                cos(phi_ang)**2.0)/2.0)/2.0
          phi_Q=(phi_opacity(i,2)-(phi_opacity(i,1)+phi_opacity(i,3))
@@ -91,9 +91,12 @@ c         psi_opacity(i,3) = 0.0
          psi_V=(psi_opacity(i,1)-psi_opacity(i,3))*
      .                cos(phi_ang)/2.0
 
-
-c         write (*,*) tauref(i), phi_I, phi_Q, phi_U, phi_V, psi_Q,
+c         if (i .eq. 40) then
+c              write (*,*) wave, chi_ang, 2.0*chi_ang, cos(chi_ang),
+c     .                cos(2.0*chi_ang)
+c             write (*,*) wave, phi_I, phi_Q, phi_U, phi_V, psi_Q,
 c     .                          psi_U, psi_V
+c         endif
 c*****  The total opacity (line+continuum)
          kaptot(i) = (kaplam(i) + phi_I)
 
@@ -129,23 +132,17 @@ c      read (*,*)
       call spline(xref, kaplam, ntau, bgfl, bgfl, dklam)
       call spline(xref, kaptot, ntau, bgfl, bgfl, dktot)
       call spline(xref, zdepth, ntau, bgfl, bgfl, deltaz)
-      call spline(xref, p_I, ntau, bgfl, bgfl, dphiI)
 
       do i=1,ntau
          if (i.eq.1) then
             tlam(i) = kaplam(i)/kapref(i)*tauref(i)
             tautot(i) = kaptot(i)/kapref(i)*tauref(i)
-c            tautot(i) = p_I(i)/kapref(i)*tauref(i)
          else
             dz = (zdepth(i)-zdepth(i-1))/6.0
             h1 = kaptot(i-1)
             midpoint = log10((tauref(i)+tauref(i-1))/2.0)
             call splint(xref, kaptot, dktot, ntau, midpoint, h2)
             h3 = kaptot(i)
-c            h1 = p_I(i-1)
-c            midpoint = log10((tauref(i)+tauref(i-1))/2.0)
-c            call splint(xref, p_I, dphiI, ntau, midpoint, h2)
-c            h3 = p_I(i)
             dtautot = dz*(h1+4.0*h2+h3)
             h1 = kaplam(i-1)
             call splint(xref, kaplam, dklam, ntau, midpoint, h2)
@@ -154,9 +151,7 @@ c            h3 = p_I(i)
             tautot(i) = tautot(i-1)+dtautot
             tlam(i) = tlam(i-1)+dtaulam
          endif
-c         write (*,*) tauref(i), kaptot(i), kaplam(i)
       enddo
-c      read (*,*)
 
 c      call spline(xref, k11, ntau, bgfl, bgfl, dk11)
       call spline(xref, k12, ntau, bgfl, bgfl, dk12)
@@ -191,7 +186,7 @@ c            via the quadratic DELO algorithm
       Stokes(4) = dble(0.0)
       continuum = Stokes(1)
 
-      delta_tau = -0.01
+      delta_tau = -0.05
       call dcopy(4, emission(:,ntau), 1, emiss_interp(:,1), 1)
       tau_interp(1) = tautot(ntau)
       tau_interp_c(1) = tlam(ntau)
@@ -204,7 +199,7 @@ c            via the quadratic DELO algorithm
       emiss_order(1) = 1
       emiss_order(2) = 2
       emiss_order(3) = 3
-      do logtau=log10(tauref(ntau))+2*delta_tau,
+      do logtau=log10(tauref(ntau))+2.0*delta_tau,
      .              log10(tauref(1)),delta_tau
          call interp_opacities(logtau, kappa_interp,
      .        kappa_order(2), emiss_interp, emiss_order(3), tau_interp,
@@ -280,6 +275,9 @@ c****     Now do the same thing for the continuum
          alph = (z-dtau*y)/((dtau+dtau_i)*dtau_i)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
          gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
+c         alph = (z-dtau_i*y)/((dtau+dtau_i)*dtau)
+c         bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
+c         gam = x+(z-(2.0*dtau_i + dtau)*y)/(dtau_i*(dtau+dtau_i))
 c         continuum=etau*continuum+alph*emiss_interp(1,emiss_order(3))+
 c     .              bet*emiss_interp(1,emiss_order(2))+
 c     .              gam*emiss_interp(1,emiss_order(1))
@@ -298,9 +296,21 @@ c             write(*,*) 'Continuum overshoot!'
 c         endif
 c         continuum = etau*continuum+blah
          continuum = etau*continuum+max(min(blah, qmax), dble(0.0))
-c         write (*,*) logtau, Stokes(1), continuum
-c         write (*,*) logtau, tau_interp_c(emiss_order(1)),
-c     .               tau_interp_c(emiss_order(2)), dtau, etau
+c         write (nfStokesI,801) logtau, Stokes(1)/continuum, 
+c     .              Stokes(2)/continuum,
+c     .              Stokes(3)/continuum, Stokes(4)/continuum
+c         write (nfStokesQ,802) logtau, emiss_interp(1,emiss_order(2)),
+c     .               emiss_interp(2, emiss_order(2)),
+c     .               emiss_interp(3, emiss_order(2)),
+c     .               emiss_interp(4, emiss_order(2))
+c         write (nfStokesU,803) logtau, kappa_interp(1,1,kappa_order(2)),
+c     .           kappa_interp(1,2,kappa_order(2)),
+c     .           kappa_interp(1,3,kappa_order(2)),
+c     .           kappa_interp(1,4,kappa_order(2)),
+c     .           kappa_interp(2,3,kappa_order(2)),
+c     .           kappa_interp(3,4,kappa_order(2)),
+c     .           kappa_interp(4,2,kappa_order(2))
+
          if (kappa_order(1).eq.1)then
              kappa_order(1) = 2
              kappa_order(2) = 1
@@ -325,6 +335,9 @@ c     .               tau_interp_c(emiss_order(2)), dtau, etau
       enddo
 
       return
+801   format (5e16.5)
+802   format (5e16.5)
+803   format (8e16.5)
       end
 
       subroutine interp_opacities(logtau, k_interp,
