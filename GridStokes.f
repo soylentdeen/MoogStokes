@@ -168,6 +168,7 @@ c*****Perform the Synthesis
       mode = 3
 30    wave = wavelength(wavecounter)
 c      wave = 11828.100
+c      wave = 11991.000
       if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave
          call opacit (2,wave)
@@ -189,10 +190,12 @@ c      write (*,*) wave
       write (nfContinuum, 6520, advance='no') wave
       if (testflag .eq. 1) then
 c         call traceStokes(dble(0.0), dble(0.0), dble(1.0))
-c         call traceStokes(dble(1.3002), dble(0.0), dble(0.2673))
+c         call traceStokes(dble(0.95532), dble(3.14159), dble(0.57735))
+c         call traceStokes(dble(0.95532), dble(0.0), dble(0.57735))
 c         call traceStokes(dble(1.5025), dble(4.712), dble(0.0682))
 
-         call traceStokes(dble(0.27064), dble(0.0), dble(0.9636))
+         call traceStokes(dble(0.698131), dble(0.0), dble(1.0))
+c         call traceStokes(dble(0.27064), dble(0.0), dble(0.9636))
 c         call traceStokes(dble(0.481286), dble(0.0), dble(0.88634))
 c         call traceStokes(dble(0.640495), dble(0.0), dble(0.8018))
 c         call traceStokes(dble(0.785389), dble(0.0), dble(0.7071))
@@ -200,6 +203,9 @@ c         call traceStokes(dble(0.929793), dble(0.0), dble(0.5979998))
 c         call traceStokes(dble(1.089532), dble(0.0), dble(0.4629))
 c         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
 
+c         close (unit=nfStokesI)
+c         close (unit=nfStokesQ)
+c         close (unit=nfStokesU)
          write (nfStokesI, 6521, advance='no') Stokes(1)/continuum
          write (nfStokesQ, 6521, advance='no') Stokes(2)/continuum
          write (nfStokesU, 6521, advance='no') Stokes(3)/continuum
