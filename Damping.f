@@ -8,6 +8,7 @@ c******************************************************************************
       implicit real*8 (a-h,o-z)
       include 'Atmos.com'
       include 'Linex.com'
+      real*8 denom
 
 
       j = linnumber
@@ -186,6 +187,14 @@ c*****now calculate radiative and Stark broadening (approximate formulae)
          endif
          gammas = 1.0e-8*ne(i)*effn2**2.5
 
+         denom = 4.0*3.14159*dopp(j,i)/(wave1(j)*1.0d-8)
+c         if (j.eq.8) write (*,*) pgas(i)*molweight(i)*1.6606d-24/
+c     .               (1.38d-16*T(i)),
+c     .               gammar/denom, gammas/denom, gammav/denom
+c         if (j.eq.8) write (*,*) tauref(i),
+c     .               gammar/denom, gammas/denom, gammav/denom
+c         if (j.eq.8) write (*,*) tauref(i),
+c     .        10.0**(8.489)/denom, 10.0**(-6.583)/denom, gammav/denom
 
 c*****now finish by summing the gammas and computing the Voigt *a* values
          gammatot = gammar + gammas + gammav
@@ -193,6 +202,7 @@ c*****now finish by summing the gammas and computing the Voigt *a* values
          if (linprintopt .gt. 2) write (nf1out,1002) i, gammar, 
      .      gammas, gammav, gammatot, a(j,i)
       enddo
+c      read (*,*)
       return
 
 

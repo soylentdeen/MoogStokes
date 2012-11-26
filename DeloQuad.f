@@ -11,7 +11,7 @@ c**********************************************************************
       include 'Dummy.com'
       include 'Stokes.com'
       include 'Angles.com'
-      real*8 matX(4,4), matY(4,4), ones(4,4), matZ(4)
+      real*8 matX(4,4), matY(4,4), ones(4,4), matZ(4), bk(4,4)
       real*8 emiss_interp(4,3), kappa_interp(4,4,2)
       real*8 tau_interp(3), tau_interp_c(3), logtau
       real*8 phi_I, phi_3, phi_U, phi_V, psi_Q, psi_U, psi_V
@@ -180,10 +180,31 @@ c      call spline(xref, k44, ntau, bgfl, bgfl, dk44)
 c*****   Trace the Stokes parameters through the atmosphere
 c            via the quadratic DELO algorithm
 
-      Stokes(1) = emission(1,ntau)
-      Stokes(2) = dble(0.0)
-      Stokes(3) = dble(0.0)
-      Stokes(4) = dble(0.0)
+      dbdz = (Planck(t(1)) - Planck(t(2)) )/(zdepth(1)-zdepth(2))
+      bk(1,1) = kaptot(1)
+      bk(1,2) = k12(1)
+      bk(1,3) = k13(1)
+      bk(1,4) = k14(1)
+      bk(2,1) = k21(1)
+      bk(2,2) = kaptot(1)
+      bk(2,3) = k23(1)
+      bk(2,4) = k24(1)
+      bk(3,1) = k31(1)
+      bk(3,2) = k32(1)
+      bk(3,3) = kaptot(1)
+      bk(3,4) = k34(1)
+      bk(4,1) = k41(1)
+      bk(4,2) = k42(1)
+      bk(4,3) = k43(1)
+      bk(4,4) = kaptot(1)
+
+      CALL DGETRF( 4, 4, bk, 4, IPIV, INFO )
+      CALL DGETRI(4, bk, 4, IPIV, WORK, LWORK, INFO)
+
+      Stokes(1) = Planck(t(1)) - dbdz*bk(1,1)
+      Stokes(2) = -dbdz*bk(2,1)
+      Stokes(3) = -dbdz*bk(3,1)
+      Stokes(4) = -dbdz*bk(4,1)
       continuum = Stokes(1)
 
       delta_tau = -0.05
