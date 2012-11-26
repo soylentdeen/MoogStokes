@@ -182,7 +182,7 @@ c      wave = 11991.000
       lim1 = lim1line
       lim2 = lim2line
       call calcopacities
-c      write (*,*) wave
+      write (*,*) wave
       write (nfStokesI, 6520, advance='no') wave
       write (nfStokesQ, 6520, advance='no') wave
       write (nfStokesU, 6520, advance='no') wave

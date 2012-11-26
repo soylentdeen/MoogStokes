@@ -20,7 +20,7 @@ c******************************************************************************
 c*****examine the parameter file
 
 c      array = 'GIVE THE MINIMUM LINE/CONTINUUM OPACITY RATIO TO KEEP: '
-      xratio = 0.1
+      xratio = 0.0001
       
 
 c*****compute the line opacities
@@ -50,14 +50,17 @@ c*****   Generate original wavelength grid
 c*****divide the lines into keepers and discards
       do j=1,nlines+nstrong
          if (strength(j)/kaplam(jtau5) .ge. xratio) then
-             do k=-40,40
-                 wavelength(nwave) = wave1(j)+0.25*asin(real(k/40.0))
+             do k=-20,20
+                 wavelength(nwave) = wave1(j)+0.25*asin(real(k/20.0))
                  nwave = nwave+1
              enddo
              wavelength(nwave) = wave1(j)+ 0.001
              nwave = nwave+1
              wavelength(nwave) = wave1(j)- 0.001
              nwave = nwave+1
+         else
+             write (*,*) "Line at :", wave1(j), " is not strong enough!"
+             write (*,*) "Strength :", strength(j)/kaplam(jtau5)
          endif
       enddo
       if (nlines +nstrong .eq. 2500) then
@@ -79,7 +82,6 @@ c*****format statements
      .        (6(1pd12.4)))
 1007  format (f10.4, f10.4, f10.3, f10.3, 30x, f9.1)
 1008  format (f10.4, f10.5, f10.3, f10.3, 10x, f10.3, 10x, f9.1)
-
 
       end
 
