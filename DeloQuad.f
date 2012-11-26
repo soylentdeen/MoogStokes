@@ -118,6 +118,23 @@ C*****   Assemble the elements of the opacity matrix (K')
          k43(i)=(-1.0*psi_Q)/kaptot(i)
          k44(i)=0.0
 
+c         k11(i)=0.0
+c         k12(i)=phi_Q/kaptot(i)
+c         k13(i)=phi_U/kaptot(i)
+c         k14(i)=phi_V/kaptot(i)
+c         k21(i)=phi_Q/kaptot(i)
+c         k22(i)=0.0
+c         k23(i)=-psi_V/kaptot(i)
+c         k24(i)=psi_U/kaptot(i)
+c         k31(i)=phi_U/kaptot(i)
+c         k32(i)=psi_V/kaptot(i)
+c         k33(i)=0.0
+c         k34(i)=-psi_Q/kaptot(i)
+c         k41(i)=phi_V/kaptot(i)
+c         k42(i)=-psi_U/kaptot(i)
+c         k43(i)=psi_Q/kaptot(i)
+c         k44(i)=0.0
+
 c*****  Assumes LTE for the Source Function
          source = Planck(t(i))
 

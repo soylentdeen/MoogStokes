@@ -59,8 +59,8 @@ c*****divide the lines into keepers and discards
              wavelength(nwave) = wave1(j)- 0.001
              nwave = nwave+1
          else
-             write (*,*) "Line at :", wave1(j), " is not strong enough!"
-             write (*,*) "Strength :", strength(j)/kaplam(jtau5)
+c             write (*,*) "Line at :", wave1(j), " is not strong enough!"
+c             write (*,*) "Strength :", strength(j)/kaplam(jtau5)
          endif
       enddo
       if (nlines +nstrong .eq. 2500) then
