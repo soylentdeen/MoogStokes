@@ -14,7 +14,6 @@ c******************************************************************************
       include 'Linex.com'
       include 'Pstuff.com'
       real*8 xratio
-      real*4 shortnum
 
 
 c*****examine the parameter file
@@ -70,18 +69,6 @@ c             write (*,*) "Strength :", strength(j)/kaplam(jtau5)
       nwave = nwave -1
 
       call sortwave
-
-c*****format statements
-1001  format (/'DESIRED LINE-TO-CONTINUUM MINIMUM OPACITY RATIO: ', 
-     .        1pe10.2)
-1002  format ('THIS IS THE KEEPER LINE LIST')
-1003  format ('THIS IS THE DISCARDED LINE LIST')
-1004  format (f10.4, f10.1, f10.3, f10.3, 30x, f9.1)
-1005  format (f10.4, f10.1, f10.3, f10.3, 10x, f10.3, 10x, f9.1)
-1006  format ('  kaplam from 1 to ntau at wavelength',f10.2/
-     .        (6(1pd12.4)))
-1007  format (f10.4, f10.4, f10.3, f10.3, 30x, f9.1)
-1008  format (f10.4, f10.5, f10.3, f10.3, 10x, f10.3, 10x, f9.1)
 
       end
 

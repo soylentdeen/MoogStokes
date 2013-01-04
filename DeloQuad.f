@@ -14,9 +14,9 @@ c**********************************************************************
       real*8 matX(4,4), matY(4,4), ones(4,4), matZ(4), bk(4,4)
       real*8 emiss_interp(4,3), kappa_interp(4,4,2)
       real*8 tau_interp(3), tau_interp_c(3), logtau
-      real*8 phi_I, phi_3, phi_U, phi_V, psi_Q, psi_U, psi_V
-      real*8 h1, h2, dx, dtau, etau, alph, bet, gam
-      real*8 matS1(4), matS2(4), bgfl, p_i(100), dphiI(100)
+      real*8 phi_I, phi_U, phi_V, psi_Q, psi_U, psi_V
+      real*8 h1, h2, dtau, etau, alph, bet, gam
+      real*8 matS1(4), matS2(4), bgfl
       real*8 blah, k1, k2, z1, z2, deltaz(100), qmax
       real*8 phi_ang, chi_ang, mu, midpoint
       integer emiss_order(3), kappa_order(2)
@@ -118,23 +118,6 @@ C*****   Assemble the elements of the opacity matrix (K')
          k43(i)=(-1.0*psi_Q)/kaptot(i)
          k44(i)=0.0
 
-c         k11(i)=0.0
-c         k12(i)=phi_Q/kaptot(i)
-c         k13(i)=phi_U/kaptot(i)
-c         k14(i)=phi_V/kaptot(i)
-c         k21(i)=phi_Q/kaptot(i)
-c         k22(i)=0.0
-c         k23(i)=-psi_V/kaptot(i)
-c         k24(i)=psi_U/kaptot(i)
-c         k31(i)=phi_U/kaptot(i)
-c         k32(i)=psi_V/kaptot(i)
-c         k33(i)=0.0
-c         k34(i)=-psi_Q/kaptot(i)
-c         k41(i)=phi_V/kaptot(i)
-c         k42(i)=-psi_U/kaptot(i)
-c         k43(i)=psi_Q/kaptot(i)
-c         k44(i)=0.0
-
 c*****  Assumes LTE for the Source Function
          source = Planck(t(i))
 
@@ -145,7 +128,6 @@ c*****  Assembles the Emission matrix (J')
          emission(4,i)=source*phi_V/kaptot(i)
       enddo
 
-c      read (*,*)
       call spline(xref, kaplam, ntau, bgfl, bgfl, dklam)
       call spline(xref, kaptot, ntau, bgfl, bgfl, dktot)
       call spline(xref, zdepth, ntau, bgfl, bgfl, deltaz)
@@ -373,9 +355,9 @@ c     .           kappa_interp(4,2,kappa_order(2))
       enddo
 
       return
-801   format (5e16.5)
-802   format (5e16.5)
-803   format (8e16.5)
+c801   format (5e16.5)
+c802   format (5e16.5)
+c803   format (8e16.5)
       end
 
       subroutine interp_opacities(logtau, k_interp,
@@ -395,13 +377,13 @@ c***********************************************************************
       implicit real*8 (a-h,o-z)
       include 'Atmos.com'
       include 'Stokes.com'
-      real*8 slope, k_interp(4,4,2), e_interp(4,3)
-      real*8 tau_interp(3), tau_interp_c(3), logtau, delta_tau
-      real*8 denom, run, kc_ref, t_tot, t_lam, tref, kref
-      real*8 ktot, klam, mu
-      real*8 k_ref, k_tot, k_lam, e_1, e_2, e_3, e_4
-      real*8 k_11, k_12, k_13, k_14, k_21, k_22, k_23, k_24
-      real*8 k_31, k_32, k_33, k_34, k_41, k_42, k_43, k_44
+      real*8 k_interp(4,4,2), e_interp(4,3)
+      real*8 tau_interp(3), tau_interp_c(3), logtau
+      real*8 t_tot, t_lam
+      real*8 mu
+      real*8 e_1, e_2, e_3, e_4
+      real*8 k_12, k_13, k_14, k_21, k_23, k_24
+      real*8 k_31, k_32, k_34, k_41, k_42, k_43
       integer k_ord, e_ord
 
       call splint(xref, tlam, dtlam, ntau, logtau+dtau, t_lam)

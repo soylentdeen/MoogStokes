@@ -14,7 +14,6 @@ c******************************************************************************
       include 'Stokes.com'
       include 'Angles.com'
       integer n_cells, icell, testflag, wavecounter
-      character sandbox*80
       real*8 az_start, az_stop, daz, az, long, dlong
       real*8 ring_area, cell_area, cell_a, phi_ang, chi_ang, mu
 
@@ -189,13 +188,13 @@ c      wave = 11991.000
       write (nfStokesV, 6520, advance='no') wave
       write (nfContinuum, 6520, advance='no') wave
       if (testflag .eq. 1) then
-c         call traceStokes(dble(0.0), dble(0.0), dble(1.0))
+         call traceStokes(dble(0.0), dble(0.0), dble(1.0))
 c         call traceStokes(dble(1.50707), dble(0.0), dble(1.0))
 c         call traceStokes(dble(0.95532), dble(3.14159), dble(0.57735))
 c         call traceStokes(dble(0.95532), dble(0.0), dble(0.57735))
 c         call traceStokes(dble(1.5025), dble(4.712), dble(0.0682))
 
-         call traceStokes(dble(0.698131), dble(0.0), dble(1.0))
+c         call traceStokes(dble(0.698131), dble(0.0), dble(1.0))
 c         call traceStokes(dble(0.27064), dble(0.0), dble(0.9636))
 c         call traceStokes(dble(0.481286), dble(0.0), dble(0.88634))
 c         call traceStokes(dble(0.640495), dble(0.0), dble(0.8018))
@@ -247,8 +246,8 @@ c*****finish
       endif
       return
 
-1001  format (a80)
-12345 format (f10.4,5e15.5)
+c1001  format (a80)
+c12345 format (f10.4,5e15.5)
 12346 format (i5,8e16.5)
 12347 format (2i5,2e16.5)
 6520  format (f10.4)
