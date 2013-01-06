@@ -188,13 +188,13 @@ c      wave = 11991.000
       write (nfStokesV, 6520, advance='no') wave
       write (nfContinuum, 6520, advance='no') wave
       if (testflag .eq. 1) then
-         call traceStokes(dble(0.0), dble(0.0), dble(1.0))
+c         call traceStokes(dble(0.0), dble(0.0), dble(1.0))
 c         call traceStokes(dble(1.50707), dble(0.0), dble(1.0))
 c         call traceStokes(dble(0.95532), dble(3.14159), dble(0.57735))
 c         call traceStokes(dble(0.95532), dble(0.0), dble(0.57735))
 c         call traceStokes(dble(1.5025), dble(4.712), dble(0.0682))
 
-c         call traceStokes(dble(0.698131), dble(0.0), dble(1.0))
+         call traceStokes(dble(0.698131), dble(0.0), dble(1.0))
 c         call traceStokes(dble(0.27064), dble(0.0), dble(0.9636))
 c         call traceStokes(dble(0.481286), dble(0.0), dble(0.88634))
 c         call traceStokes(dble(0.640495), dble(0.0), dble(0.8018))

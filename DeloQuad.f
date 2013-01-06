@@ -65,12 +65,6 @@ c*****  zdepth is the physical depth scale
 c***** For each layer in the atmosphere, calculate each element of the
 c      opacity matrix and emission vector for the DELO algorithm
       do i=1,ntau
-c         phi_opacity(i,1) = 0.0
-c         phi_opacity(i,2) = 0.0
-c         phi_opacity(i,3) = 0.0
-c         psi_opacity(i,1) = 0.0
-c         psi_opacity(i,2) = 0.0
-c         psi_opacity(i,3) = 0.0
          phi_I=(phi_opacity(i,2)*sin(phi_ang)**2.0+
      .                (phi_opacity(i,1)+phi_opacity(i,3))*(1.0+
      .                cos(phi_ang)**2.0)/2.0)/2.0
@@ -101,29 +95,33 @@ c*****  The total opacity (line+continuum)
          kaptot(i) = (kaplam(i) + phi_I)
 
 C*****   Assemble the elements of the opacity matrix (K')
-         phiQ(i) = phi_Q/kaptot(i)
-         phiU(i) = phi_U/kaptot(i)
-         phiV(i) = phi_V/kaptot(i)
-         psiQ(i) = psi_Q/kaptot(i)
-         psiU(i) = psi_U/kaptot(i)
-         psiV(i) = psi_V/kaptot(i)
+c         phiQ(i) = phi_Q/kaptot(i)
+c         phiU(i) = phi_U/kaptot(i)
+c         phiV(i) = phi_V/kaptot(i)
+c         psiQ(i) = psi_Q/kaptot(i)
+c         psiU(i) = psi_U/kaptot(i)
+c         psiV(i) = psi_V/kaptot(i)
 
-c         k11(i)=0.0
-c         k12(i)=phi_Q/kaptot(i)
-c         k13(i)=phi_U/kaptot(i)
-c         k14(i)=phi_V/kaptot(i)
-c         k21(i)=phi_Q/kaptot(i)
-c         k22(i)=0.0
-c         k23(i)=psi_V/kaptot(i)
-c         k24(i)=(-1.0*psi_U)/kaptot(i)
-c         k31(i)=phi_U/kaptot(i)
-c         k32(i)=(-1.0*psi_V)/kaptot(i)
-c         k33(i)=0.0
-c         k34(i)=psi_Q/kaptot(i)
-c         k41(i)=phi_V/kaptot(i)
-c         k42(i)=psi_U/kaptot(i)
-c         k43(i)=(-1.0*psi_Q)/kaptot(i)
-c         k44(i)=0.0
+c         write (*,*) phi_I,phi_Q,phi_U,phi_V,
+c     .               psi_Q,psi_U,psi_V, kaptot(i)
+c         read (*,*)
+
+         k11(i)=0.0
+         k12(i)=phi_Q/kaptot(i)
+         k13(i)=phi_U/kaptot(i)
+         k14(i)=phi_V/kaptot(i)
+         k21(i)=phi_Q/kaptot(i)
+         k22(i)=0.0
+         k23(i)=psi_V/kaptot(i)
+         k24(i)=(-1.0*psi_U)/kaptot(i)
+         k31(i)=phi_U/kaptot(i)
+         k32(i)=(-1.0*psi_V)/kaptot(i)
+         k33(i)=0.0
+         k34(i)=psi_Q/kaptot(i)
+         k41(i)=phi_V/kaptot(i)
+         k42(i)=psi_U/kaptot(i)
+         k43(i)=(-1.0*psi_Q)/kaptot(i)
+         k44(i)=0.0
 
 c*****  Assumes LTE for the Source Function
          source = Planck(t(i))
@@ -159,28 +157,28 @@ c*****  Assembles the Emission matrix (J')
          endif
       enddo
 
-      call spline(xref, phiQ, ntau, bgfl, bgfl, dphiQ)
-      call spline(xref, phiU, ntau, bgfl, bgfl, dphiU)
-      call spline(xref, phiV, ntau, bgfl, bgfl, dphiV)
-      call spline(xref, psiQ, ntau, bgfl, bgfl, dpsiQ)
-      call spline(xref, psiU, ntau, bgfl, bgfl, dpsiU)
-      call spline(xref, psiV, ntau, bgfl, bgfl, dpsiV)
+c      call spline(xref, phiQ, ntau, bgfl, bgfl, dphiQ)
+c      call spline(xref, phiU, ntau, bgfl, bgfl, dphiU)
+c      call spline(xref, phiV, ntau, bgfl, bgfl, dphiV)
+c      call spline(xref, psiQ, ntau, bgfl, bgfl, dpsiQ)
+c      call spline(xref, psiU, ntau, bgfl, bgfl, dpsiU)
+c      call spline(xref, psiV, ntau, bgfl, bgfl, dpsiV)
 
-c      call spline(xref, k12, ntau, bgfl, bgfl, dk12)
-c      call spline(xref, k13, ntau, bgfl, bgfl, dk13)
-c      call spline(xref, k14, ntau, bgfl, bgfl, dk14)
-c      call spline(xref, k21, ntau, bgfl, bgfl, dk21)
-cc      call spline(xref, k22, ntau, bgfl, bgfl, dk22)
-c      call spline(xref, k23, ntau, bgfl, bgfl, dk23)
-c      call spline(xref, k24, ntau, bgfl, bgfl, dk24)
-c      call spline(xref, k31, ntau, bgfl, bgfl, dk31)
-c      call spline(xref, k32, ntau, bgfl, bgfl, dk32)
-cc      call spline(xref, k33, ntau, bgfl, bgfl, dk33)
-c      call spline(xref, k34, ntau, bgfl, bgfl, dk34)
-c      call spline(xref, k41, ntau, bgfl, bgfl, dk41)
-c      call spline(xref, k42, ntau, bgfl, bgfl, dk42)
-c      call spline(xref, k43, ntau, bgfl, bgfl, dk43)
-cc      call spline(xref, k44, ntau, bgfl, bgfl, dk44)
+      call spline(xref, k12, ntau, bgfl, bgfl, dk12)
+      call spline(xref, k13, ntau, bgfl, bgfl, dk13)
+      call spline(xref, k14, ntau, bgfl, bgfl, dk14)
+      call spline(xref, k21, ntau, bgfl, bgfl, dk21)
+c      call spline(xref, k22, ntau, bgfl, bgfl, dk22)
+      call spline(xref, k23, ntau, bgfl, bgfl, dk23)
+      call spline(xref, k24, ntau, bgfl, bgfl, dk24)
+      call spline(xref, k31, ntau, bgfl, bgfl, dk31)
+      call spline(xref, k32, ntau, bgfl, bgfl, dk32)
+c      call spline(xref, k33, ntau, bgfl, bgfl, dk33)
+      call spline(xref, k34, ntau, bgfl, bgfl, dk34)
+      call spline(xref, k41, ntau, bgfl, bgfl, dk41)
+      call spline(xref, k42, ntau, bgfl, bgfl, dk42)
+      call spline(xref, k43, ntau, bgfl, bgfl, dk43)
+c      call spline(xref, k44, ntau, bgfl, bgfl, dk44)
       call spline(xref, tautot, ntau, bgfl, bgfl, dttot)
       call spline(xref, tlam, ntau, bgfl, bgfl, dtlam)
       call spline(xref, emission(1,:), ntau, bgfl, bgfl, de1)
@@ -329,7 +327,7 @@ c             write(*,*) 'Continuum overshoot!'
 c         endif
 c         continuum = etau*continuum+blah
          continuum = etau*continuum+max(min(blah, qmax), dble(0.0))
-c         write (nfStokesI,801) logtau, Stokes(1)/continuum, 
+c         write (*,801) logtau, Stokes(1)/continuum, 
 c     .              Stokes(2)/continuum,
 c     .              Stokes(3)/continuum, Stokes(4)/continuum
 c         write (nfStokesQ,802) logtau, emiss_interp(1,emiss_order(2)),
@@ -367,6 +365,8 @@ c     .           kappa_interp(4,2,kappa_order(2))
 
       enddo
 
+c      read (*,*)
+
       return
 c801   format (5e16.5)
 c802   format (5e16.5)
@@ -395,37 +395,37 @@ c***********************************************************************
       real*8 t_tot, t_lam
       real*8 mu
       real*8 e_1, e_2, e_3, e_4
-      real*8 phQ, phU, phV, psQ, psU, psV
-c      real*8 k_12, k_13, k_14, k_21, k_23, k_24
-c      real*8 k_31, k_32, k_34, k_41, k_42, k_43
+c      real*8 phQ, phU, phV, psQ, psU, psV
+      real*8 k_12, k_13, k_14, k_21, k_23, k_24
+      real*8 k_31, k_32, k_34, k_41, k_42, k_43
       integer k_ord, e_ord
 
       call splint(xref, tlam, dtlam, ntau, logtau+dtau, t_lam)
       call splint(xref, tautot, dttot, ntau, logtau+dtau, t_tot)
 
-      call splint(xref, phiQ, dphiQ, ntau, logtau, phQ)
-      call splint(xref, phiU, dphiU, ntau, logtau, phU)
-      call splint(xref, phiV, dphiV, ntau, logtau, phV)
-      call splint(xref, psiQ, dpsiQ, ntau, logtau, psQ)
-      call splint(xref, psiU, dpsiU, ntau, logtau, psU)
-      call splint(xref, psiV, dpsiV, ntau, logtau, psV)
+c      call splint(xref, phiQ, dphiQ, ntau, logtau, phQ)
+c      call splint(xref, phiU, dphiU, ntau, logtau, phU)
+c      call splint(xref, phiV, dphiV, ntau, logtau, phV)
+c      call splint(xref, psiQ, dpsiQ, ntau, logtau, psQ)
+c      call splint(xref, psiU, dpsiU, ntau, logtau, psU)
+c      call splint(xref, psiV, dpsiV, ntau, logtau, psV)
 
-cc      call splint(xref, k11, dk11, ntau, logtau, k_11)
-c      call splint(xref, k12, dk12, ntau, logtau, k_12)
-c      call splint(xref, k13, dk13, ntau, logtau, k_13)
-c      call splint(xref, k14, dk14, ntau, logtau, k_14)
-c      call splint(xref, k21, dk21, ntau, logtau, k_21)
-cc      call splint(xref, k22, dk22, ntau, logtau, k_22)
-c      call splint(xref, k23, dk23, ntau, logtau, k_23)
-c      call splint(xref, k24, dk24, ntau, logtau, k_24)
-c      call splint(xref, k31, dk31, ntau, logtau, k_31)
-c      call splint(xref, k32, dk32, ntau, logtau, k_32)
-cc      call splint(xref, k33, dk33, ntau, logtau, k_33)
-c      call splint(xref, k34, dk34, ntau, logtau, k_34)
-c      call splint(xref, k41, dk41, ntau, logtau, k_41)
-c      call splint(xref, k42, dk42, ntau, logtau, k_42)
-c      call splint(xref, k43, dk43, ntau, logtau, k_43)
-cc      call splint(xref, k44, dk44, ntau, logtau, k_44)
+c      call splint(xref, k11, dk11, ntau, logtau, k_11)
+      call splint(xref, k12, dk12, ntau, logtau, k_12)
+      call splint(xref, k13, dk13, ntau, logtau, k_13)
+      call splint(xref, k14, dk14, ntau, logtau, k_14)
+      call splint(xref, k21, dk21, ntau, logtau, k_21)
+c      call splint(xref, k22, dk22, ntau, logtau, k_22)
+      call splint(xref, k23, dk23, ntau, logtau, k_23)
+      call splint(xref, k24, dk24, ntau, logtau, k_24)
+      call splint(xref, k31, dk31, ntau, logtau, k_31)
+      call splint(xref, k32, dk32, ntau, logtau, k_32)
+c      call splint(xref, k33, dk33, ntau, logtau, k_33)
+      call splint(xref, k34, dk34, ntau, logtau, k_34)
+      call splint(xref, k41, dk41, ntau, logtau, k_41)
+      call splint(xref, k42, dk42, ntau, logtau, k_42)
+      call splint(xref, k43, dk43, ntau, logtau, k_43)
+c      call splint(xref, k44, dk44, ntau, logtau, k_44)
 
       call splint(xref, emission(1,:), de1, ntau, logtau+dtau, e_1)
       call splint(xref, emission(2,:), de2, ntau, logtau+dtau, e_2)
@@ -433,21 +433,38 @@ cc      call splint(xref, k44, dk44, ntau, logtau, k_44)
       call splint(xref, emission(4,:), de4, ntau, logtau+dtau, e_4)
 
       k_interp(1,1,k_ord)=0.0
-      k_interp(1,2,k_ord)=phQ
-      k_interp(1,3,k_ord)=phU
-      k_interp(1,4,k_ord)=phV
-      k_interp(2,1,k_ord)=phQ
+      k_interp(1,2,k_ord)=k_12
+      k_interp(1,3,k_ord)=k_13
+      k_interp(1,4,k_ord)=k_14
+      k_interp(2,1,k_ord)=k_21
       k_interp(2,2,k_ord)=0.0
-      k_interp(2,3,k_ord)=psV
-      k_interp(2,4,k_ord)=-psU
-      k_interp(3,1,k_ord)=phU
-      k_interp(3,2,k_ord)=-psV
+      k_interp(2,3,k_ord)=k_23
+      k_interp(2,4,k_ord)=k_24
+      k_interp(3,1,k_ord)=k_31
+      k_interp(3,2,k_ord)=k_32
       k_interp(3,3,k_ord)=0.0
-      k_interp(3,4,k_ord)=psQ
-      k_interp(4,1,k_ord)=phV
-      k_interp(4,2,k_ord)=psU
-      k_interp(4,3,k_ord)=-psQ
+      k_interp(3,4,k_ord)=k_34
+      k_interp(4,1,k_ord)=k_41
+      k_interp(4,2,k_ord)=k_42
+      k_interp(4,3,k_ord)=k_43
       k_interp(4,4,k_ord)=0.0
+
+c      k_interp(1,1,k_ord)=0.0
+c      k_interp(1,2,k_ord)=phQ
+c      k_interp(1,3,k_ord)=phU
+c      k_interp(1,4,k_ord)=phV
+c      k_interp(2,1,k_ord)=phQ
+c      k_interp(2,2,k_ord)=0.0
+c      k_interp(2,3,k_ord)=psV
+c      k_interp(2,4,k_ord)=-psU
+c      k_interp(3,1,k_ord)=phU
+c      k_interp(3,2,k_ord)=-psV
+c      k_interp(3,3,k_ord)=0.0
+c      k_interp(3,4,k_ord)=psQ
+c      k_interp(4,1,k_ord)=phV
+c      k_interp(4,2,k_ord)=psU
+c      k_interp(4,3,k_ord)=-psQ
+c      k_interp(4,4,k_ord)=0.0
 
       e_interp(1,e_ord) = e_1/mu
       e_interp(2,e_ord) = e_2/mu
