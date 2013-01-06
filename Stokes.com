@@ -9,8 +9,7 @@ c     so leave them alone or suffer unspeakable programming tortures.
 c******************************************************************************
 
       real*8       deltamj(2500),phi_opacity(100, 3),psi_opacity(100,3),
-     .             Stokes(4), continuum, total_weight,
-     .             Stokes_I, Stokes_Q, Stokes_U, Stokes_V,
+     .             Stokes(4), continuum,
      .             kappa(4,4,100), emission(4,100), kaptot(100),
      .             phiI(100), phiQ(100), phiU(100), phiV(100),
      .             psiQ(100), psiU(100), psiV(100), dphiI(100),
@@ -23,8 +22,7 @@ c******************************************************************************
      .             zdepth(100)
 
       common/stokesparams/deltamj, phi_opacity, psi_opacity,
-     .             Stokes, continuum, total_weight,
-     .             Stokes_I, Stokes_Q, Stokes_U, Stokes_V,
+     .             Stokes, continuum,
      .             kappa, emission, kaptot,
      .             phiI, phiQ, phiU, phiV,
      .             psiQ, psiU, psiV, dphiI,

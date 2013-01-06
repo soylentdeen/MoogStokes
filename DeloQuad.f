@@ -96,27 +96,6 @@ C*****   Assemble the elements of the opacity matrix (K')
          psiU(i) = psi_U/kaptot(i)
          psiV(i) = psi_V/kaptot(i)
 
-c         write (*,*) phi_I,phi_Q,phi_U,phi_V,
-c     .               psi_Q,psi_U,psi_V, kaptot(i)
-c         read (*,*)
-
-c         k11(i)=0.0
-c         k12(i)=phi_Q/kaptot(i)
-c         k13(i)=phi_U/kaptot(i)
-c         k14(i)=phi_V/kaptot(i)
-c         k21(i)=phi_Q/kaptot(i)
-c         k22(i)=0.0
-c         k23(i)=psi_V/kaptot(i)
-c         k24(i)=(-1.0*psi_U)/kaptot(i)
-c         k31(i)=phi_U/kaptot(i)
-c         k32(i)=(-1.0*psi_V)/kaptot(i)
-c         k33(i)=0.0
-c         k34(i)=psi_Q/kaptot(i)
-c         k41(i)=phi_V/kaptot(i)
-c         k42(i)=psi_U/kaptot(i)
-c         k43(i)=(-1.0*psi_Q)/kaptot(i)
-c         k44(i)=0.0
-
 c*****  Assumes LTE for the Source Function
          source = Planck(t(i))
 
@@ -157,29 +136,6 @@ c*****  Assembles the Emission matrix (J')
       call spline(xref, psiQ, ntau, bgfl, bgfl, dpsiQ)
       call spline(xref, psiU, ntau, bgfl, bgfl, dpsiU)
       call spline(xref, psiV, ntau, bgfl, bgfl, dpsiV)
-
-c      call spline(xref, k12, ntau, bgfl, bgfl, dk12)
-c      call spline(xref, k13, ntau, bgfl, bgfl, dk13)
-c      call spline(xref, k14, ntau, bgfl, bgfl, dk14)
-c      call spline(xref, k21, ntau, bgfl, bgfl, dk21)
-cc      call spline(xref, k22, ntau, bgfl, bgfl, dk22)
-c      call spline(xref, k23, ntau, bgfl, bgfl, dk23)
-c      call spline(xref, k24, ntau, bgfl, bgfl, dk24)
-c      call spline(xref, k31, ntau, bgfl, bgfl, dk31)
-c      call spline(xref, k32, ntau, bgfl, bgfl, dk32)
-cc      call spline(xref, k33, ntau, bgfl, bgfl, dk33)
-c      call spline(xref, k34, ntau, bgfl, bgfl, dk34)
-c      call spline(xref, k41, ntau, bgfl, bgfl, dk41)
-c      call spline(xref, k42, ntau, bgfl, bgfl, dk42)
-c      call spline(xref, k43, ntau, bgfl, bgfl, dk43)
-cc      call spline(xref, k44, ntau, bgfl, bgfl, dk44)
-c      call spline(xref, tautot, ntau, bgfl, bgfl, dttot)
-c      call spline(xref, tlam, ntau, bgfl, bgfl, dtlam)
-c      call spline(xref, emission(1,:), ntau, bgfl, bgfl, de1)
-c      call spline(xref, emission(2,:), ntau, bgfl, bgfl, de2)
-c      call spline(xref, emission(3,:), ntau, bgfl, bgfl, de3)
-c      call spline(xref, emission(4,:), ntau, bgfl, bgfl, de4)
-
 
 c*****   Trace the Stokes parameters through the atmosphere
 c            via the quadratic DELO algorithm
@@ -279,7 +235,6 @@ c         gam = x+(z-(dtau_i+2*dtau)*y)/(dtau*(dtau+dtau_i))
              endif
 
          enddo
-c         read (*,*)
 c****      calculate the RHS of the equation.  Store in matZ
          call dgemv('N',4,4,dble(1.0),matY,4,Stokes,1,dble(1.0),matZ,1)
 
@@ -366,8 +321,6 @@ c***********************************************************************
       real*8 mu
       real*8 e_1, e_2, e_3, e_4
       real*8 phQ, phU, phV, psQ, psU, psV
-      real*8 k_12, k_13, k_14, k_21, k_23, k_24
-      real*8 k_31, k_32, k_34, k_41, k_42, k_43
       integer k_ord, e_ord
 
       call splint(xref, tlam, dtlam, ntau, logtau+dtau, t_lam)
@@ -380,44 +333,10 @@ c***********************************************************************
       call splint(xref, psiU, dpsiU, ntau, logtau, psU)
       call splint(xref, psiV, dpsiV, ntau, logtau, psV)
 
-cc      call splint(xref, k11, dk11, ntau, logtau, k_11)
-c      call splint(xref, k12, dk12, ntau, logtau, k_12)
-c      call splint(xref, k13, dk13, ntau, logtau, k_13)
-c      call splint(xref, k14, dk14, ntau, logtau, k_14)
-c      call splint(xref, k21, dk21, ntau, logtau, k_21)
-cc      call splint(xref, k22, dk22, ntau, logtau, k_22)
-c      call splint(xref, k23, dk23, ntau, logtau, k_23)
-c      call splint(xref, k24, dk24, ntau, logtau, k_24)
-c      call splint(xref, k31, dk31, ntau, logtau, k_31)
-c      call splint(xref, k32, dk32, ntau, logtau, k_32)
-cc      call splint(xref, k33, dk33, ntau, logtau, k_33)
-c      call splint(xref, k34, dk34, ntau, logtau, k_34)
-c      call splint(xref, k41, dk41, ntau, logtau, k_41)
-c      call splint(xref, k42, dk42, ntau, logtau, k_42)
-c      call splint(xref, k43, dk43, ntau, logtau, k_43)
-cc      call splint(xref, k44, dk44, ntau, logtau, k_44)
-
       call splint(xref, emission(1,:), de1, ntau, logtau+dtau, e_1)
       call splint(xref, emission(2,:), de2, ntau, logtau+dtau, e_2)
       call splint(xref, emission(3,:), de3, ntau, logtau+dtau, e_3)
       call splint(xref, emission(4,:), de4, ntau, logtau+dtau, e_4)
-
-c      k_interp(1,1,k_ord)=0.0
-c      k_interp(1,2,k_ord)=k_12
-c      k_interp(1,3,k_ord)=k_13
-c      k_interp(1,4,k_ord)=k_14
-c      k_interp(2,1,k_ord)=k_21
-c      k_interp(2,2,k_ord)=0.0
-c      k_interp(2,3,k_ord)=k_23
-c      k_interp(2,4,k_ord)=k_24
-c      k_interp(3,1,k_ord)=k_31
-c      k_interp(3,2,k_ord)=k_32
-c      k_interp(3,3,k_ord)=0.0
-c      k_interp(3,4,k_ord)=k_34
-c      k_interp(4,1,k_ord)=k_41
-c      k_interp(4,2,k_ord)=k_42
-c      k_interp(4,3,k_ord)=k_43
-c      k_interp(4,4,k_ord)=0.0
 
       k_interp(1,1,k_ord)=0.0
       k_interp(1,2,k_ord)=phQ
