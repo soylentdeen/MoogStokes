@@ -187,14 +187,15 @@ c*****now calculate radiative and Stark broadening (approximate formulae)
          endif
          gammas = 1.0e-8*ne(i)*effn2**2.5
 
+c         denom = 4.0*3.14159*dopp(j,i)/(wave1(j)*1.0d-8)
          denom = 4.0*3.14159*dopp(j,i)/(wave1(j)*1.0d-8)
-c         if (j.eq.8) write (*,*) pgas(i)*molweight(i)*1.6606d-24/
-c     .               (1.38d-16*T(i)),
-c     .               gammar/denom, gammas/denom, gammav/denom
-c         if (j.eq.8) write (*,*) tauref(i),
-c     .               gammar/denom, gammas/denom, gammav/denom
-c         if (j.eq.8) write (*,*) tauref(i),
-c     .        10.0**(8.489)/denom, 10.0**(-6.583)/denom, gammav/denom
+
+         gammar = 10.0**8.489
+         gammas = (t(i)/10000.)**(1./6.)*ne(i)*10.0**(-6.583)
+         gammav = (t(i)/10000.)**(0.3)*(numdens(1,1,i)+
+     .             0.42*numdens(2,1,i))*10.0**(-7.914)
+c         write (*,*) j, i, dopp(j,i), dopp(j,i)*2.9979e18/wave1(j)
+c         write (*,*) rhox(i), denom, gammar, gammas, gammav
 
 c*****now finish by summing the gammas and computing the Voigt *a* values
          gammatot = gammar + gammas + gammav

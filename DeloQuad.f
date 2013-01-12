@@ -204,12 +204,12 @@ c            via the quadratic DELO algorithm
          y = dtau - x
          z = dtau**2.0 - 2.0 * y
          dtau_i =(tau_interp(emiss_order(2))-tau_interp(emiss_order(3)))
-c         alph = (z - dtau*y)/((dtau + dtau_i)*dtau_i)
-c         bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
-c         gam = x+(z-(dtau_i+2*dtau)*y)/(dtau*(dtau+dtau_i))
-         alph = (z - dtau_i*y)/((dtau + dtau_i)*dtau)
+         alph = (z - dtau*y)/((dtau + dtau_i)*dtau_i)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
-         gam = x+(z-(2*dtau_i+dtau)*y)/(dtau_i*(dtau+dtau_i))
+         gam = x+(z-(dtau_i+2*dtau)*y)/(dtau*(dtau+dtau_i))
+c         alph = (z - dtau_i*y)/((dtau + dtau_i)*dtau)
+c         bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
+c         gam = x+(z-(2*dtau_i+dtau)*y)/(dtau_i*(dtau+dtau_i))
 
          call dcopy(4, emiss_interp(:,emiss_order(3)), 1, matS1, 1)
          call dcopy(4, emiss_interp(:,emiss_order(2)), 1, matS2, 1)

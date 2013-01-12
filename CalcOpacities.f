@@ -25,10 +25,8 @@ c*****compute the total line opacity at each depth
          psi_opacity(i,2) = 0.0
          psi_opacity(i,3) = 0.0
          do j=lim1,lim2
-            gam_L = a(j,i)
-            gam_D = dopp(j,i)/(2.997929d2*wave)
-            voigt_x = (1.0d8*(1./wave1(j)-1./wave))/gam_D
-            voigt_y =gam_L
+            voigt_x = (wave-wave1(j))/(wave1(j)*dopp(j,i)/2.997929d10)
+            voigt_y = a(j,i)
             Z = cmplx(voigt_x, voigt_y)
             humlicek = w4(Z)
             voigt_val = REAL(humlicek,8)/sqrtpi
@@ -43,10 +41,9 @@ c*****compute the total line opacity at each depth
 c*****do the same for the strong lines
          if (dostrong .gt. 0) then
             do j=nlines+1,nlines+nstrong
-               gam_L = a(j,i)
-               gam_D = dopp(j,i)/(2.997929d2*wave)
-               voigt_x = (1.0d8*(1./wave1(j)-1./wave))/gam_D
-               voigt_y =gam_L
+               voigt_x =(wave-wave1(j))/(wave1(j)*dopp(j,i)/2.997929d10)
+               voigt_y = a(j,i)
+c               write (*,*) i, wave-wave1(j), voigt_x
                Z = cmplx(voigt_x, voigt_y)
                humlicek = w4(Z)
                voigt_val = REAL(humlicek,8)/sqrtpi
@@ -59,6 +56,7 @@ c*****do the same for the strong lines
 c            j = nlines+1
          endif
       enddo      
+c      read (*,*)
 
       return                                              
       end                                                
