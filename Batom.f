@@ -22,13 +22,7 @@ c  names = atomic symbols for the elements
      .           'Tl','Pb','Bi','Po','At','Rn','Fr','Ra','Ac','Th',
      .           'Pa','U ','Np','Pu','Am'/                         
 c
-c  xabu = the set of current solar (when available) or meteorite       
-c  abundances, scaled to log(h) = 12.00 .  The data are from Anders
-c  and Grevesse (1989, Geochim.Cosmichim.Acta, v53, p197) and the solar
-c  values are adopted except for a) uncertain solar data, or b) Li, Be,
-c  and B, for which the meteoritic values are adopted.
-c  I was told to use the new Fe value of 7.52 as adopted in Sneden 
-c  et al. 1992 AJ 102 2001.
+c    Where do these abundance values come from?
       data xsolar/
      * 12.00,10.93, 3.25, 1.38, 2.70, 8.39, 7.78, 8.66, 4.56, 7.84,    
      1  6.17, 7.53, 6.37, 7.51, 5.36, 7.14, 5.50, 6.18, 5.08, 6.31,     

@@ -166,6 +166,8 @@ c*****Perform the Synthesis
       wavl = 0.
       mode = 3
 30    wave = wavelength(wavecounter)
+      wave = 4923.627
+c      wave = 4923.927
       if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave
          call opacit (2,wave)
@@ -179,7 +181,7 @@ c*****Perform the Synthesis
       lim1 = lim1line
       lim2 = lim2line
       call calcopacities
-      write (*,*) wave
+c      write (*,*) wave
       write (nfStokesI, 6520, advance='no') wave
       write (nfStokesQ, 6520, advance='no') wave
       write (nfStokesU, 6520, advance='no') wave
@@ -228,7 +230,6 @@ c         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
           go to 30
       endif
 
-c      read (*,*)
 c*****finish
       if (control .ne. 'gridend') then
          call finish (1)

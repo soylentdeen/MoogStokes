@@ -56,7 +56,6 @@ c               write (*,*) i, wave-wave1(j), voigt_x
 c            j = nlines+1
          endif
       enddo      
-c      read (*,*)
 
       return                                              
       end                                                

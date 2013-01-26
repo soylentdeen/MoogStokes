@@ -16,10 +16,10 @@ c******************************************************************************
      .             dphiQ(100), dphiU(100), dphiV(100), dpsiQ(100),
      .             dpsiU(100), dpsiV(100),
      .             de1(100), de2(100), de3(100), de4(100),
-     .             eta0(100), deta0(100), tlam(100), dktot(100),
-     .             dkref(100),
-     .             dttot(100), dtlam(100), tautot(100), dklam(100),
-     .             zdepth(100)
+     .             eta0(100), deta0(100), tlam(20000), dktot(100),
+     .             dkref(100), taus(20000),
+     .             dttot(20000), dtlam(20000), tautot(20000), dklam(100)
+      integer      nz
 
       common/stokesparams/deltamj, phi_opacity, psi_opacity,
      .             Stokes, continuum,
@@ -30,7 +30,6 @@ c******************************************************************************
      .             dpsiU, dpsiV,
      .             de1, de2, de3, de4,
      .             eta0, deta0, tlam, dktot,
-     .             dkref,
+     .             dkref, taus,
      .             dttot, dtlam, tautot, dklam,
-     .             zdepth
-
+     .             nz
