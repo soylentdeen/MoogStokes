@@ -19,9 +19,9 @@ c**********************************************************************
       real*8 matS1(4), matS2(4), bgfl, ztau
       real*8 k1, k2, k3, z1, z2, deltaz(100), qmax
       real*8 phi_ang, chi_ang, mu, midpoint
-      real*8 zdepth(20000), dz(20000), delz
-      real*8 ktot, klam, kref
-      integer emiss_order(3), kappa_order(2)
+      real*8 zdepth(20000), z_knots(20000), z_coeffs(20000), delz
+      real*8 ktot, klam, kref, taus(20000)
+      integer emiss_order(3), kappa_order(2), n_z_knots
       integer INFO, IPIV(4), LDA, LWORK
       parameter (LDA=4, LWORK=64*LDA)
       double precision WORK(LWORK)
@@ -53,7 +53,8 @@ c         read (*,*)
 c      enddo
 
 c*****  zdepth is the physical depth scale
-      call spline(xref, kapref, ntau, bgfl, bgfl, dkref)
+      call spl_def(ntau, xref, kapref, kref_knots, n_kref_knots,
+     1     kref_coeffs)
       nz = 1
       dt = 0.001
       do ztau=log10(tauref(1)), log10(tauref(ntau)), dt
@@ -61,23 +62,28 @@ c*****  zdepth is the physical depth scale
              zdepth(nz) = 0.0
              taus(nz) = ztau
          else
-             call splint(xref, kapref, dkref, ntau, ztau, k1)
+             k1=spl_ev(kref_knots, n_kref_knots, kref_coeffs, ztau)
              h1 = 1.0/k1
-             call splint(xref, kapref, dkref, ntau, ztau-dt, k2)
+             k2=spl_ev(kref_knots, n_kref_knots, kref_coeffs, ztau-dt)
              h2 = 1.0/k2
              dtau = (10.0**ztau-10.0**(ztau-dt))/(mu)
              zdepth(nz) = zdepth(nz-1)+(h1+h2)/2.0*dtau
              taus(nz) = ztau
-c             write (*,*) taus(nz), taus(nz-1), zdepth(nz), k1, k2, dtau
-             write (*,*) taus(nz), k1
-c             read (*,*) 
+c             write (*,*) taus(nz), k1
          endif
          nz=nz+1
       enddo
+c      k1=spl_ev(kref_knots,n_kref_knots,kref_coeffs,log10(tauref(ntau)))
+c      h1 = 1.0/k1
+c      k2=spl_ev(kref_knots, n_kref_knots, kref_coeffs, ztau)
+c      h2 = 1.0/k2
+c      dtau = (tauref(ntau)-10.0**(ztau-dtau))/(mu)
+c      zdepth(nz) = zdepth(nz-1)+(h1+h2)/2.0*dtau
+c      taus(nz) = ztau
+c      write (*,*) dtau, taus(nz), zdepth(nz)
       nz=nz-1
-c      write (*,*) nz
-      read (*,*)
-      call spline(taus, zdepth, nz, bgfl, bgfl, dz)
+      call spl_def(nz, taus, zdepth, z_knots, n_z_knots, z_coeffs)
+c      read (*,*)
 
 c***** For each layer in the atmosphere, calculate each element of the
 c      opacity matrix and emission vector for the DELO algorithm
@@ -118,54 +124,83 @@ c*****  Assumes LTE for the Source Function
 
 c*****  Assembles the Emission matrix (J')
          emission(1,i)=source
-         emission(2,i)=source*phi_Q/kaptot(i)
-         emission(3,i)=source*phi_U/kaptot(i)
-         emission(4,i)=source*phi_V/kaptot(i)
+         emission(2,i)=source*phi_Q
+         emission(3,i)=source*phi_U
+         emission(4,i)=source*phi_V
+c         write (*,*) tauref(i), emission(1,i), emission(2,i)
+c         read (*,*)
       enddo
 
-      call spline(xref, kaplam, ntau, bgfl, bgfl, dklam)
-      call spline(xref, kaptot, ntau, bgfl, bgfl, dktot)
+      call spl_def(ntau, xref, kaplam, klam_knots, n_klam_knots,
+     .           klam_coeffs)
+      call spl_def(ntau, xref, kaptot, ktot_knots, n_ktot_knots,
+     .           ktot_coeffs)
+      call spl_def(ntau, xref, emission(1,:), e1_knots, n_e1_knots,
+     .           e1_coeffs)
+      call spl_def(ntau, xref, emission(2,:), e2_knots, n_e2_knots,
+     .           e2_coeffs)
+      call spl_def(ntau, xref, emission(3,:), e3_knots, n_e3_knots,
+     .           e3_coeffs)
+      call spl_def(ntau, xref, emission(4,:), e4_knots, n_e4_knots,
+     .           e4_coeffs)
 
       do i=1, nz
          if (i.eq.1) then
-            call splint(xref, kaplam, dklam, ntau, taus(i), klam)
-            call splint(xref, kaptot, dktot, ntau, taus(i), ktot)
-            call splint(xref, kapref, dkref, ntau, taus(i), kref)
+            klam=spl_ev(klam_knots,n_klam_knots,klam_coeffs,taus(i))
+            ktot=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,taus(i))
+            kref=spl_ev(kref_knots,n_kref_knots,kref_coeffs,taus(i))
             tlam(i) = klam/kref*10.0**(taus(i))
-            tautot(i) = ktot/kref*10.0**(taus(i))
+            ttot(i) = ktot/kref*10.0**(taus(i))
          else
             delz = (zdepth(i)-zdepth(i-1))
-            call splint(xref, kaptot, dktot, ntau, taus(i), h1)
-            call splint(xref, kaptot, dktot, ntau, taus(i-1), h2)
+            h1=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,taus(i))
+            h2=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,taus(i-1))
             dtautot = delz*(h1+h2)/2.0
-            tautot(i) = tautot(i-1)+dtautot
-            call splint(xref, kaplam, dklam, ntau, taus(i), h1)
-            call splint(xref, kaplam, dklam, ntau, taus(i-1), h2)
+            ttot(i) = ttot(i-1)+dtautot
+            h1=spl_ev(klam_knots,n_klam_knots,klam_coeffs,taus(i))
+            h2=spl_ev(klam_knots,n_klam_knots,klam_coeffs,taus(i-1))
             dtaulam = delz*(h1+h2)/2.0
             tlam(i) = tlam(i-1)+dtaulam
-            write (*,*) taus(i), tlam(i), delz, zdepth(i)
-            read (*,*)
+c            write (*,*) taus(i), tlam(i), delz, zdepth(i)
+c            read (*,*)
          endif
 c         write (*,*) tauref(i),kapref(i),kaplam(i),kaptot(i),phiQ(i),
 c     .     phiU(i),phiV(i), psiQ(i), psiU(i), psiV(i), emission(1,i),
 c     .     kaptot(i)/kaplam(i)*taulam(i), taulam(i)
       enddo
-      read (*,*)
+c      read (*,*)
+      h1=kaptot(ntau)
+      h2=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,taus(i))
+      dtautot = delz*(h1+h2)/2.0
+      ttot(nz) = ttot(nz-1)+dtautot
+      h1=kaplam(ntau)
+      h2=spl_ev(klam_knots,n_klam_knots,klam_coeffs,taus(i))
+      dtaulam = delz*(h1+h2)/2.0
+      tlam(nz) = tlam(nz-1)+dtaulam
 
-      call spline(taus, tlam, nz, bgfl, bgfl, dtlam)
-      call spline(taus, tautot, nz, bgfl, bgfl, dttot)
-      call spline(xref, phiQ, ntau, bgfl, bgfl, dphiQ)
-      call spline(xref, phiU, ntau, bgfl, bgfl, dphiU)
-      call spline(xref, phiV, ntau, bgfl, bgfl, dphiV)
-      call spline(xref, psiQ, ntau, bgfl, bgfl, dpsiQ)
-      call spline(xref, psiU, ntau, bgfl, bgfl, dpsiU)
-      call spline(xref, psiV, ntau, bgfl, bgfl, dpsiV)
+      call spl_def(nz, taus, tlam, tlam_knots, n_tlam_knots,
+     .           tlam_coeffs)
+      call spl_def(nz, taus, ttot, ttot_knots, n_ttot_knots,
+     .           ttot_coeffs)
+      call spl_def(ntau, xref, phiQ, phiQ_knots, n_phiQ_knots,
+     .           phiQ_coeffs)
+      call spl_def(ntau, xref, phiU, phiU_knots, n_phiU_knots,
+     .           phiU_coeffs)
+      call spl_def(ntau, xref, phiV, phiV_knots, n_phiV_knots,
+     .           phiV_coeffs)
+      call spl_def(ntau, xref, psiQ, psiQ_knots, n_psiQ_knots,
+     .           psiQ_coeffs)
+      call spl_def(ntau, xref, psiU, psiU_knots, n_psiU_knots,
+     .           psiU_coeffs)
+      call spl_def(ntau, xref, psiV, psiV_knots, n_psiV_knots,
+     .           psiV_coeffs)
 
 c*****   Trace the Stokes parameters through the atmosphere
 c            via the quadratic DELO algorithm
 
-      call splint(taus, zdepth, dz, nz, tauref(1), zd1)
-      call splint(taus, zdepth, dz, nz, tauref(2), zd2)
+
+      zd1=spl_ev(z_knots,n_z_knots,z_coeffs,xref(1))
+      zd2=spl_ev(z_knots,n_z_knots,z_coeffs,xref(2))
       dbdz = (Planck(t(1)) - Planck(t(2)) )/(zd1-zd2)
       bk(1,1) = kaptot(1)
       bk(1,2) = phiQ(1)
@@ -187,15 +222,20 @@ c            via the quadratic DELO algorithm
       CALL DGETRF( 4, 4, bk, 4, IPIV, INFO )
       CALL DGETRI(4, bk, 4, IPIV, WORK, LWORK, INFO)
 
-      Stokes(1) = Planck(t(1)) - dbdz*bk(1,1)
-      Stokes(2) = -dbdz*bk(2,1)
-      Stokes(3) = -dbdz*bk(3,1)
-      Stokes(4) = -dbdz*bk(4,1)
+c      Stokes(1) = Planck(t(1)) - dbdz*bk(1,1)
+c      Stokes(2) = -dbdz*bk(2,1)
+c      Stokes(3) = -dbdz*bk(3,1)
+c      Stokes(4) = -dbdz*bk(4,1)
+c      continuum = Stokes(1)
+      Stokes(1) = Planck(t(1))
+      Stokes(2) = 0.0
+      Stokes(3) = 0.0
+      Stokes(4) = 0.0
       continuum = Stokes(1)
 
-      delta_tau = -0.05
+      delta_tau = -0.005
       call dcopy(4, emission(:,ntau), 1, emiss_interp(:,1), 1)
-      tau_interp(1) = tautot(nz)
+      tau_interp(1) = ttot(nz)
       tau_interp_c(1) = tlam(nz)
 
       call interp_opacities(log10(tauref(ntau)),
@@ -206,13 +246,13 @@ c            via the quadratic DELO algorithm
       emiss_order(1) = 1
       emiss_order(2) = 2
       emiss_order(3) = 3
-      do logtau=log10(tauref(ntau))+2.0*delta_tau,
+      do logtau=log10(tauref(ntau))+delta_tau,
      .              log10(tauref(1)),delta_tau
          call interp_opacities(logtau, kappa_interp,
      .        kappa_order(2), emiss_interp, emiss_order(3), tau_interp,
      .        tau_interp_c, mu, delta_tau)
          dtau = (tau_interp(emiss_order(1))-tau_interp(emiss_order(2)))
-         etau = 2.71828183**(-dtau)
+         etau = dexp(-dtau)
 
          alph = 1.0-etau
          bet =(1.0-(1.0+dtau)*etau)/dtau
@@ -276,10 +316,10 @@ c****      Solve the system of differential equations
 c****     Now do the same thing for the continuum
          dtau=(tau_interp_c(emiss_order(1))-
      .         tau_interp_c(emiss_order(2)))
-         etau = 2.71828183**(-dtau)
-         x = 1.0 - etau
-         y = dtau - x
-         z = dtau**2.0 - 2.0*y
+         etau = dexp(-dtau)
+         x = dble(dble(1.0) - etau)
+         y = dble(dtau - x)
+         z = dble(dtau**2.0 - 2.0*y)
          dtau_i = (tau_interp_c(emiss_order(2))-
      .             tau_interp_c(emiss_order(3)))
          alph = (z-dtau*y)/((dtau+dtau_i)*dtau_i)
@@ -291,6 +331,13 @@ c         gam = x+(z-(2.0*dtau_i + dtau)*y)/(dtau_i*(dtau+dtau_i))
          continuum=etau*continuum+alph*emiss_interp(1,emiss_order(3))+
      .              bet*emiss_interp(1,emiss_order(2))+
      .              gam*emiss_interp(1,emiss_order(1))
+c         write (*,*) logtau, dtau, tau_interp_c(emiss_order(1)),
+c     .         tau_interp_c(emiss_order(2)),
+c     .         emiss_interp(1,emiss_order(1))
+c         write (*,*) logtau, continuum
+c         s1=spl_ev(e1_knots,n_e1_knots,e1_coeffs,logtau-delta_tau)
+c         write (*,*) logtau, logtau-delta_tau, s1
+c         read (*,*)
 
 c         blah = alph*emiss_interp(1,emiss_order(3))+
 c     .          bet*emiss_interp(1,emiss_order(2))+
@@ -326,6 +373,7 @@ c         continuum = etau*continuum+max(min(blah, qmax), dble(0.0))
 c         write (*,*) logtau, Stokes(1), Stokes(2), Stokes(3), Stokes(4),
 c     .               continuum
       enddo
+c      read(*,*)
       return
       end
 
@@ -353,20 +401,32 @@ c***********************************************************************
       real*8 phQ, phU, phV, psQ, psU, psV
       integer k_ord, e_ord
 
-      call splint(taus, tlam, dtlam, nz, logtau+deltau, t_lam)
-      call splint(taus, tautot, dttot, nz, logtau+deltau, t_tot)
+      t_lam=spl_ev(tlam_knots,n_tlam_knots,tlam_coeffs,logtau+deltau)
+      t_tot=spl_ev(ttot_knots,n_ttot_knots,ttot_coeffs,logtau+deltau)
+c      call splint(taus, tlam, dtlam, nz, logtau+deltau, t_lam)
+c      call splint(taus, tautot, dttot, nz, logtau+deltau, t_tot)
 
-      call splint(xref, phiQ, dphiQ, ntau, logtau, phQ)
-      call splint(xref, phiU, dphiU, ntau, logtau, phU)
-      call splint(xref, phiV, dphiV, ntau, logtau, phV)
-      call splint(xref, psiQ, dpsiQ, ntau, logtau, psQ)
-      call splint(xref, psiU, dpsiU, ntau, logtau, psU)
-      call splint(xref, psiV, dpsiV, ntau, logtau, psV)
+      phQ=spl_ev(phiQ_knots,n_phiQ_knots,phiQ_coeffs,logtau)
+      phU=spl_ev(phiU_knots,n_phiU_knots,phiU_coeffs,logtau)
+      phV=spl_ev(phiV_knots,n_phiV_knots,phiV_coeffs,logtau)
+      psQ=spl_ev(psiQ_knots,n_psiQ_knots,psiQ_coeffs,logtau)
+      psU=spl_ev(psiU_knots,n_psiU_knots,psiU_coeffs,logtau)
+      psV=spl_ev(psiV_knots,n_psiV_knots,psiV_coeffs,logtau)
+c      call splint(xref, phiQ, dphiQ, ntau, logtau, phQ)
+c      call splint(xref, phiU, dphiU, ntau, logtau, phU)
+c      call splint(xref, phiV, dphiV, ntau, logtau, phV)
+c      call splint(xref, psiQ, dpsiQ, ntau, logtau, psQ)
+c      call splint(xref, psiU, dpsiU, ntau, logtau, psU)
+c      call splint(xref, psiV, dpsiV, ntau, logtau, psV)
 
-      call splint(xref, emission(1,:), de1, ntau, logtau+deltau, e_1)
-      call splint(xref, emission(2,:), de2, ntau, logtau+deltau, e_2)
-      call splint(xref, emission(3,:), de3, ntau, logtau+deltau, e_3)
-      call splint(xref, emission(4,:), de4, ntau, logtau+deltau, e_4)
+      e_1=spl_ev(e1_knots,n_e1_knots,e1_coeffs,logtau+deltau)
+      e_2=spl_ev(e2_knots,n_e2_knots,e2_coeffs,logtau+deltau)
+      e_3=spl_ev(e3_knots,n_e3_knots,e3_coeffs,logtau+deltau)
+      e_4=spl_ev(e4_knots,n_e4_knots,e4_coeffs,logtau+deltau)
+c      call splint(xref, emission(1,:), de1, ntau, logtau+deltau, e_1)
+c      call splint(xref, emission(2,:), de2, ntau, logtau+deltau, e_2)
+c      call splint(xref, emission(3,:), de3, ntau, logtau+deltau, e_3)
+c      call splint(xref, emission(4,:), de4, ntau, logtau+deltau, e_4)
 
       k_interp(1,1,k_ord)=0.0
       k_interp(1,2,k_ord)=phQ

@@ -166,7 +166,7 @@ c*****Perform the Synthesis
       wavl = 0.
       mode = 3
 30    wave = wavelength(wavecounter)
-      wave = 4923.627
+c      wave = 4923.627
 c      wave = 4923.927
       if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave
@@ -181,7 +181,7 @@ c      wave = 4923.927
       lim1 = lim1line
       lim2 = lim2line
       call calcopacities
-c      write (*,*) wave
+      write (*,*) wave
       write (nfStokesI, 6520, advance='no') wave
       write (nfStokesQ, 6520, advance='no') wave
       write (nfStokesU, 6520, advance='no') wave
