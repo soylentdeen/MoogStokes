@@ -161,6 +161,29 @@ c*****Read in the line list and calculate the equilibria
       call inlines (1)
       call eqlib
       call nearly (1)
+
+c***** Calculate zdepth, the physical depth scale
+      call spl_def(ntau, xref, kapref, kref_knots, n_kref_knots,
+     .             kref_coeffs)
+      nz = 1
+      dtau = 0.05
+      do ztau = xref(1), xref(ntau), dtau
+          if (nz.eq.1) then
+              zdepth(nz) = 0.0
+          else
+              h1=1.0/spl_ev(kref_knots, n_kref_knots, kref_coeffs,
+     .                      ztau)
+              h2=1.0/spl_ev(kref_knots, n_kref_knots, kref_coeffs,
+     .                      ztau-dtau)
+              dt = (10.0**ztau-10.0**(ztau-dtau))
+              zdepth(nz) = zdepth(nz-1)+(h1+h2)/2.0*dt
+          endif
+          taus(nz) = ztau
+          nz=nz+1
+      enddo
+      nz=nz-1
+      call spl_def(nz, taus, zdepth, z_knots, n_z_knots, z_coeffs)
+
       wavecounter = 1
 c*****Perform the Synthesis
       wavl = 0.

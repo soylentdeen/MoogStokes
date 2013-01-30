@@ -18,10 +18,10 @@ c**********************************************************************
       real*8 h1, h2, dtau, etau, alph, bet, gam
       real*8 matS1(4), matS2(4), bgfl, ztau
       real*8 k1, k2, k3, z1, z2, deltaz(100), qmax
-      real*8 phi_ang, chi_ang, mu, midpoint
-      real*8 zdepth(20000), z_knots(20000), z_coeffs(20000), delz
-      real*8 ktot, klam, kref, taus(20000)
-      integer emiss_order(3), kappa_order(2), n_z_knots
+      real*8 phi_ang, chi_ang, mu, midpoint, delz
+c      real*8 zdepth(20000), z_knots(20000), z_coeffs(20000),taus(20000)
+      real*8 ktot, klam, kref
+      integer emiss_order(3), kappa_order(2)!, n_z_knots
       integer INFO, IPIV(4), LDA, LWORK
       parameter (LDA=4, LWORK=64*LDA)
       double precision WORK(LWORK)
@@ -46,29 +46,6 @@ c*****Sets up constants
       ones(4,2) = 0.0
       ones(4,3) = 0.0
       ones(4,4) = 1.0
-
-c*****  zdepth is the physical depth scale
-      call spl_def(ntau, xref, kapref, kref_knots, n_kref_knots,
-     1     kref_coeffs)
-      nz = 1
-      dt = 0.01
-      do ztau=log10(tauref(1)), log10(tauref(ntau)), dt
-         if (nz.eq.1) then
-             zdepth(nz) = 0.0
-             taus(nz) = ztau
-         else
-             k1=spl_ev(kref_knots, n_kref_knots, kref_coeffs, ztau)
-             h1 = 1.0/k1
-             k2=spl_ev(kref_knots, n_kref_knots, kref_coeffs, ztau-dt)
-             h2 = 1.0/k2
-             dtau = (10.0**ztau-10.0**(ztau-dt))/(mu)
-             zdepth(nz) = zdepth(nz-1)+(h1+h2)/2.0*dtau
-             taus(nz) = ztau
-         endif
-         nz=nz+1
-      enddo
-      nz=nz-1
-      call spl_def(nz, taus, zdepth, z_knots, n_z_knots, z_coeffs)
 
 c***** For each layer in the atmosphere, calculate each element of the
 c      opacity matrix and emission vector for the DELO algorithm
@@ -108,24 +85,15 @@ c*****  Assumes LTE for the Source Function
          source = Planck(t(i))
 
 c*****  Assembles the Emission matrix (J')
-         emission(1,i)=source
-         emission(2,i)=source*phiQ(i)
-         emission(3,i)=source*phiU(i)
-         emission(4,i)=source*phiV(i)
+         emission(i)=source
       enddo
 
       call spl_def(ntau, xref, kaplam, klam_knots, n_klam_knots,
      .           klam_coeffs)
       call spl_def(ntau, xref, kaptot, ktot_knots, n_ktot_knots,
      .           ktot_coeffs)
-      call spl_def(ntau, xref, emission(1,:), e1_knots, n_e1_knots,
-     .           e1_coeffs)
-      call spl_def(ntau, xref, emission(2,:), e2_knots, n_e2_knots,
-     .           e2_coeffs)
-      call spl_def(ntau, xref, emission(3,:), e3_knots, n_e3_knots,
-     .           e3_coeffs)
-      call spl_def(ntau, xref, emission(4,:), e4_knots, n_e4_knots,
-     .           e4_coeffs)
+      call spl_def(ntau, xref, emission, e_knots, n_e_knots,
+     .           e_coeffs)
 
       do i=1, nz
          if (i.eq.1) then
@@ -135,7 +103,7 @@ c*****  Assembles the Emission matrix (J')
             tlam(i) = klam/kref*10.0**(taus(i))
             ttot(i) = ktot/kref*10.0**(taus(i))
          else
-            delz = (zdepth(i)-zdepth(i-1))
+            delz = (zdepth(i)-zdepth(i-1))/mu
             h1=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,taus(i))
             h2=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,taus(i-1))
             dtautot = delz*(h1+h2)/2.0
@@ -199,19 +167,24 @@ c            via the quadratic DELO algorithm
       CALL DGETRF( 4, 4, bk, 4, IPIV, INFO )
       CALL DGETRI(4, bk, 4, IPIV, WORK, LWORK, INFO)
 
-c      Stokes(1) = Planck(t(1)) - dbdz*bk(1,1)
-c      Stokes(2) = -dbdz*bk(2,1)
-c      Stokes(3) = -dbdz*bk(3,1)
-c      Stokes(4) = -dbdz*bk(4,1)
-c      continuum = Stokes(1)
-      Stokes(1) = Planck(t(1))
-      Stokes(2) = 0.0
-      Stokes(3) = 0.0
-      Stokes(4) = 0.0
+      Stokes(1) = Planck(t(1)) - dbdz*bk(1,1)
+      Stokes(2) = -dbdz*bk(2,1)
+      Stokes(3) = -dbdz*bk(3,1)
+      Stokes(4) = -dbdz*bk(4,1)
       continuum = Stokes(1)
 
+c      Stokes(1) = Planck(t(1))
+c      Stokes(2) = 0.0
+c      Stokes(3) = 0.0
+c      Stokes(4) = 0.0
+c      continuum = Stokes(1)
+
       delta_tau = -0.05
-      call dcopy(4, emission(:,ntau), 1, emiss_interp(:,1), 1)
+      emiss_interp(1,1) = emission(ntau)
+      emiss_interp(2,1) = emission(ntau)*phiQ(ntau)
+      emiss_interp(3,1) = emission(ntau)*phiU(ntau)
+      emiss_interp(4,1) = emission(ntau)*phiV(ntau)
+c      call dcopy(4, emission(:,ntau), 1, emiss_interp(:,1), 1)
       tau_interp(1) = ttot(nz)
       tau_interp_c(1) = tlam(nz)
 
@@ -303,11 +276,7 @@ c****     Now do the same thing for the continuum
              emiss_order(2) = 2
              emiss_order(3) = 3
          endif
-c         write (*,*) logtau, dtau, dtautot
-c         write (*,*) logtau, Stokes(1), Stokes(2), Stokes(3), Stokes(4),
-c     .    continuum
       enddo
-c      read (*,*)
       return
       end
 
@@ -345,11 +314,6 @@ c***********************************************************************
       psU=spl_ev(psiU_knots,n_psiU_knots,psiU_coeffs,logtau)
       psV=spl_ev(psiV_knots,n_psiV_knots,psiV_coeffs,logtau)
 
-      e_1=spl_ev(e1_knots,n_e1_knots,e1_coeffs,logtau+deltau)
-      e_2=spl_ev(e2_knots,n_e2_knots,e2_coeffs,logtau+deltau)
-      e_3=spl_ev(e3_knots,n_e3_knots,e3_coeffs,logtau+deltau)
-      e_4=spl_ev(e4_knots,n_e4_knots,e4_coeffs,logtau+deltau)
-
       k_interp(1,1,k_ord)=0.0
       k_interp(1,2,k_ord)=phQ
       k_interp(1,3,k_ord)=phU
@@ -367,15 +331,20 @@ c***********************************************************************
       k_interp(4,3,k_ord)=-psQ
       k_interp(4,4,k_ord)=0.0
 
-      e_interp(1,e_ord) = e_1/mu
-      e_interp(2,e_ord) = e_2/mu
-      e_interp(3,e_ord) = e_3/mu
-      e_interp(4,e_ord) = e_4/mu
+      phQ=spl_ev(phiQ_knots,n_phiQ_knots,phiQ_coeffs,logtau+deltau)
+      phU=spl_ev(phiU_knots,n_phiU_knots,phiU_coeffs,logtau+deltau)
+      phV=spl_ev(phiV_knots,n_phiV_knots,phiV_coeffs,logtau+deltau)
+
+      emiss = spl_ev(e_knots,n_e_knots,e_coeffs,logtau+deltau)
+
+      e_interp(1,e_ord) = emiss/mu
+      e_interp(2,e_ord) = emiss*phQ/mu
+      e_interp(3,e_ord) = emiss*phU/mu
+      e_interp(4,e_ord) = emiss*phV/mu
 
       tau_interp(e_ord) = t_tot
-      tau_interp_c(e_ord) =t_lam
+      tau_interp_c(e_ord) = t_lam
 
-c      write (*,*) logtau, phQ, phU,phV, psQ,psU, psV
       return
       end
 
