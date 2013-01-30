@@ -10,8 +10,7 @@ c******************************************************************************
       include 'Linex.com'
       include 'Dummy.com'
       include 'Stokes.com'
-      real*8 voigt_val, faraday_voigt_val,voigt_x,voigt_y,gam_L, gam_D,
-     .       sqrtpi
+      real*8 voigt_val, faraday_voigt_val,voigt_x,voigt_y, sqrtpi
       complex Z, humlicek, w4
 
 c*****compute the total line opacity at each depth    
@@ -43,7 +42,6 @@ c*****do the same for the strong lines
             do j=nlines+1,nlines+nstrong
                voigt_x =(wave-wave1(j))/(wave1(j)*dopp(j,i)/2.997929d10)
                voigt_y = a(j,i)
-c               write (*,*) i, wave-wave1(j), voigt_x
                Z = cmplx(voigt_x, voigt_y)
                humlicek = w4(Z)
                voigt_val = REAL(humlicek,8)/sqrtpi
@@ -53,7 +51,6 @@ c               write (*,*) i, wave-wave1(j), voigt_x
                psi_opacity(i,int(deltamj(j)+2))=psi_opacity(i,
      .                  int(deltamj(j)+2))+kapnu0(j,i)*faraday_voigt_val
             enddo
-c            j = nlines+1
          endif
       enddo      
 
