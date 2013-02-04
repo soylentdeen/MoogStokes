@@ -18,7 +18,7 @@ c**********************************************************************
       real*8 h1, h2, dtau, etau, alph, bet, gam
       real*8 matS1(4), matS2(4), bgfl, ztau
       real*8 k1, k2, k3, z1, z2, deltaz(100), qmax
-      real*8 phi_ang, chi_ang, mu, midpoint, delz
+      real*8 phi_ang, chi_ang, mu, midpoint, delz, delta_tau
 c      real*8 zdepth(20000), z_knots(20000), z_coeffs(20000),taus(20000)
       real*8 ktot, klam, kref
       integer emiss_order(3), kappa_order(2)!, n_z_knots
@@ -114,14 +114,14 @@ c*****  Assembles the Emission matrix (J')
             tlam(i) = tlam(i-1)+dtaulam
          endif
       enddo
-      h1=kaptot(ntau)
-      h2=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,taus(i))
-      dtautot = delz*(h1+h2)/2.0
-      ttot(nz) = ttot(nz-1)+dtautot
-      h1=kaplam(ntau)
-      h2=spl_ev(klam_knots,n_klam_knots,klam_coeffs,taus(i))
-      dtaulam = delz*(h1+h2)/2.0
-      tlam(nz) = tlam(nz-1)+dtaulam
+c      h1=kaptot(ntau)
+c      h2=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,taus(i))
+c      dtautot = delz*(h1+h2)/2.0
+c      ttot(nz) = ttot(nz-1)+dtautot
+c      h1=kaplam(ntau)
+c      h2=spl_ev(klam_knots,n_klam_knots,klam_coeffs,taus(i))
+c      dtaulam = delz*(h1+h2)/2.0
+c      tlam(nz) = tlam(nz-1)+dtaulam
 
       call spl_def(nz, taus, tlam, tlam_knots, n_tlam_knots,
      .           tlam_coeffs)
@@ -184,7 +184,6 @@ c      continuum = Stokes(1)
       emiss_interp(2,1) = emission(ntau)*phiQ(ntau)
       emiss_interp(3,1) = emission(ntau)*phiU(ntau)
       emiss_interp(4,1) = emission(ntau)*phiV(ntau)
-c      call dcopy(4, emission(:,ntau), 1, emiss_interp(:,1), 1)
       tau_interp(1) = ttot(nz)
       tau_interp_c(1) = tlam(nz)
 
@@ -203,6 +202,9 @@ c      call dcopy(4, emission(:,ntau), 1, emiss_interp(:,1), 1)
      .        tau_interp_c, mu, delta_tau)
          dtau = (tau_interp(emiss_order(1))-tau_interp(emiss_order(2)))
          etau = dexp(-dtau)
+
+c         write (*,*) tau_interp
+c         read (*,*)
 
          alph = dble(1.0-etau)
          bet =dble((1.0-(1.0+dtau)*etau)/dtau)
@@ -276,7 +278,9 @@ c****     Now do the same thing for the continuum
              emiss_order(2) = 2
              emiss_order(3) = 3
          endif
+c         write (*,*) logtau, dtau, Stokes(1), continuum
       enddo
+c      read (*,*)
       return
       end
 

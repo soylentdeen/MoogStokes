@@ -195,7 +195,7 @@ c         denom = 4.0*3.14159*dopp(j,i)/(wave1(j)*1.0d-8)
          gammav = (t(i)/10000.)**(0.3)*(numdens(1,1,i)+
      .             0.42*numdens(2,1,i))*10.0**(-7.914)
 c         write (*,*) j, i, dopp(j,i), dopp(j,i)*2.9979e18/wave1(j)
-c         write (*,*) rhox(i), denom, gammar, gammas, gammav
+c         write (*,*) dlog10(rhox(i)), denom, gammar, gammas, gammav
 
 c*****now finish by summing the gammas and computing the Voigt *a* values
          gammatot = gammar + gammas + gammav

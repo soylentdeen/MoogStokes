@@ -34,7 +34,7 @@ c*****calculate continuum quantities at the line list wavelength middle
       
 c*****   Generate original wavelength grid
 
-      deltawave = 0.25
+      deltawave = 0.0625
       nwave = 1
 
       wave = start
@@ -49,8 +49,8 @@ c*****   Generate original wavelength grid
 c*****divide the lines into keepers and discards
       do j=1,nlines+nstrong
          if (strength(j)/kaplam(jtau5) .ge. xratio) then
-             do k=-40,40
-                 wavelength(nwave) = wave1(j)+0.25*asin(real(k/40.0))
+             do k=-60,60
+                 wavelength(nwave) = wave1(j)+0.25*asin(real(k/60.0))
                  nwave = nwave+1
              enddo
              wavelength(nwave) = wave1(j)+ 0.001
