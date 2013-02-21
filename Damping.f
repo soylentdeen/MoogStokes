@@ -194,6 +194,11 @@ c         denom = 4.0*3.14159*dopp(j,i)/(wave1(j)*1.0d-8)
          gammas = (t(i)/10000.)**(1./6.)*ne(i)*10.0**(-6.583)
          gammav = (t(i)/10000.)**(0.3)*(numdens(1,1,i)+
      .             0.42*numdens(2,1,i))*10.0**(-7.914)
+
+c         gammas = (t(i)/10000.)**(1./6.)*ne(i)*10.0**(-5.170)
+c         gammav = (t(i)/10000.)**(0.3)*(numdens(1,1,i)+
+c     .             0.42*numdens(2,1,i))*10.0**(-7.724)
+
 c         write (*,*) j, i, dopp(j,i), dopp(j,i)*2.9979e18/wave1(j)
 c         write (*,*) dlog10(rhox(i)), denom, gammar, gammas, gammav
 
