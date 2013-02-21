@@ -181,7 +181,10 @@ c***** Calculate zdepth, the physical depth scale
           taus(nz) = ztau
           nz=nz+1
       enddo
-      nz=nz-1
+      taus(nz) = xref(ntau)
+      h2=1.0/kapref(ntau)
+      dt = 10.0**taus(nz)-10.0**taus(nz-1)
+      zdepth(nz) = zdepth(nz-1)+(h2+h1)/2.0*dt
       call spl_def(nz, taus, zdepth, z_knots, n_z_knots, z_coeffs)
 
       wavecounter = 1

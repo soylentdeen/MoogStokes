@@ -113,7 +113,9 @@ c*****  Assembles the Emission matrix (J')
             dtaulam = delz*(h1+h2)/2.0
             tlam(i) = tlam(i-1)+dtaulam
          endif
+c         write (*,*) i, taus(i), ttot(i)
       enddo
+c      read (*,*)
 c      h1=kaptot(ntau)
 c      h2=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,taus(i))
 c      dtautot = delz*(h1+h2)/2.0
