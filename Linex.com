@@ -14,7 +14,7 @@ c******************************************************************************
      .             dampnum(2500), gf1(2500), width(2500), 
      .             abundout(2500), widout(2500), strength(2500), 
      .             rdmass(2500), gambark(2500), alpbark(2500),
-     .             wid1comp(2500), wavelength(100000)
+     .             wid1comp(2500), strong(2500), weak(2500)
       real*8       kapnu(100), taunu(100), cd(100), sline(100)
       real*8       d(5000), dellam(400), w(100),
      .             rwtab(3000), gftab(3000), gfhold
@@ -25,7 +25,8 @@ c******************************************************************************
       real*8       gammatot, gammav, gammas, gammar, viewang
       integer      lim1, lim2, mode, ndepths, ncurve, nlines,nstrong,
      .             lim1line, lim2line, ntabtot, group(2500),
-     .             iabatom, molflag, dostrong, gfstyle, nwave
+     .             iabatom, molflag, dostrong, gfstyle,
+     .             nw_lines, ns_lines
       character*7  damptype(2500)
 
       common/linex/a, dopp, kapnu0,   
@@ -34,7 +35,7 @@ c******************************************************************************
      .             dampnum, gf1, width, 
      .             abundout, widout, strength,
      .             rdmass, gambark, alpbark,
-     .             wid1comp, wavelength,
+     .             wid1comp, strong, weak,
      .             kapnu, taunu, cd, sline,
      .             d, dellam, w,
      .             rwtab, gftab, gfhold,
@@ -45,6 +46,7 @@ c******************************************************************************
      .             gammatot, gammav, gammas, gammar, viewang,
      .             lim1, lim2, mode, ndepths, ncurve, nlines,nstrong, 
      .             lim1line, lim2line, ntabtot, group,
-     .             iabatom, molflag, dostrong, gfstyle, nwave
+     .             iabatom, molflag, dostrong, gfstyle,
+     .             nw_lines, ns_lines
       common/lindamp/damptype
 

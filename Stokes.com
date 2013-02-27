@@ -8,9 +8,9 @@ c     "kapnu0" are often over-written with plotting data,
 c     so leave them alone or suffer unspeakable programming tortures.
 c******************************************************************************
 
-      real*8       deltamj(2500),phi_opacity(100, 3),psi_opacity(100,3),
-     .             Stokes(4), continuum, emission(100),
-     .             kref_knots(100), kref_coeffs(100),
+      real*8       deltamj(2500),crad(2500),c4(2500),phi_opacity(100,3),
+     .             psi_opacity(100,3), Stokes(4), continuum,
+     .             emission(100), kref_knots(100), kref_coeffs(100),
      .             klam_knots(100), klam_coeffs(100),
      .             kaptot(100), ktot_knots(100), ktot_coeffs(100),
      .             phiI(100), phiI_knots(100), phiI_coeffs(100),
@@ -30,9 +30,9 @@ c******************************************************************************
      .             n_ktot_knots, n_e_knots, n_z_knots,
      .             n_tlam_knots, n_ttot_knots
 
-      common/stokesparams/deltamj, phi_opacity, psi_opacity,
-     .             Stokes, continuum, emission,
-     .             kref_knots, kref_coeffs,
+      common/stokesparams/deltamj, crad, c4, phi_opacity,
+     .             psi_opacity, Stokes, continuum,
+     .             emission, kref_knots, kref_coeffs,
      .             klam_knots, klam_coeffs,
      .             kaptot, ktot_knots, ktot_coeffs,
      .             phiI, phiI_knots, phiI_coeffs,

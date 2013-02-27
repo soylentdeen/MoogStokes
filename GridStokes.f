@@ -13,11 +13,12 @@ c******************************************************************************
       include 'Pstuff.com'
       include 'Stokes.com'
       include 'Angles.com'
-      integer n_cells, icell, testflag, wavecounter
+      integer n_cells, icell, testflag, diskflag, curr_strong, curr_weak
       real*8 az_start, az_stop, daz, az, long, dlong
       real*8 ring_area, cell_area, cell_a, phi_ang, chi_ang, mu
 
       testflag = 1
+      diskflag = 1
 
       zeros(1,1) = 0.0
       zeros(1,2) = 0.0
@@ -121,40 +122,70 @@ c         lscreen = lscreen + 2
       B_xyz(2) = 0.0
       B_xyz(3) = 0.0
 
-      inclination = 3.1415926/2.0
-      position_angle = 0.0
+      if (diskflag .eq. 0) then
+          inclination = 3.1415926/2.0
+          position_angle = 0.0
 
-      write (nfAngles, 12347) ncells, nrings, inclination,
-     .                        position_angle
-      cell_area = 4.0*3.14159262/ncells
-      radtodeg = 180.0/3.1459262
-      icell = 1
-      do i=1,nrings
-         az_start = (i-1)*3.14159262/nrings - 3.14159262/2.0
-         az_stop = i*3.14159262/nrings - 3.14159262/2.0
-         az = (az_start + az_stop)/2.0
-         daz= sin(az_stop) - sin(az_start)
-         ring_area = 2.0*3.14159262 * daz ! total sterrad in circular ring
-         n_cells = nint(ring_area/cell_area) ! # of cells in ring
-         cell_a = ring_area/float(n_cells)
-         dlong = 2.0*3.14159262/n_cells
-         do j=1,n_cells
-            long = -3.14159262+(j-0.5)*dlong
-            call computeRotations(az, long, phi_ang, chi_ang, mu)
-            if (mu .ge. 0.001) THEN
-               phi_angle(icell) = phi_ang
-               chi_angle(icell) = chi_ang
-               azimuth(icell) = az
-               longitude(icell) = long
-               mus(icell) = mu
-               write (nfAngles, 12346)icell, az, az_start, az_stop,long,
-     .                dlong, phi_ang, chi_ang, mu
-               icell = icell + 1
-            endif
-         enddo
-      enddo
-
-      icell = icell-1
+          write (nfAngles, 12347) ncells, nrings, inclination,
+     .                               position_angle
+          cell_area = 4.0*3.14159262/ncells
+          radtodeg = 180.0/3.1459262
+          icell = 1
+          do i=1,nrings
+             az_start = (i-1)*3.14159262/nrings - 3.14159262/2.0
+             az_stop = i*3.14159262/nrings - 3.14159262/2.0
+             az = (az_start + az_stop)/2.0
+             daz= sin(az_stop) - sin(az_start)
+             ring_area = 2.0*3.14159262 * daz ! total sterrad in circular ring
+             n_cells = nint(ring_area/cell_area) ! # of cells in ring
+             cell_a = ring_area/float(n_cells)
+             dlong = 2.0*3.14159262/n_cells
+             do j=1,n_cells
+                long = -3.14159262+(j-0.5)*dlong
+                call computeRotations(az, long, phi_ang, chi_ang, mu)
+                if (mu .ge. 0.001) THEN
+                   phi_angle(icell) = phi_ang
+                   chi_angle(icell) = chi_ang
+                   azimuth(icell) = az
+                   longitude(icell) = long
+                   mus(icell) = mu
+                   write (nfAngles, 12346)icell, az, az_start, az_stop,
+     .                    long, dlong, phi_ang, chi_ang, mu
+                   icell = icell + 1
+                endif
+             enddo
+          enddo
+          icell = icell-1
+      else
+c*****  Now need to make the simple Stokes I, V disk sampling routine.
+          phi_angle(1) = 0.270640041
+          chi_angle(1) = 0.0
+          mus(1) = 0.93659998
+          phi_angle(2) = 0.481286
+          chi_angle(2) = 0.0
+          mus(2) = 0.88634
+          phi_angle(3) = 0.640495
+          chi_angle(3) = 0.0
+          mus(3) = 0.8018
+          phi_angle(4) = 0.785389
+          chi_angle(4) = 0.0
+          mus(4) = 0.7071
+          phi_angle(5) = 0.929793
+          chi_angle(5) = 0.0
+          mus(5) = 0.5979998
+          phi_angle(6) = 1.089532
+          chi_angle(6) = 0.0
+          mus(6) = 0.4629
+          phi_angle(7) = 1.300206
+          chi_angle(7) = 0.0
+          mus(7) = 0.2673
+          icell = 7
+          
+          write(nfAngles, 12348) 7
+          do i=1,7
+              write (nfAngles, 12349) i, phi_angle(i), mus(i)
+          enddo
+      endif
 
       call wavegrid
 c*****Read in the line list and calculate the equilibria
@@ -187,13 +218,12 @@ c***** Calculate zdepth, the physical depth scale
       zdepth(nz) = zdepth(nz-1)+(h2+h1)/2.0*dt
       call spl_def(nz, taus, zdepth, z_knots, n_z_knots, z_coeffs)
 
-      wavecounter = 1
+      curr_strong = 1
+      curr_weak = 1
 c*****Perform the Synthesis
       wavl = 0.
       mode = 3
-30    wave = wavelength(wavecounter)
-c      wave = 4923.627
-c      wave = 4923.927
+30    wave = start
       if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave
          call opacit (2,wave)
@@ -220,14 +250,14 @@ c         call traceStokes(dble(0.95532), dble(3.14159), dble(0.57735))
 c         call traceStokes(dble(0.95532), dble(0.0), dble(0.57735))
 c         call traceStokes(dble(1.5025), dble(4.712), dble(0.0682))
 
-         call traceStokes(dble(0.698131), dble(0.0), dble(1.0))
+c         call traceStokes(dble(0.698131), dble(0.0), dble(1.0))
 c         call traceStokes(dble(0.27064), dble(0.0), dble(0.9636))
 c         call traceStokes(dble(0.481286), dble(0.0), dble(0.88634))
 c         call traceStokes(dble(0.640495), dble(0.0), dble(0.8018))
 c         call traceStokes(dble(0.785389), dble(0.0), dble(0.7071))
 c         call traceStokes(dble(0.929793), dble(0.0), dble(0.5979998))
 c         call traceStokes(dble(1.089532), dble(0.0), dble(0.4629))
-c         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
+         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
 
          write (nfStokesI, 6521, advance='no') Stokes(1)/continuum
          write (nfStokesQ, 6521, advance='no') Stokes(2)/continuum
@@ -250,9 +280,38 @@ c         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
       write (nfStokesV, *) ''
       write (nfContinuum, *) ''
       
-      stepsize = dopp(nstrong, 50)*wave/2.997929e11
-      wavecounter = wavecounter + 1
-      if (wavecounter .le. nwave) then
+      if (curr_strong .eq. 1) then
+          strong_blue_distance = 1000.0
+      else
+          strong_blue_distance = wave - strong(curr_strong-1)
+      endif
+      if (curr_weak .eq. 1) then
+          weak_blue_distance = 1000.0
+      else
+          weak_blue_distance = wave - weak(curr_strong-1)
+      endif
+
+      if (curr_strong .eq. ns_lines) then
+          strong_red_distance = 1000.0
+      else
+          strong_red_distance = strong(curr_strong) - wave
+      endif
+      if (curr_weak .eq. nw_lines) then
+          weak_red_distance = 1000.0
+      else
+          weak_red_distance = weak(curr_strong) - wave
+      endif
+
+      strong_distance = MIN(strong_red_distance, strong_blue_distance)
+      weak_distance = MIN(weak_red_distance, weak_blue_distance)
+
+      strong_step = 0.25 - 0.22*exp(-(strong_distance)**2/50.0)
+      weak_step = 0.25 - 0.22*exp(-(weak_distance)**2/10.0)
+
+      wave = wave + MIN(strong_step, weak_step)
+
+
+      if (wave .le. sstop) then
           go to 30
       endif
 
@@ -269,6 +328,8 @@ c1001  format (a80)
 c12345 format (f10.4,5e15.5)
 12346 format (i5,8e16.5)
 12347 format (2i5,2e16.5)
+12348 format (i5)
+12349 format (i5,2e16.5)
 6520  format (f10.4)
 6521  format (e16.8)
       end 

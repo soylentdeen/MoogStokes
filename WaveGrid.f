@@ -13,13 +13,14 @@ c******************************************************************************
       include 'Atmos.com'
       include 'Linex.com'
       include 'Pstuff.com'
-      real*8 xratio
+      real*8 strongratio, weakratio
 
 
 c*****examine the parameter file
 
 c      array = 'GIVE THE MINIMUM LINE/CONTINUUM OPACITY RATIO TO KEEP: '
-      xratio = 0.0001
+      strongratio = 0.1
+      weakratio = 0.001
       
 
 c*****compute the line opacities
@@ -32,34 +33,17 @@ c*****calculate continuum quantities at the line list wavelength middle
       wave = (wave1(1)+wave1(nlines))/2.
       call opacit (2,wave)
       
-c*****   Generate original wavelength grid
-
-      deltawave = 0.0625
-      nwave = 1
-
-      wave = start
-30    wavelength(nwave) = wave
-      wave = wave + deltawave
-      nwave = nwave + 1
-      if (wave .le. sstop) then
-          goto 30
-      endif
-      wave = start
-
 c*****divide the lines into keepers and discards
+      ns_lines = 0
+      nw_lines = 0
       do j=1,nlines+nstrong
-         if (strength(j)/kaplam(jtau5) .ge. xratio) then
-             do k=-60,60
-                 wavelength(nwave) = wave1(j)+0.25*asin(real(k/60.0))
-                 nwave = nwave+1
-             enddo
-             wavelength(nwave) = wave1(j)+ 0.001
-             nwave = nwave+1
-             wavelength(nwave) = wave1(j)- 0.001
-             nwave = nwave+1
-         else
-c             write (*,*) "Line at :", wave1(j), " is not strong enough!"
-c             write (*,*) "Strength :", strength(j)/kaplam(jtau5)
+         if (strength(j)/kaplam(jtau5) .ge. strongratio) then
+             ns_lines = ns_lines+1
+             strong(ns_lines) = wave1(j)
+             write (*,*) "Strong line at ", wave1(j)
+         elseif (strength(j)/kaplam(jtau5) .ge. weakratio) then
+             nw_lines = nw_lines+1
+             weak(nw_lines) = wave1(j)
          endif
       enddo
       if (nlines +nstrong .eq. 2500) then
@@ -68,43 +52,41 @@ c             write (*,*) "Strength :", strength(j)/kaplam(jtau5)
       endif
       nwave = nwave -1
 
-      call sortwave
-
       end
 
-      subroutine sortwave
-
-      implicit real*8 (a-h,o-z)
-      include 'Atmos.com'
-      include 'Linex.com'
-      include 'Pstuff.com'
-      INTEGER I,J
-      REAL*8 X, temp(nwave)
-      DO 30 I=2,nwave
-      X=wavelength(I)
-      J=I
-   10 J=J-1
-      IF(J.EQ.0 .OR. wavelength(J).LT.X) GO TO 20
-      wavelength(J+1)=wavelength(J)
-      GO TO 10
-   20 wavelength(J+1)=X
-   30 CONTINUE
-
-c****   Now, go through and purge duplicates and very close together points
-      temp(1) = wavelength(1)
-      I=1
-      do J=2,nwave
-         if(abs(wavelength(J)-temp(I)) .lt. 0.001) THEN
-            temp(I) = (wavelength(J)+temp(I))/2.0
-            wavelength(J) = 0.0
-         else
-            I = I+1
-            temp(I) = wavelength(J)
-            wavelength(J) = 0.0
-         endif
-      enddo
-      nwave = I
-      do J=1, nwave
-         wavelength(J)=temp(J)
-      enddo
-      END
+c      subroutine sortwave
+c
+c      implicit real*8 (a-h,o-z)
+c      include 'Atmos.com'
+c      include 'Linex.com'
+c      include 'Pstuff.com'
+c      INTEGER I,J
+c      REAL*8 X, temp(nwave)
+c      DO 30 I=2,nwave
+c      X=wavelength(I)
+c      J=I
+c   10 J=J-1
+c      IF(J.EQ.0 .OR. wavelength(J).LT.X) GO TO 20
+c      wavelength(J+1)=wavelength(J)
+c      GO TO 10
+c   20 wavelength(J+1)=X
+c   30 CONTINUE
+c
+cc****   Now, go through and purge duplicates and very close together points
+c      temp(1) = wavelength(1)
+c      I=1
+c      do J=2,nwave
+c         if(abs(wavelength(J)-temp(I)) .lt. 0.001) THEN
+c            temp(I) = (wavelength(J)+temp(I))/2.0
+c            wavelength(J) = 0.0
+c         else
+c            I = I+1
+c            temp(I) = wavelength(J)
+c            wavelength(J) = 0.0
+c         endif
+c      enddo
+c      nwave = I
+c      do J=1, nwave
+c         wavelength(J)=temp(J)
+c      enddo
+c      END
