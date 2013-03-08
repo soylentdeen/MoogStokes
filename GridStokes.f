@@ -16,9 +16,15 @@ c******************************************************************************
       integer n_cells, icell, testflag, diskflag, curr_strong, curr_weak
       real*8 az_start, az_stop, daz, az, long, dlong
       real*8 ring_area, cell_area, cell_a, phi_ang, chi_ang, mu
+      real*8 beta_strong, beta_weak, R_strong, R_weak
 
-      testflag = 1
+      testflag = 0
       diskflag = 1
+
+      beta_strong = 5.0
+      beta_weak = 10.0
+      R_strong = 0.5
+      R_weak = 0.25
 
       zeros(1,1) = 0.0
       zeros(1,2) = 0.0
@@ -187,7 +193,10 @@ c*****  Now need to make the simple Stokes I, V disk sampling routine.
           enddo
       endif
 
+      start = oldstart
+      write (*,*) "Calculating Wave grid, ", start
       call wavegrid
+      read (*,*)
 c*****Read in the line list and calculate the equilibria
       call inlines (1)
       call eqlib
@@ -223,8 +232,8 @@ c***** Calculate zdepth, the physical depth scale
 c*****Perform the Synthesis
       wavl = 0.
       mode = 3
-30    wave = start
-      if (dabs(wave-wavl)/wave .ge. 0.001) then
+      wave = start
+30    if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave
          call opacit (2,wave)
       endif
@@ -283,33 +292,50 @@ c         call traceStokes(dble(1.089532), dble(0.0), dble(0.4629))
       if (curr_strong .eq. 1) then
           strong_blue_distance = 1000.0
       else
-          strong_blue_distance = wave - strong(curr_strong-1)
+          strong_blue_distance = dabs(wave - strong(curr_strong-1))
       endif
       if (curr_weak .eq. 1) then
           weak_blue_distance = 1000.0
       else
-          weak_blue_distance = wave - weak(curr_strong-1)
+          weak_blue_distance = dabs(wave - weak(curr_weak-1))
       endif
 
       if (curr_strong .eq. ns_lines) then
           strong_red_distance = 1000.0
       else
-          strong_red_distance = strong(curr_strong) - wave
+          strong_red_distance = dabs(strong(curr_strong) - wave)
       endif
       if (curr_weak .eq. nw_lines) then
           weak_red_distance = 1000.0
       else
-          weak_red_distance = weak(curr_strong) - wave
+          weak_red_distance = dabs(weak(curr_weak) - wave)
       endif
 
-      strong_distance = MIN(strong_red_distance, strong_blue_distance)
-      weak_distance = MIN(weak_red_distance, weak_blue_distance)
+65    if (wave .ge. strong(curr_strong)) then
+          curr_strong = curr_strong + 1
+          goto 65
+      endif
+66    if (wave .ge. weak(curr_weak)) then
+          curr_weak = curr_weak + 1
+          goto 66
+      endif
+      strong_distance = MIN(strong_red_distance,
+     .           strong_blue_distance)
+      weak_distance = MIN(weak_red_distance, 
+     .           weak_blue_distance)
 
-      strong_step = 0.25 - 0.22*exp(-(strong_distance)**2/50.0)
-      weak_step = 0.25 - 0.22*exp(-(weak_distance)**2/10.0)
+      strong_step = 0.25 - 0.24/(1.0+exp(beta_strong*
+     .          (strong_distance/R_strong-1.0)))
+      weak_step = 0.25 - 0.24/(1.0+exp(beta_weak*
+     .          (weak_distance/R_weak-1.0)))
 
+c      write (*,*) strong_distance, weak_distance
+c      write (*,*) weak_red_distance, weak_blue_distance
+c      write (*,*) strong(curr_strong), weak(curr_weak)
+c      write (*,*) curr_strong, curr_weak
+c      write (*,*) strong_step, weak_step
+c      read (*,*)
       wave = wave + MIN(strong_step, weak_step)
-
 
       if (wave .le. sstop) then
           go to 30

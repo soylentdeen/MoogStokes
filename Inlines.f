@@ -130,22 +130,21 @@ c*****read in the strong lines if needed
       if (j .le. nlines) go to 333
 311   nlines = j - 1 
 
-
 c*****append the strong lines here if necessary
       if (dostrong .gt. 0) then
-         do k=1,nstrong
-            wave1(nlines+k) = swave1(k)
-            atom1(nlines+k) = satom1(k)
-            e(nlines+k,1) = se(k)
-            gf(nlines+k) = sgf(k)
-            dampnum(nlines+k) = sdampnum(k)
-            d0(nlines+k) = sd0(k)
-            width(nlines+k) = swidth(k)
-            deltamj(nlines+k) = sdeltamj(k)
-            charge(nlines+k) = scharge(k)
-            crad(nlines+k) = scrad(k)
-            c4(nlines+k) = sc4(k)
-         enddo
+          do k=1,nstrong
+              wave1(nlines+k) = swave1(k)
+              atom1(nlines+k) = satom1(k)
+              e(nlines+k,1) = se(k)
+              gf(nlines+k) = sgf(k)
+              dampnum(nlines+k) = sdampnum(k)
+              d0(nlines+k) = sd0(k)
+              width(nlines+k) = swidth(k)
+              deltamj(nlines+k) = sdeltamj(k)
+              charge(nlines+k) = scharge(k)
+              crad(nlines+k) = scrad(k)
+              c4(nlines+k) = sc4(k)
+          enddo
       endif
 
 
@@ -204,6 +203,7 @@ c     and a different one for atomic lines
 
 
 c*****here are the calculations specific to molecular lines
+c         write (*,*) j, iatom, wave1(j)
          if (iatom .ge. 100) then
             call sunder (atom1(j),ia,ib)
             if (ia .gt. ib) then
@@ -229,14 +229,13 @@ c*****here are the calculations specific to molecular lines
 c*****use an internal dissociation energy for molecules if the user
 c     does not read one in
             if (d0(j) .eq. 0.) then
-               do k=1,110
+                do k=1,110
                   if (int(datmol(1,k)+0.01) .eq.
      .                int(atom1(j)+0.01)) then
                      d0(j) = datmol(2,k)
                      go to 390
                   endif
                 enddo
-                write (*,*) atom1(j), wave1(j), j, nlines
                 write (*,1013) atom1(j)
                 stop
             endif
@@ -267,6 +266,8 @@ c      if (nlines+nstrong .lt. 2500) then
 c         if (sstop .gt. wave1(nlines)+10.) sstop = wave1(nlines)+10.
 c      endif
       lim1line = 1
+      write (*,*) j, wave1(j-1), wave1(nlines-1)
+      read (*,*)
       return  
 
 
