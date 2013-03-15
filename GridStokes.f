@@ -22,7 +22,7 @@ c******************************************************************************
       diskflag = 1
 
       beta_strong = 5.0
-      beta_weak = 10.0
+      beta_weak = 7.0
       R_strong = 0.5
       R_weak = 0.25
 
@@ -194,9 +194,10 @@ c*****  Now need to make the simple Stokes I, V disk sampling routine.
       endif
 
       start = oldstart
-      write (*,*) "Calculating Wave grid, ", start
       call wavegrid
-      read (*,*)
+c      write (*,*) "Number of Strong Lines ", ns_lines
+c      write (*,*) "Number of weak Lines ", nw_lines
+c      read (*,*)
 c*****Read in the line list and calculate the equilibria
       call inlines (1)
       call eqlib
@@ -232,7 +233,7 @@ c***** Calculate zdepth, the physical depth scale
 c*****Perform the Synthesis
       wavl = 0.
       mode = 3
-      wave = start
+      wave = oldstart
 30    if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave
          call opacit (2,wave)
@@ -311,11 +312,13 @@ c         call traceStokes(dble(1.089532), dble(0.0), dble(0.4629))
           weak_red_distance = dabs(weak(curr_weak) - wave)
       endif
 
-65    if (wave .ge. strong(curr_strong)) then
+65    if ((wave .ge. strong(curr_strong)).and.
+     .          (curr_strong .lt. ns_lines)) then
           curr_strong = curr_strong + 1
           goto 65
       endif
-66    if (wave .ge. weak(curr_weak)) then
+66    if ((wave .ge. weak(curr_weak)).and.
+     .          (curr_weak .lt. nw_lines)) then
           curr_weak = curr_weak + 1
           goto 66
       endif
@@ -329,12 +332,17 @@ c         call traceStokes(dble(1.089532), dble(0.0), dble(0.4629))
       weak_step = 0.25 - 0.24/(1.0+exp(beta_weak*
      .          (weak_distance/R_weak-1.0)))
 
-c      write (*,*) strong_distance, weak_distance
-c      write (*,*) weak_red_distance, weak_blue_distance
-c      write (*,*) strong(curr_strong), weak(curr_weak)
-c      write (*,*) curr_strong, curr_weak
-c      write (*,*) strong_step, weak_step
-c      read (*,*)
+c      if (wave .ge. 22266.4) then
+c         write (*,*) strong_distance, weak_distance
+c         write (*,*) weak_red_distance, weak_blue_distance
+c         write (*,*) strong(curr_strong), weak(curr_weak)
+c         write (*,*) curr_strong, curr_weak
+c         write (*,*) strong_step, weak_step
+c         read (*,*)
+c      endif
+
+c      wave = wave + 0.01
+
       wave = wave + MIN(strong_step, weak_step)
 
       if (wave .le. sstop) then

@@ -16,9 +16,11 @@ c******************************************************************************
       real*8 deltalogab(5), blah
       character keyword*20, sandbox*80, junk*80
       character arrayz*80, stokes_base*80
-      integer kk
+      integer kk, gridflag
       data newcount, linecount /0, 0/
 
+
+      gridflag = 0
 
       if (linecount .eq. 0) oldcount = 0
 
@@ -506,7 +508,7 @@ c           0 = integrated flux calculations
 c           1 = central intensity calculations
       elseif (keyword .eq. 'flux/int') then
          read (array,*) fluxintopt
-         viewang = 0.0
+c         viewang = 0.0
 
       elseif (keyword .eq. 'viewang') then
          read (array,*) blah
@@ -644,6 +646,7 @@ c                       for line opacity calculations
       elseif (keyword .eq. 'synlimits') then
          read (nfparam,*) start, sstop, step, delta
          linecount = linecount + 1
+         gridflag = 1
 
 
 c  keyword 'fluxlimits' gives the wavelength parameters for flux curves;
@@ -770,10 +773,12 @@ c  exit normally
          step  = 1.d+4*step
          delta = 1.d+4*delta
       endif
-      oldstart = start
-      oldstop  = sstop
-      oldstep  = step
-      olddelta = delta
+      if (gridflag .eq. 1) then
+          oldstart = start
+          oldstop  = sstop
+          oldstep  = step
+          olddelta = delta
+      endif
       return
 
 

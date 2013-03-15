@@ -20,63 +20,86 @@ c*****examine the parameter file
 
 c      array = 'GIVE THE MINIMUM LINE/CONTINUUM OPACITY RATIO TO KEEP: '
       strongratio = 0.1
-      weakratio = 0.001
+      weakratio = 0.01
       ns_lines = 0
       nw_lines = 0
       
 
 c*****compute the line opacities
-      write (*,*) "Checkpoint A"
       call inlines (1)
-      write (*,*) "Checkpoint B"
       call eqlib
 1     call nearly (1)
 
 
 c*****calculate continuum quantities at the line list wavelength middle
+      mode = 3
       wave = (wave1(1)+wave1(nlines))/2.
       call opacit (2,wave)
+      call linlimit
       
 c*****divide the lines into keepers and discards
-      do j=1,nlines+nstrong
+      do j=1,nlines
          if (strength(j)/kaplam(jtau5) .ge. strongratio) then
              ns_lines = ns_lines+1
              strong(ns_lines) = wave1(j)
-             write (*,*) "Strong line at ", wave1(j)
          elseif (strength(j)/kaplam(jtau5) .ge. weakratio) then
              nw_lines = nw_lines+1
              weak(nw_lines) = wave1(j)
-             write (*,*) "Weak line at ", wave1(j)
          endif
       enddo
       if (nlines +nstrong .eq. 2500) then
-         write (*,*) "Checkpoint C"
-         call inlines (6)
-         write (*,*) "Checkpoint D"
+         wave = wave1(nlines)
+         call linlimit
+         if (lim2line .lt. 0) then
+             call inlines(2)
+             call nearly(1)
+         endif
          go to 1
+      else
+         do j=nlines+1, nlines+nstrong
+            if (strength(j)/kaplam(jtau5) .ge. strongratio) then
+               ns_lines = ns_lines+1
+               strong(ns_lines) = wave1(j)
+            elseif (strength(j)/kaplam(jtau5) .ge. weakratio) then
+               nw_lines = nw_lines+1
+               weak(nw_lines) = wave1(j)
+            endif
+         enddo
       endif
+      call sortwave
+      start = oldstart
 
       end
 
-c      subroutine sortwave
-c
-c      implicit real*8 (a-h,o-z)
-c      include 'Atmos.com'
-c      include 'Linex.com'
-c      include 'Pstuff.com'
-c      INTEGER I,J
-c      REAL*8 X, temp(nwave)
-c      DO 30 I=2,nwave
-c      X=wavelength(I)
-c      J=I
-c   10 J=J-1
-c      IF(J.EQ.0 .OR. wavelength(J).LT.X) GO TO 20
-c      wavelength(J+1)=wavelength(J)
-c      GO TO 10
-c   20 wavelength(J+1)=X
-c   30 CONTINUE
-c
-cc****   Now, go through and purge duplicates and very close together points
+      subroutine sortwave
+
+      implicit real*8 (a-h,o-z)
+      include 'Atmos.com'
+      include 'Linex.com'
+      include 'Pstuff.com'
+      INTEGER I,J
+      REAL*8 X
+      DO 30 I=2,ns_lines
+      X=strong(I)
+      J=I
+   10 J=J-1
+      IF(J.EQ.0 .OR. strong(J).LT.X) GO TO 20
+      strong(J+1)=strong(J)
+      GO TO 10
+   20 strong(J+1)=X
+   30 CONTINUE
+
+      do 60 I=2, nw_lines
+      X=weak(I)
+      J=I
+   40 J=J-1
+      if(J.eq.0 .or. weak(j).LT.X) GO TO 50
+      weak(j+1)=weak(J)
+      GO TO 40
+   50 weak(j+1)=X
+   60 CONTINUE
+
+c****   Now, go through and purge duplicates and very close together points
 c      temp(1) = wavelength(1)
 c      I=1
 c      do J=2,nwave
@@ -93,4 +116,4 @@ c      nwave = I
 c      do J=1, nwave
 c         wavelength(J)=temp(J)
 c      enddo
-c      END
+      END

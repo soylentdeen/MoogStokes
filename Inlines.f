@@ -266,8 +266,6 @@ c      if (nlines+nstrong .lt. 2500) then
 c         if (sstop .gt. wave1(nlines)+10.) sstop = wave1(nlines)+10.
 c      endif
       lim1line = 1
-      write (*,*) j, wave1(j-1), wave1(nlines-1)
-      read (*,*)
       return  
 
 

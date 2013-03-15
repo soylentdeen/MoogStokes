@@ -100,17 +100,17 @@ c*****  Assembles the Emission matrix (J')
             klam=spl_ev(klam_knots,n_klam_knots,klam_coeffs,taus(i))
             ktot=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,taus(i))
             kref=spl_ev(kref_knots,n_kref_knots,kref_coeffs,taus(i))
-            tlam(i) = klam/kref*10.0**(taus(i))
-            ttot(i) = ktot/kref*10.0**(taus(i))
+            tlam(i) = klam/kref*10.0**(taus(i))/mu
+            ttot(i) = ktot/kref*10.0**(taus(i))/mu
          else
             delz = (zdepth(i)-zdepth(i-1))/mu
             h1=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,taus(i))
             h2=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,taus(i-1))
-            dtautot = delz*(h1+h2)/2.0
+            dtautot = delz*(h1+h2)/2.0!/mu
             ttot(i) = ttot(i-1)+dtautot
             h1=spl_ev(klam_knots,n_klam_knots,klam_coeffs,taus(i))
             h2=spl_ev(klam_knots,n_klam_knots,klam_coeffs,taus(i-1))
-            dtaulam = delz*(h1+h2)/2.0
+            dtaulam = delz*(h1+h2)/2.0!/mu
             tlam(i) = tlam(i-1)+dtaulam
          endif
 c         write (*,*) i, taus(i), ttot(i)

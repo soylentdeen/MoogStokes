@@ -34,6 +34,7 @@ c     spectra, and (if desired) IRAF-style smoothed spectra
      .             f2out,lscreen)
       if (plotopt .gt. 0) then
          nf3out = 22               
+         write (*,*) 'Test!'
          lscreen = lscreen + 2
          array = 'SMOOTHED SYNTHESES OUTPUT'
          nchars = 25
