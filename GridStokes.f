@@ -18,7 +18,7 @@ c******************************************************************************
       real*8 ring_area, cell_area, cell_a, phi_ang, chi_ang, mu
       real*8 beta_strong, beta_weak, R_strong, R_weak
 
-      testflag = 0
+      testflag = 1
       diskflag = 1
 
       beta_strong = 5.0
@@ -254,7 +254,7 @@ c*****Perform the Synthesis
       write (nfStokesV, 6520, advance='no') wave
       write (nfContinuum, 6520, advance='no') wave
       if (testflag .eq. 1) then
-c         call traceStokes(dble(0.0), dble(0.0), dble(1.0))
+         call traceStokes(dble(0.0), dble(0.0), dble(1.0))
 c         call traceStokes(dble(1.50707), dble(0.0), dble(1.0))
 c         call traceStokes(dble(0.95532), dble(3.14159), dble(0.57735))
 c         call traceStokes(dble(0.95532), dble(0.0), dble(0.57735))
@@ -267,7 +267,7 @@ c         call traceStokes(dble(0.640495), dble(0.0), dble(0.8018))
 c         call traceStokes(dble(0.785389), dble(0.0), dble(0.7071))
 c         call traceStokes(dble(0.929793), dble(0.0), dble(0.5979998))
 c         call traceStokes(dble(1.089532), dble(0.0), dble(0.4629))
-         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
+c         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
 
          write (nfStokesI, 6521, advance='no') Stokes(1)/continuum
          write (nfStokesQ, 6521, advance='no') Stokes(2)/continuum
@@ -341,9 +341,9 @@ c         write (*,*) strong_step, weak_step
 c         read (*,*)
 c      endif
 
-c      wave = wave + 0.01
+      wave = wave + 0.001
 
-      wave = wave + MIN(strong_step, weak_step)
+c      wave = wave + MIN(strong_step, weak_step)
 
       if (wave .le. sstop) then
           go to 30
