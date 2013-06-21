@@ -13,6 +13,7 @@ c******************************************************************************
       include 'Atmos.com'
       include 'Linex.com'
       include 'Pstuff.com'
+      include 'Stokes.com'
       real*8 strongratio, weakratio
 
 
@@ -77,6 +78,7 @@ c*****divide the lines into keepers and discards
       include 'Atmos.com'
       include 'Linex.com'
       include 'Pstuff.com'
+      include 'Stokes.com'
       INTEGER I,J
       REAL*8 X
       DO 30 I=2,ns_lines

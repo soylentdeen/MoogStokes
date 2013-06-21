@@ -1,5 +1,5 @@
 
-      subroutine gridstokes
+      subroutine synstokes
 c******************************************************************************
 c     This program can synthesize the full stokes parameters for multiple
 c     sections of spectra for multiple input model atmospheres
@@ -38,7 +38,6 @@ c******************************************************************************
 
 c*****examine the parameter file
 1     call params
-      linfileopt = 2
       linprintopt = linprintalt
       
 c*****open the files for: standard output, raw spectrum depths, smoothed 
@@ -240,7 +239,7 @@ c*****Perform the Synthesis
       endif
 20    call linlimit
       if (lim2line .lt. 0) then
-          call inlinesStokes(2)
+          call inlines(2)
           call nearly (1)
           go to 20
       endif
@@ -350,13 +349,7 @@ c      wave = wave + 0.001
       endif
 
 c*****finish
-      if (control .ne. 'gridend') then
-         call finish (1)
-         go to 1
-      else
-         call finish (0)
-      endif
-      return
+      call finish (0)
 
 c1001  format (a80)
 c12345 format (f10.4,5e15.5)

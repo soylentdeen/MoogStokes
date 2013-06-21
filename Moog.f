@@ -83,6 +83,8 @@ c*****use one of the standard driver routines ("isotop" is obsolete):
          call abpop
       elseif (control .eq. 'synpop ') then
          call synpop
+      elseif (control .eq. 'synstok') then
+         call synstokes
 
 
 c*****or, put in your own drivers in the form below....

@@ -7,6 +7,7 @@ c******************************************************************************
       implicit real*8 (a-h,o-z)
       include 'Atmos.com'
       include 'Pstuff.com'
+      include 'Stokes.com'
 
 
 c  close the files
@@ -28,7 +29,7 @@ c  close the files
          if (nf9out .ne. 0)    close (unit=nf9out)
          if (nf10out .ne. 0)   close (unit=nf10out)
       endif
-      if (control .eq. 'gridsto') then
+      if (control .eq. 'gridsto' .or. control .eq. 'synstok') then
          if (nfAngles .ne. 0) close (unit=nfAngles)
          if (nfStokesI .ne. 0) close (unit=nfStokesI)
          if (nfStokesQ .ne. 0) close (unit=nfStokesQ)

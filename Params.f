@@ -1,7 +1,8 @@
 
-      subroutine params 
+      subroutine params
 c****************************************************************************** 
 c     This subroutine reads in the commands from the parameter file 
+c       Modified for use by MoogStokes!!
 c****************************************************************************** 
 
       implicit real*8 (a-h,o-z) 
@@ -13,8 +14,9 @@ c******************************************************************************
       include 'Mol.com'
       include 'Multistar.com'
       include 'Angles.com'
-      real*8 deltalogab(5), blah
-      character keyword*20, sandbox*80, junk*80
+      include 'Stokes.com'
+      real*8 deltalogab(5), temp 
+      character keyword*20, sandbox*80
       character arrayz*80, stokes_base*80
       integer kk, gridflag
       data newcount, linecount /0, 0/
@@ -212,8 +214,6 @@ c  key word, which is always within the first 20 characters;  dump the
 c  rest of arrayz into "array"
 5     write (array,1007)
       read (nfparam,1001,end=98) arrayz
-c      write (*,*) arrayz, newcount, oldcount, syncount
-c      read (*,*)
       linecount = linecount + 1
       i=index(arrayz,' ')
       keyword = arrayz(1:i-1)
@@ -241,6 +241,9 @@ c  the default value, then the old-style formatted input will be used;
 c  If freeform = 1, unformatted read will be used, BUT the user must then
 c  give values for all quantities (that is, explicit zeros will need to
 c  be put instead of blank spaces.
+c     MOOGStokes Modification - If freeform = 2, then Inlines will
+c      expect 100 character lines in the linelist (delta_mj,
+c      radiative_damping_coeff, C4_coefficient)
       if     (keyword .eq. 'freeform') then
          read (array,*) linfileopt
  
@@ -511,8 +514,8 @@ c           1 = central intensity calculations
 c         viewang = 0.0
 
       elseif (keyword .eq. 'viewang') then
-         read (array,*) blah
-         viewang = dble(3.14159262/180.0)*blah
+         read (array,*) temp 
+         viewang = dble(3.14159262/180.0)*temp
 
 c           0 = use the Unsold approximation, except multiply possibly
 c                 by a factor read in for an individual line

@@ -15,9 +15,8 @@ c******************************************************************************
       integer      ntau, jtau5, iunits, itru, iraf, modelnum
       integer      nfparam, nfmodel, nflines, nfslines, nfobs, nftable
       integer      nf1out, nf2out, nf3out, nf4out, nf5out, nf6out,
-     .             nf7out, nf8out, nf9out, nf10out, nf11out, nf12out,
-     .             nf13out, nfbarklem, nfbarklemUV, nfAngles, nfStokesI,
-     .             nfStokesQ, nfStokesU, nfStokesV, nfContinuum
+     .             nf7out, nf8out, nf9out, nf10out,
+     .             nfbarklem, nfbarklemUV
       integer      modprintopt, molopt, linprintopt, linprintalt,
      .             fluxintopt, plotopt, dampingopt, specfileopt, 
      .             linfileopt, printstrong, linecount, oldcount,
@@ -25,8 +24,7 @@ c******************************************************************************
       character*80 f1out, f2out, f3out, f4out, f5out, f6out,
      .             f7out, f8out, f9out, f10out, f11out, f12out, f13out,
      .             fparam, fmodel, flines, fslines, fobs, ftable,
-     .             fbarklem, fbarklemUV, fAngles, fStokesI, fStokesQ,
-     .             fStokesU, fStokesV, fContinuum, AtmosDir, OutDir
+     .             fbarklem, fbarklemUV, AtmosDir, OutDir
       character*60 moogpath
       character*2  names(95)
       character*10 modtype
@@ -45,9 +43,8 @@ c******************************************************************************
      .             ntau, jtau5, iunits, itru, iraf, modelnum,
      .             nfparam, nfmodel, nflines, nfslines, nfobs, nftable,
      .             nf1out, nf2out, nf3out, nf4out, nf5out, nf6out,
-     .             nf7out, nf8out, nf9out, nf10out, nf11out, nf12out,
-     .             nf13out, nfbarklem, nfbarklemUV, nfAngles, nfStokesI,
-     .             nfStokesQ, nfStokesU, nfStokesV, nfContinuum,
+     .             nf7out, nf8out, nf9out, nf10out,
+     .             nfbarklem, nfbarklemUV,
      .             modprintopt, molopt, linprintopt, linprintalt,
      .             fluxintopt, plotopt, dampingopt, specfileopt, 
      .             linfileopt, printstrong, linecount, oldcount, scatopt
@@ -55,8 +52,7 @@ c******************************************************************************
       common/charstuff/ f1out, f2out, f3out, f4out, f5out, f6out,
      .                  f7out,f8out,f9out,f10out,f11out,f12out,f13out,
      .                  fparam, fmodel, flines, fslines, fobs, ftable,
-     .               fbarklem, fbarklemUV, fAngles, fStokesI, fStokesQ,
-     .                fStokesU, fStokesV, fContinuum, AtmosDir, OutDir,
+     .                  fbarklem, fbarklemUV, AtmosDir, OutDir,
      .                  moogpath,
      .                  names,
      .                  modtype,
