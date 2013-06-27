@@ -19,14 +19,15 @@ c******************************************************************************
      .             tlam(10000), tlam_knots(10000), tlam_coeffs(10000),
      .             ttot(10000), ttot_knots(10000), ttot_coeffs(10000),
      .             zdepth(10000), z_knots(10000), z_coeffs(10000),
-     .             strong(25000), weak(25000)
+     .             strong(25000), weak(25000), beta_strong, beta_weak,
+     .             R_strong, R_weak
       integer      nz, n_phiI_knots, n_phiQ_knots, n_phiU_knots,
      .             n_phiV_knots, n_psiQ_knots, n_psiU_knots,
      .             n_psiV_knots, n_kref_knots, n_klam_knots,
      .             n_ktot_knots, n_e_knots, n_z_knots,
      .             n_tlam_knots, n_ttot_knots,
      .             nfAngles, nfStokesI, nfStokesQ, nfStokesU, nfStokesV,
-     .             nfContinuum
+     .             nfContinuum, nw_lines, ns_lines
       character*80 fAngles, fStokesI, fStokesQ, fStokesU, fStokesV,
      .             fContinuum
 
@@ -46,13 +47,14 @@ c******************************************************************************
      .             tlam, tlam_knots, tlam_coeffs,
      .             ttot, ttot_knots, ttot_coeffs,
      .             zdepth, z_knots, z_coeffs,
-     .             strong, weak,
+     .             strong, weak, beta_strong, beta_weak,
+     .             R_strong, R_weak,
      .             nz, n_phiI_knots, n_phiQ_knots, n_phiU_knots,
      .             n_phiV_knots, n_psiQ_knots, n_psiU_knots,
      .             n_psiV_knots, n_kref_knots, n_klam_knots,
      .             n_ktot_knots, n_e_knots, n_z_knots,
      .             n_tlam_knots, n_ttot_knots,
      .             nfAngles, nfStokesI, nfStokesQ, nfStokesU, nfStokesV,
-     .             nfContinuum,
+     .             nfContinuum, nw_lines, ns_lines,
      .             fAngles, fStokesI, fStokesQ, fStokesU, fStokesV,
      .             fContinuum

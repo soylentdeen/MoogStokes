@@ -13,18 +13,9 @@ c******************************************************************************
       include 'Pstuff.com'
       include 'Stokes.com'
       include 'Angles.com'
-      integer n_cells, icell, testflag, diskflag, curr_strong, curr_weak
+      integer n_cells, icell, curr_strong, curr_weak
       real*8 az_start, az_stop, daz, az, long, dlong
       real*8 ring_area, cell_area, cell_a, phi_ang, chi_ang, mu
-      real*8 beta_strong, beta_weak, R_strong, R_weak
-
-      testflag = 0
-      diskflag = 1
-
-      beta_strong = 5.0
-      beta_weak = 7.0
-      R_strong = 0.5
-      R_weak = 0.25
 
       zeros(1,1) = 0.0
       zeros(1,2) = 0.0
@@ -128,9 +119,6 @@ c         lscreen = lscreen + 2
       B_xyz(3) = 0.0
 
       if (diskflag .eq. 0) then
-          inclination = 3.1415926/2.0
-          position_angle = 0.0
-
           write (nfAngles, 12347) ncells, nrings, inclination,
      .                               position_angle
           cell_area = 4.0*3.14159262/ncells
@@ -254,19 +242,6 @@ c*****Perform the Synthesis
       write (nfContinuum, 6520, advance='no') wave
       if (testflag .eq. 1) then
          call traceStokes(dble(0.0), dble(0.0), dble(1.0))
-c         call traceStokes(dble(1.50707), dble(0.0), dble(1.0))
-c         call traceStokes(dble(0.95532), dble(3.14159), dble(0.57735))
-c         call traceStokes(dble(0.95532), dble(0.0), dble(0.57735))
-c         call traceStokes(dble(1.5025), dble(4.712), dble(0.0682))
-
-c         call traceStokes(dble(0.698131), dble(0.0), dble(1.0))
-c         call traceStokes(dble(0.27064), dble(0.0), dble(0.9636))
-c         call traceStokes(dble(0.481286), dble(0.0), dble(0.88634))
-c         call traceStokes(dble(0.640495), dble(0.0), dble(0.8018))
-c         call traceStokes(dble(0.785389), dble(0.0), dble(0.7071))
-c         call traceStokes(dble(0.929793), dble(0.0), dble(0.5979998))
-c         call traceStokes(dble(1.089532), dble(0.0), dble(0.4629))
-c         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
 
          write (nfStokesI, 6521, advance='no') Stokes(1)/continuum
          write (nfStokesQ, 6521, advance='no') Stokes(2)/continuum
@@ -289,6 +264,7 @@ c         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
       write (nfStokesV, *) ''
       write (nfContinuum, *) ''
       
+c****      Calculate the distances to the closest strong/weak line
       if (curr_strong .eq. 1) then
           strong_blue_distance = 1000.0
       else
@@ -321,6 +297,8 @@ c         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
           curr_weak = curr_weak + 1
           goto 66
       endif
+
+c****      Calculate the next wavelength step
       strong_distance = MIN(strong_red_distance,
      .           strong_blue_distance)
       weak_distance = MIN(weak_red_distance, 
@@ -330,17 +308,6 @@ c         call traceStokes(dble(1.300206), dble(0.0), dble(0.2673))
      .          (strong_distance/R_strong-1.0)))
       weak_step = 0.25 - 0.24/(1.0+exp(beta_weak*
      .          (weak_distance/R_weak-1.0)))
-
-c      if (wave .ge. 22266.4) then
-c         write (*,*) strong_distance, weak_distance
-c         write (*,*) weak_red_distance, weak_blue_distance
-c         write (*,*) strong(curr_strong), weak(curr_weak)
-c         write (*,*) curr_strong, curr_weak
-c         write (*,*) strong_step, weak_step
-c         read (*,*)
-c      endif
-
-c      wave = wave + 0.001
 
       wave = wave + MIN(strong_step, weak_step)
 

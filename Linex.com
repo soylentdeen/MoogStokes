@@ -26,8 +26,7 @@ c******************************************************************************
       real*8       gammatot, gammav, gammas, gammar, viewang
       integer      lim1, lim2, mode, ndepths, ncurve, nlines,nstrong,
      .             lim1line, lim2line, ntabtot, group(2500),
-     .             iabatom, molflag, dostrong, gfstyle,
-     .             nw_lines, ns_lines
+     .             iabatom, molflag, dostrong, gfstyle
       character*7  damptype(2500)
 
       common/linex/a, dopp, kapnu0,   
@@ -48,7 +47,6 @@ c******************************************************************************
      .             gammatot, gammav, gammas, gammar, viewang,
      .             lim1, lim2, mode, ndepths, ncurve, nlines,nstrong, 
      .             lim1line, lim2line, ntabtot, group,
-     .             iabatom, molflag, dostrong, gfstyle,
-     .             nw_lines, ns_lines
+     .             iabatom, molflag, dostrong, gfstyle
       common/lindamp/damptype
 

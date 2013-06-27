@@ -1,5 +1,4 @@
 
-
       subroutine inlines (num)
 c******************************************************************************
 c     This subroutine reads in the line data - From original MOOG
@@ -82,7 +81,7 @@ c*****read in the strong lines if needed
 302   nstrong = 0
       if (dostrong .gt. 0 ) then
          rewind nfslines
-         do j=1,41
+         do j=1,401
             if (linfileopt .eq. 0) then
                read (nfslines,1002,end=340) swave1(j),satom1(j),se(j),
      .                             sgf(j),sdampnum(j),sd0(j),swidth(j)

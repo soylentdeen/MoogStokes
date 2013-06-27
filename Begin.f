@@ -109,12 +109,10 @@ c  write a header and find the appropriate parameter file, and exit normally
       call infile ('input  ',nfparam,'formatted  ',0,nchars,
      .             fparam,lscreen)
       read (nfparam,1002) control
-c      write (*,*) "THIS IS A TEST"
-c      read (*,*)
-c      write (array,1003) control
-c      istat = ivwrite (2,1,array,58)
-c      write (array,1001)
-c      istat = ivwrite (3,1,array,79)
+      write (array,1003) control
+      istat = ivwrite (2,1,array,58)
+      write (array,1001)
+      istat = ivwrite (3,1,array,79)
       return
 
 

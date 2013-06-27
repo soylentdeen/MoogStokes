@@ -176,6 +176,19 @@ c  INITIALIZE SOME VARIABLES: spectroscopic binary parameters
       deltaradvel = 0.
       lumratio = 1.
 
+c  INITIALIZE SOME VARIABLES: MOOGStokes specific stellar geometry
+      inclination = 3.1415926/2.0
+      position_angle = 0.0
+      diskflag = 1             ! 1 => annuli, 0 => disco-ball
+
+c  INITIALIZE SOME VARIABLES: MOOGStokes test flag
+      testflag = 0
+
+c  INITIALIZE SOME VARIABLE: WaveGrid parameters
+      beta_strong = 5.0
+      beta_weak = 7.0
+      R_strong = 0.5
+      R_weak = 0.25
 
 c  INITIALIZE SOME VARIABLES: elements with special abundance data; for
 c  practical reasons, keyword "abundances" and "isotopes" must be specified
@@ -292,9 +305,9 @@ c  created previously, that will be read in for plotting purposes
 
 c  keyword 'smoothed_out' controls the name of the smoothed synthesis output
       elseif (keyword .eq. 'smoothed_out') then
-         read (array,*) stokes_base
-         sandbox = trim(OutDir)//trim(stokes_base)
-         f3out = trim(sandbox)//'.moog'
+         read (array,*) f3out
+c         sandbox = trim(OutDir)//trim(stokes_base)
+c         f3out = trim(sandbox)//'.moog'
 
 c  keyword 'atmos_dir' specifies the location of the model atmosphere'
       elseif (keyword .eq. 'atmos_dir') then
@@ -317,11 +330,50 @@ c  keyword 'stokes_out' controls the base name of all the Stokes-related output
          fStokesV = trim(sandbox)//'.spectrum_V'
          fContinuum = trim(sandbox)//'.continuum'
 
+c  keyword 'ncells' controls the number of latitude belts to synthesize in the
+c        discoball (diskflag = 0)
       elseif (keyword .eq. 'nrings') then
          read (array,*) nrings
 
+c  keyword 'ncells' controls the number of cells to synthesize in the
+c        discoball (diskflag = 0)
       elseif (keyword .eq. 'ncells') then
          read (array,*) ncells
+
+c  keyword 'inclination' controls the inclination of the stellar
+c          rotation axis
+      elseif (keyword .eq. 'inclination') then
+         read (array,*) inclination
+
+c  keyword 'pos_ang' controls the position angle of the stellar rotation
+      elseif (keyword .eq. 'pos_ang') then
+         read (array,*) position_angle
+
+c  keyword 'diskflag' controls whether MOOGStokes calculates annuli (1) or a
+c         disco-ball (0)
+      elseif (keyword .eq. 'diskflag') then
+         read (array,*) diskflag
+
+c  keyword 'testflag' controls whether MOOGStokes calculates full disk
+c         spectrum (0) or just a single pencil beam (1)
+      elseif (keyword .eq. 'testflag') then
+         read (array,*) testflag
+
+c  keyword 'beta_strong' controls wavelength stepsize around strong lines
+      elseif (keyword .eq. 'beta_strong') then
+         read (array,*) beta_strong
+
+c  keyword 'R_strong' controls wavelength stepsize around strong lines
+      elseif (keyword .eq. 'R_strong') then
+         read (array,*) R_strong
+
+c  keyword 'beta_weak' controls wavelength stepsize around weak lines
+      elseif (keyword .eq. 'beta_weak') then
+         read (array,*) beta_weak
+
+c  keyword 'R_weak' controls wavelength stepsize around weak lines
+      elseif (keyword .eq. 'R_weak') then
+         read (array,*) R_weak
 
 c  keyword 'keeplines_out' controls the name of the list of kept lines
 c  for future synthetic spectrum runs
