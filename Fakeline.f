@@ -56,7 +56,7 @@ c*****setting some counting parameters and do a curve-of-growth
       lim1     = 1
       lim2     = 1
       rwlow    = -6.7
-      rwhigh   = -3.7
+      rwhigh   = -2.5
       rwstep   =  0.15
       call curve
       nf2out = idump

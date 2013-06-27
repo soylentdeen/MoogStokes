@@ -182,22 +182,3 @@ c
        end
 
  
-
-
-
-
-       integer function ivcpos(x,y)
-c
-c    Damned if I know what this clever little routine does!
-c
-       integer x,y
-       character*1 esc
-
-       esc = char(27)
-       write(*,'(1x,a1,a)') esc,'[6n'
-
-       ivcpos = 0
-       return
-       end
-
-

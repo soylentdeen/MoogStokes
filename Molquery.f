@@ -36,6 +36,10 @@ c*****halt if M.E. wasn't done or didn't include this species
          stop
       endif
       call sunder(atom1(lim1obs),ia,ib)
+      iaa = ia
+      ibb = ib
+            write (*,*) iaa, ibb
+            pause
       do n=1,neq
          if (ia.eq.iorder(n) .or. ib.eq.iorder(n)) molflag = ia
       enddo
@@ -62,6 +66,7 @@ c*****for other molecules, the user specifies which element will be varied
          nchars = 49
          call getnum (nchars,ikount+1,xnum,shortnum)
          iabatom = idint(xnum+0.0001)
+         
          if (iabatom.ne.ia .and. iabatom.ne.ib) then
             write (array,1003)
             stop
@@ -77,8 +82,6 @@ c*****format statements
      .        'THE ATOMS FOR SPECIES ', i3, '; I QUIT!')
 1003  format ('MOLECULAR LINES OF SPECIES ', i3, ' ARE NEXT: ',
      .        'WHICH ATOMIC NUMBER SHOULD BE CHANGED? ')
-1004  format ('YOUR CHOICE OF ATOM TO VARY IS ', i5,
-     .        '; DOESNT MAKE SENSE; I QUIT')
 
 
       end

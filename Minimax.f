@@ -1,7 +1,7 @@
       subroutine minimax(x,xmin,xmax,numpts)
 c*****this routine simply finds the minimum and maximum values of array x
 
-      dimension x(1)
+      real*8 x(*)
  
       xmax=x(1)
       xmin=xmax

@@ -11,7 +11,7 @@ c******************************************************************************
      .             kaplamabs(100), kaplamsca(100),
      .             rho(100), rhox(100), xref(100), xdepth(100)
       real*8       elem(95), xabund(95), xabu(95), u(95,4,100)
-      real*8       flux, fudge, wavref,abscale,deltaabund
+      real*8       flux, fudge, wavref, abscale, deltaabund
       integer      ntau, jtau5, iunits, itru, iraf, modelnum
       integer      nfparam, nfmodel, nflines, nfslines, nfobs, nftable
       integer      nf1out, nf2out, nf3out, nf4out, nf5out, nf6out,
@@ -22,7 +22,7 @@ c******************************************************************************
      .             linfileopt, printstrong, linecount, oldcount,
      .             scatopt
       character*80 f1out, f2out, f3out, f4out, f5out, f6out,
-     .             f7out, f8out, f9out, f10out, f11out, f12out, f13out,
+     .             f7out, f8out, f9out, f10out,
      .             fparam, fmodel, flines, fslines, fobs, ftable,
      .             fbarklem, fbarklemUV, AtmosDir, OutDir
       character*60 moogpath
@@ -50,7 +50,7 @@ c******************************************************************************
      .             linfileopt, printstrong, linecount, oldcount, scatopt
 
       common/charstuff/ f1out, f2out, f3out, f4out, f5out, f6out,
-     .                  f7out,f8out,f9out,f10out,f11out,f12out,f13out,
+     .                  f7out, f8out, f9out, f10out,
      .                  fparam, fmodel, flines, fslines, fobs, ftable,
      .                  fbarklem, fbarklemUV, AtmosDir, OutDir,
      .                  moogpath,

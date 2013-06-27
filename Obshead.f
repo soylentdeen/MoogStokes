@@ -1,5 +1,5 @@
 
-      subroutine obshead (head,iend)
+      subroutine obshead (head,iend,line)
 c******************************************************************************
 c     this routine decodes the header records of the observed FITS
 c     spectrum file

@@ -1,8 +1,7 @@
 
-      subroutine params
+      subroutine params 
 c****************************************************************************** 
 c     This subroutine reads in the commands from the parameter file 
-c       Modified for use by MoogStokes!!
 c****************************************************************************** 
 
       implicit real*8 (a-h,o-z) 
@@ -15,14 +14,12 @@ c******************************************************************************
       include 'Multistar.com'
       include 'Angles.com'
       include 'Stokes.com'
-      real*8 deltalogab(5), temp 
+      real*8 deltalogab(5), temp
       character keyword*20, sandbox*80
       character arrayz*80, stokes_base*80
-      integer kk, gridflag
+      integer kk, outflag, atmosflag
       data newcount, linecount /0, 0/
 
-
-      gridflag = 0
 
       if (linecount .eq. 0) oldcount = 0
 
@@ -89,6 +86,7 @@ c                    to be used for some other purpose as needed`
       nf8out =   0
       nf9out =   0
       nf10out =  0
+      modelnum = 0
       nfAngles = 0
       nfStokesI = 0
       nfStokesQ = 0
@@ -96,6 +94,8 @@ c                    to be used for some other purpose as needed`
       nfStokesV = 0
       nfContinuum = 0
       modelnum = 0
+      outflag = 0
+      atmosflag = 0
 
 
 c  INITIALIZE SOME VARIABLES: input file names and input file numbers
@@ -146,6 +146,8 @@ c  source function with scat+abs          scatopt
       deviations   = 0
       scatopt      = 0
       gfstyle      = 0
+      maxshift     = 0
+      dostrong     = 0
  
 
 c  INITIALIZE SOME VARIABLES:
@@ -180,6 +182,8 @@ c  INITIALIZE SOME VARIABLES: MOOGStokes specific stellar geometry
       inclination = 3.1415926/2.0
       position_angle = 0.0
       diskflag = 1             ! 1 => annuli, 0 => disco-ball
+      ncells = 695
+      nrings = 23
 
 c  INITIALIZE SOME VARIABLES: MOOGStokes test flag
       testflag = 0
@@ -313,16 +317,22 @@ c  keyword 'atmos_dir' specifies the location of the model atmosphere'
       elseif (keyword .eq. 'atmos_dir') then
          read (array,*) sandbox
          AtmosDir = trim(sandbox)
+         atmosflag = 1
 
 c  keyword 'out_dir' specifies the location of the model atmosphere'
       elseif (keyword .eq. 'out_dir') then
          read (array,*) sandbox
          OutDir = trim(sandbox)
+         outflag = 1
 
 c  keyword 'stokes_out' controls the base name of all the Stokes-related output
       elseif (keyword .eq. 'stokes_out') then
          read (array,*) stokes_base
-         sandbox = trim(OutDir)//trim(stokes_base)
+         if (outflag .eq. 1) then
+             sandbox = trim(OutDir)//trim(stokes_base)
+         else
+             sandbox = trim(stokes_base)
+         endif
          fAngles = trim(sandbox)//'.angles'
          fStokesI = trim(sandbox)//'.spectrum_I'
          fStokesQ = trim(sandbox)//'.spectrum_Q'
@@ -330,7 +340,7 @@ c  keyword 'stokes_out' controls the base name of all the Stokes-related output
          fStokesV = trim(sandbox)//'.spectrum_V'
          fContinuum = trim(sandbox)//'.continuum'
 
-c  keyword 'ncells' controls the number of latitude belts to synthesize in the
+c  keyword 'nrings' controls the number of latitude belts to synthesize in the
 c        discoball (diskflag = 0)
       elseif (keyword .eq. 'nrings') then
          read (array,*) nrings
@@ -375,6 +385,11 @@ c  keyword 'R_weak' controls wavelength stepsize around weak lines
       elseif (keyword .eq. 'R_weak') then
          read (array,*) R_weak
 
+c  keyword 'viewang' controls the viewing angle (measured in Degrees)
+      elseif (keyword .eq. 'viewang') then
+         read (array,*) temp 
+         viewang = dble(3.14159262/180.0)*temp
+
 c  keyword 'keeplines_out' controls the name of the list of kept lines
 c  for future synthetic spectrum runs
       elseif (keyword .eq. 'keeplines_out') then
@@ -395,6 +410,12 @@ c  keyword 'iraf_out' controls the name of the optional IRAF output
 c  keyword 'model_in' controls the name of input model atmosphere file
       elseif (keyword .eq. 'model_in') then
          read (array,*) fmodel
+         if (atmosflag .eq. 1) then
+             sandbox = trim(AtmosDir)//trim(fmodel)
+         else
+             sandbox = trim(fmodel)
+         endif
+         fmodel = sandbox
 
 
 c  keyword 'lines_in' controls the name of the input line list
@@ -533,6 +554,14 @@ c                         subroutine trudamp? (Default is *no*)
          read (array,*) itru
 
 
+c keyword 'veladjust   '  shoud moog try to do a cross-correlation between
+c                         observed and synthetic spectra and use that to
+c                         align the spectra better in wavelength
+c                         (Default is *no*)
+      elseif (keyword .eq. 'veladjust') then
+         read (array,*) maxshift
+
+
 c keyword 'units      ' controls the units in which moog 
 c          outputs the final spectrum
 c            0 = angs
@@ -563,11 +592,7 @@ c           0 = integrated flux calculations
 c           1 = central intensity calculations
       elseif (keyword .eq. 'flux/int') then
          read (array,*) fluxintopt
-c         viewang = 0.0
 
-      elseif (keyword .eq. 'viewang') then
-         read (array,*) temp 
-         viewang = dble(3.14159262/180.0)*temp
 
 c           0 = use the Unsold approximation, except multiply possibly
 c                 by a factor read in for an individual line
@@ -623,6 +648,7 @@ c  keyword 'abundances' gives the changes to be applied to the abundances
 c           # = the number of different syntheses to run
 c               (the next line gives the different abundance factors
 c               to use)
+c  minimum error check:  numatomsyn must equal numisosyn or code will stop
       elseif (keyword .eq. 'abundances') then
          neq = 0
          numpecatom = 0
@@ -640,6 +666,13 @@ c               to use)
             enddo
          enddo
          read (array,*) numpecatom,numatomsyn
+         if (numisosyn .ne. 0) then
+            if (numatomsyn .ne. numisosyn) then
+               write (array,1002) numatomsyn, numisosyn
+               call putasci (77,6)
+               stop
+            endif
+         endif
          do l=1,numpecatom
             read (nfparam,*) jatom,(deltalogab(kk),kk=1,numatomsyn)
             linecount = linecount + 1
@@ -659,6 +692,7 @@ c               to use)
 
 c keyword 'isotopes   ' gives the isotopes used in the line list and their
 c                       abundance relative to the parent spiecies
+c  minimum error check:  numatomsyn must equal numisosyn or code will stop
       elseif (keyword .eq. 'isotopes') then
          numiso = 0
          numisosyn = 0
@@ -673,6 +707,13 @@ c                       abundance relative to the parent spiecies
             enddo
          enddo
          read (array,*) numiso,numisosyn
+         if (numatomsyn .ne. 0) then
+            if (numatomsyn .ne. numisosyn) then
+               write (array,1002) numatomsyn, numisosyn
+               call putasci (77,6)
+               stop
+            endif
+         endif
          do  j=1,numiso
             read (nfparam,*) isotope(j),(isoabund(j,kk),kk=1,numisosyn)
             linecount = linecount + 1
@@ -701,7 +742,6 @@ c                       for line opacity calculations
       elseif (keyword .eq. 'synlimits') then
          read (nfparam,*) start, sstop, step, delta
          linecount = linecount + 1
-         gridflag = 1
 
 
 c  keyword 'fluxlimits' gives the wavelength parameters for flux curves;
@@ -805,7 +845,6 @@ c  parameter file, then ask for it
      .          control .eq. 'isoplot' .or.
      .          control .eq. 'gridsyn' .or.
      .          control .eq. 'gridplo' .or.
-     .          control .eq. 'gridsto' .or.
      .          control .eq. 'doflux ' .or.
      .          control .eq. 'cogsyn ' .or.
      .          control .eq. 'cog    ' .or.
@@ -828,23 +867,19 @@ c  exit normally
          step  = 1.d+4*step
          delta = 1.d+4*delta
       endif
-      if (gridflag .eq. 1) then
-          oldstart = start
-          oldstop  = sstop
-          oldstep  = step
-          olddelta = delta
-      endif
+      oldstart = start
+      oldstop  = sstop
+      oldstep  = step
+      olddelta = delta
       return
 
 
 c*****format statements
 1001  format (a80)
-1003  format (10x,i5)
-1005  format (10x,i5,i5)
+1002  format ('# OF ABUNDANCE (',i1,') AND ISOTOPIC (',i1,')',
+     .        ' SYNTHESES DO NOT AGREE!   I QUIT!       ')
 1006  format ('THIS OPTION IS UNKNOWN TO MOOG: ', a10, ' I QUIT!')
 1007  format (79(' '))
-1012  format(f10.4,8f8.0)
-1019  format(i10,8f8.0)
 
 
       end

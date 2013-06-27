@@ -28,10 +28,10 @@ c******************************************************************************
      .              xplotpos, yplotpos, addflux, ydelta
       integer       lount, kount, nsyn, lim1obs, lim2obs,
      .              iterm, iscale, maxline, histoyes, deviations,
-     .              syncount, kounter
+     .              syncount, kounter, maxshift
 
       character*400 abitle
-      character*600 isoitle
+      character*240 isoitle
       character*80  smterm, smtotalterm, smt1, smt2
       character*80  moditle, obsitle, linitle, smitle,
      .              array, chinfo, errmess, plotroutine
@@ -62,7 +62,7 @@ c******************************************************************************
      .              xplotpos, yplotpos, addflux, ydelta,
      .              lount, kount, nsyn, lim1obs, lim2obs,
      .              iterm, iscale, maxline, histoyes, deviations,
-     .              syncount , kounter
+     .              syncount, kounter, maxshift
 
       common/cstuff/abitle, isoitle,
      .              smterm, smtotalterm, smt1, smt2,

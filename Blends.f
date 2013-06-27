@@ -70,6 +70,7 @@ c*****define the set of lines responsible for a blended feature
 30    call linlimit
       lim1 = lim1line
       lim2 = lim2line
+      write (99,1007) iatom, wave1(lim1), wave1(lim2)
 
 
 c*****make sure that the element whose abundance is to be fit has
@@ -235,14 +236,14 @@ c*****here a plot may be made on the terminal (and paper) if there
 c     are enough lines; then the user will be prompted on some
 c     options concerning what is seen on the plot
       if (plotopt .ne. 0) then
-c         call pltabun
+         call pltabun
          if (choice.eq.'v' .or. choice.eq.'m') go to 100
       endif
 
 
 c*****now the option will be to redo the molecular equilibrium and redo
 c     the last species, at the user's option.
-60    if (neq .ne. 0) then
+      if (neq .ne. 0) then
          do n=1,neq
             if (iatom .eq. iorder(n)) then
                write (array,1004)
@@ -285,6 +286,8 @@ c*****format statements
 1006  format (/'LINE ', i5, ':',
      .        '  tau(total) is greater than 1 at level',i3/
      .        '  logs of tauref, taulam, taunu =', 3f6.2)
+1007  format (/'VARYING THIS ELEMENT: ', i8/
+     .        'USING THE LINE GROUP IN THE RANGE: ', 2f10.3)
 
 
       end

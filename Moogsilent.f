@@ -19,7 +19,7 @@ c     be able to pull in auxiliary data files; executing 'make' will
 c     generate a reminder of this
       write (moogpath,1001)
       moogpath = 
-     .  '/home/deen/Code/FORTRAN/MoogStokes/'
+     .  '/home/deen/Code/FORTRAN/release/'
 
 
 c*****What kind of machine are you using?  Possible ones are:
@@ -48,7 +48,7 @@ c     if silent = 'y', the non-interactive MOOG is run
 
 
 c*****invoke the overall starting routine
-1     control = '       '
+      control = '       '
       call begin
 
 
@@ -88,10 +88,6 @@ c*****use one of the standard driver routines ("isotop" is obsolete):
          call abpop
       elseif (control .eq. 'synpop ') then
          call synpop
-      elseif (control .eq. 'gridsto') then
-         call gridstokes
-      elseif (control .eq. 'synstok') then
-         call synstokes
 
 
 c*****or, put in your own drivers in the form below....

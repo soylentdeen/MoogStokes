@@ -7,6 +7,7 @@ c******************************************************************************
       implicit real*8 (a-h,o-z)
       include 'Atmos.com'
       include 'Linex.com'
+      include 'Pstuff.com'
 
 
 c*****set up the parameters 
@@ -60,7 +61,7 @@ c*****end the computations with a summary print
       if (nf2out .eq. 0) return
       write (nf2out,1002) wave1(lim1),atom1(lim1),e(lim1,1),
      .       abund,ncurve
-      write (nf2out,1004) (gf1(i),w(i),i=1,ncurve)
+      write (nf2out,1003) (gf1(i),w(i),i=1,ncurve)
       return
 
 
@@ -69,7 +70,7 @@ c*****format statements
 1002  format(/'wavelength =',f8.2,5x,'species =',f6.1,5x,'ep =',f6.2/
      .       'abundance =',f9.2,5x,'n =',i2)
 1003  format('  curve of growth in (loggf,logrw) pairs'/
-     .       (5('  (',f5.2,',',f5.2,')')))
+     .       (5(f6.2,',',f6.2)))
 1004  format (12f6.2)
 
 

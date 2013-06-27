@@ -52,6 +52,7 @@ c*****open and read the line list file; get ready for the line calculations
       nchars = 13
       call infile ('input  ',nflines,'formatted  ',0,nchars,
      .             flines,lscreen)
+      isynth = 1
 101   call inlines (1)
       call eqlib
       call nearly (1)
@@ -70,7 +71,7 @@ c*****do the curves of growth, making plots if desired
       do lim1=lim1line,lim2line
          lim2 = lim1
          call curve
-c         call pltcog
+         call pltcog
          if (choice .eq. 'm') then
             close (unit=nfmodel)
             close (unit=nflines)

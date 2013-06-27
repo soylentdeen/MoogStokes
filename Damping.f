@@ -8,13 +8,12 @@ c******************************************************************************
       implicit real*8 (a-h,o-z)
       include 'Atmos.com'
       include 'Linex.com'
-      include 'Stokes.com'
-      real*8 denom
 
 
       j = linnumber
-      iwave = int(wave1(j)+0.0001)
-      iatom = int(atom1(j)+0.0001)
+      iwave = idnint(wave1(j))
+      iatom = idnint(atom1(j))
+      if (dampnum(j) .lt. 0.) dampnum(j) = 10.**dampnum(j)
 
 
 c*****here is a totally empirical set of (large) damping parameters
@@ -38,8 +37,9 @@ c     for autoionization lines
 c*****for a few lines, explicit detailed broadening terms have 
 c     appeared in the literature, and so do these lines with a 
 c     sepaarate subroutine
-1     if (itru .eq. 1) then
-         if (int(10*atom1(j)+0.01) .eq. 201) then
+      if (itru .eq. 1) then
+c     Ca II
+         if (idnint(10.*atom1(j)) .eq. 201) then
             if (iwave .eq. 8498 .or.
      .          iwave .eq. 8542 .or.
      .          iwave .eq. 8662) then
@@ -47,13 +47,23 @@ c     sepaarate subroutine
                damptype(j) = 'TRUEgam'
                return
             endif
-         elseif (atom1(j) .eq. 20.0) then 
+c     CH
+         elseif(idnint(10.*atom1(j)) .eq. 1060) then
+            if (idnint(100.*wave1(j)) .eq. 369339 .or.
+     .          idnint(100.*wave1(j)) .eq. 369353) then
+               call trudamp (j)
+               damptype(j) = 'TRUEgam'
+               return
+            endif
+c     Ca I
+         elseif (idnint(10.*atom1(j)) .eq. 200) then
             if (iwave.eq.6717 .or. iwave.eq.6318) then
                call trudamp (j)
                damptype(j) = 'TRUEgam'
                return
             endif
-         elseif (atom1(j) .eq. 11.0) then
+c     Na I
+         elseif (idnint(10.*atom1(j)) .eq. 110) then
                call trudamp (j)
                damptype(j) = 'TRUEgam'
                return
@@ -63,17 +73,17 @@ c     sepaarate subroutine
 
 c*****here are the calculations to set up the damping; for atomic lines 
 c     there are several options:
-c        dampingopt = 0 and dampnum < 0 --->
-c                             gammav = 10^{dampnum(i)}*(T/10000K)^0.3*n_HI
 c        dampingopt = 0 and dampnum = 0 ---> 
 c                             c6 = Unsold formula
-c        dampingopt = 0 and dampnum > 10^(-10) ---> 
-c                             c6 =  (Unsold formula)*dampnum(i)
-c        dampingopt = 0 and dampnum(i) < 10^(-10) ---> 
-c                             c6 = dampnum(i)
+c        dampingopt = 0 and dampnum < 10^(-15) ---> 
+c                             c6 = dampnum
+c        dampingopt = 0 and 10^(-15) < dampnum < 10^(-5) ---> 
+c                             gamma = dampnum
+c        dampingopt = 0 and dampnum(i) > 10^(-5) ---> 
+c                             c6 =  (Unsold formula)*dampnum
 c        dampingopt = 1 --->    
 c                             gammav = gamma_Barklem if possible, 
-c                                        otherwise use dampingopt=0 options
+c                                      otherwise use dampingopt=0 options
 c        dampingopt = 2 ---> 
 c                             c6 = c6_Blackwell-group
 c        dampingopt = 3 and dampnum <= 10^(-10) --->             
@@ -106,49 +116,31 @@ c*****first calculate an Unsold approximation to gamma_VanderWaals
          endif
 
 
-c*****dampingopt = 0
-         if     (dampingopt .eq. 0) then
-            if     (dampnum(j) .lt. 0.0) then
-               damptype(j) = 'MYgamma'
-               gammav = 
-     .            10.**dampnum(j)*(t(i)/10000.)**0.3*numdens(1,1,i)
-            elseif (dampnum(j) .eq. 0.0) then
+c*****dampingopt = 0 or 
+c*****dampingopt = 1 and no Barklem data
+         if     (dampingopt .eq. 0 .or.
+     .          (dampingopt.eq.1 .and. gambark(j).lt.0)) then
+            if     (dampnum(j) .eq. 0.0) then
                damptype(j) = 'UNSLDc6'
                gammav = 17.0*unsold**0.4*v1**0.6*numdens(1,1,i)
-            elseif (dampnum(j) .lt. 1.0d-10) then
+            elseif (dampnum(j) .lt. 1.0d-15) then
                damptype(j) = '   MYc6'
                gammav = 17.0*dampnum(j)**0.4*v1**0.6*numdens(1,1,i)
-            elseif (dampnum(j) .ge. 1.0d-10) then
+            elseif (dampnum(j) .lt. 1.0d-05) then
+               damptype(j) = 'MYgamma'
+               gammav = dampnum(j)*(t(i)/10000.)**0.3*numdens(1,1,i)
+            else
                damptype(j) = 'MODUNc6'
                gammav = 
      .            17.0*(unsold*dampnum(j))**0.4*v1**0.6*numdens(1,1,i)
             endif
 
 
-c*****dampingopt = 1
-         elseif (dampingopt .eq. 1) then
-            if (gambark(j) .gt. 0.) then
+c*****dampingopt = 1 with extant Barklem data
+         elseif (dampingopt.eq.1 .and. gambark(j).gt.0.) then
                damptype(j) = 'BKgamma'
-               gammav = 
+               gammav =
      .            gambark(j)*(t(i)/10000.)**alpbark(j)*numdens(1,1,i)
-            else
-               if     (dampnum(j) .lt. 0.0) then
-                  damptype(j) = 'MYgamma'
-                  gammav =
-     .               10.**dampnum(j)*(t(i)/10000.)**0.3*numdens(1,1,i)
-               elseif (dampnum(j) .eq. 0.0) then
-                  damptype(j) = 'UNSLDc6'
-                  gammav = 17.0*unsold**0.4*v1**0.6*numdens(1,1,i)
-               elseif (dampnum(j) .lt. 1.0d-10) then
-                  damptype(j) = '   MYc6'
-                  gammav = 
-     .               17.0*dampnum(j)**0.4*v1**0.6*numdens(1,1,i)
-               elseif (dampnum(j) .ge. 1.0d-10) then
-                  damptype(j) = 'MODUNc6'
-                  gammav =
-     .             17.0*(unsold*dampnum(j))**0.4*v1**0.6*numdens(1,1,i)
-               endif
-            endif
 
 
 c*****dampingopt = 2
@@ -179,47 +171,15 @@ c*****dampingopt = 3
          endif
 
 c*****now calculate radiative and Stark broadening (approximate formulae)
-c         gammar = 2.223d15/wave1(j)**2
-c         excdiff = chi(j,idint(charge(j)+0.001)) - e(j,2)
-c         if (excdiff .gt. 0.0 .and. atom1(j).lt.100.) then
-c            effn2 = 13.6*charge(j)**2/excdiff
-c         else
-c            effn2 = 25.
-c         endif
-c         gammas = 1.0e-8*ne(i)*effn2**2.5
-
-         if (crad(j) .eq. 0) then
-             gammar = 2.223d15/wave1(j)**2
+         gammar = 2.223d15/wave1(j)**2
+         excdiff = chi(j,idint(charge(j)+0.001)) - e(j,2)
+         if (excdiff .gt. 0.0 .and. atom1(j).lt.100.) then
+            effn2 = 13.6*charge(j)**2/excdiff
          else
-             gammar = 10.0**crad(j)
+            effn2 = 25.
          endif
+         gammas = 1.0e-8*ne(i)*effn2**2.5
 
-         if (c4(j) .eq. 0) then
-             excdiff = chi(j,idint(charge(j)+0.001)) - e(j,2)
-             if (excdiff .gt. 0.0 .and. atom1(j).lt.100.) then
-                effn2 = 13.6*charge(j)**2/excdiff
-             else
-                effn2 = 25.
-             endif
-             gammas = 1.0e-8*ne(i)*effn2**2.5
-         else
-             gammas = (t(i)/10000.)**(1./6.)*ne(i)*10.0**c4(j)
-         endif
-
-c         denom = 4.0*3.14159*dopp(j,i)/(wave1(j)*1.0d-8)
-c         denom = 4.0*3.14159*dopp(j,i)/(wave1(j)*1.0d-8)
-
-c         gammar = 10.0**8.489
-c         gammas = (t(i)/10000.)**(1./6.)*ne(i)*10.0**(-6.583)
-c         gammav = (t(i)/10000.)**(0.3)*(numdens(1,1,i)+
-c     .             0.42*numdens(2,1,i))*10.0**(-7.914)
-
-c         gammas = (t(i)/10000.)**(1./6.)*ne(i)*10.0**(-5.170)
-c         gammav = (t(i)/10000.)**(0.3)*(numdens(1,1,i)+
-c     .             0.42*numdens(2,1,i))*10.0**(-7.724)
-
-c         write (*,*) j, i, dopp(j,i), dopp(j,i)*2.9979e18/wave1(j)
-c         write (*,*) dlog10(rhox(i)), denom, gammar, gammas, gammav
 
 c*****now finish by summing the gammas and computing the Voigt *a* values
          gammatot = gammar + gammas + gammav
@@ -227,7 +187,6 @@ c*****now finish by summing the gammas and computing the Voigt *a* values
          if (linprintopt .gt. 2) write (nf1out,1002) i, gammar, 
      .      gammas, gammav, gammatot, a(j,i)
       enddo
-c      read (*,*)
       return
 
 

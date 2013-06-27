@@ -12,6 +12,7 @@ c******************************************************************************
       include 'Linex.com'
       include 'Pstuff.com'
       include 'Dummy.com'
+      include 'Stokes.com'
 
 
 c*****examine the parameter file
@@ -104,6 +105,7 @@ c*****do the syntheses
             sstop = oldstop
             mode = 3
             call inlines (1)
+              molopt = 2
             call eqlib
             call nearly (1)
             call synspec
@@ -127,7 +129,7 @@ c*****now plot the spectrum
          endif
       endif
       if (plotopt .ne. 0) then
-c         call pltspec (lscreen,ncall)
+         call pltspec (lscreen,ncall)
       endif
 
 
@@ -187,7 +189,6 @@ c*****otherwise end the code gracefully
 
 
 c*****format statements
-1001  format (/'KAPREF ARRAY:'/(6(1pd12.4)))
 1002  format (13('-'),'MOOG OUTPUT FILE',10('-'),
      .        '(MOOG version from 23/04/07)',13('-')//
      .        'THE MODEL TYPE: ',a10)

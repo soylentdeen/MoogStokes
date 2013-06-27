@@ -210,7 +210,7 @@ c*****now plot the spectrum
       endif
       if (plotopt .ne. 0) then
          nf2out = nf9out
-c         call pltspec (lscreen,ncall)
+         call pltspec (lscreen,ncall)
       endif
 
             pause
@@ -230,7 +230,6 @@ c*****format statements
 1005  format ('#models =', i3, 5x, 'total weight =', f7.2//
      .        ('model#', i5, 5x, 'relative weight', f8.2))
 1006  format (i3, a30, a10, f8.0, 2f8.2)
-1007  format ('MODEL: combined population model')
 1008  format (80(' '))
 
 

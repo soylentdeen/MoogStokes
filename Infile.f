@@ -34,7 +34,7 @@ c  write out the appropriate message about this file
          array(charcount+1:charcount+24) ='; here is the filename: '
          array(charcount+25:79) = fname
          charcount = 79
-c         call putasci (charcount,line)
+         call putasci (charcount,line)
          if (type .ne. 'input  ') kstat = 'unknown'
       endif
      

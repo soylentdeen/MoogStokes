@@ -71,7 +71,7 @@ c*****draw and label the box for the curve-of-growth
       call sm_angle (0.)
       call sm_ltype (1)
       call sm_lweight (0.8)
-      call sm_grid (0)
+      call sm_grid (0,0)
       call sm_ltype (0)
 
 

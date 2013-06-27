@@ -141,7 +141,7 @@ c*****combine the synthetic spectra for plotting
 
 
 c*****now plot the spectrum, maybe iterating abundances, and end the program
-100   if (plotopt.eq.2 .and. specfileopt.gt.0) then
+      if (plotopt.eq.2 .and. specfileopt.gt.0) then
          nfobs = 33               
          lscreen = lscreen + 2
          array = 'THE OBSERVED SPECTRUM'
@@ -158,7 +158,7 @@ c*****now plot the spectrum, maybe iterating abundances, and end the program
          control = 'binary '
          nf2out = nf9out
          nf3out = nf10out
-c         call pltspec (lscreen,ncall)
+         call pltspec (lscreen,ncall)
          if (choice .eq. 'n') then
             do syncount=1,2
                if (numpecatom .gt. 0) then

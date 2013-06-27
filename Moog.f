@@ -19,7 +19,7 @@ c     be able to pull in auxiliary data files; executing 'make' will
 c     generate a reminder of this necessity
       write (moogpath,1001)
       moogpath = 
-     .  '/home/deen/Code/FORTRAN/Moog2010/'
+     .  '/home/deen/Code/FORTRAN/release/'
 
 
 c*****What kind of machine are you using?  Possible ones are:
@@ -44,7 +44,7 @@ c     will be queried on all occasions that might call for user input;
 c     DON'T CHANGE THIS VARIABLE; 
 c     if silent = 'n', the normal interactive MOOG is run;
 c     if silent = 'y', the non-interactive MOOG is run
-      silent = 'y'
+      silent = 'n'
 
 
 c*****invoke the overall starting routine
@@ -83,8 +83,6 @@ c*****use one of the standard driver routines ("isotop" is obsolete):
          call abpop
       elseif (control .eq. 'synpop ') then
          call synpop
-      elseif (control .eq. 'synstok') then
-         call synstokes
 
 
 c*****or, put in your own drivers in the form below....

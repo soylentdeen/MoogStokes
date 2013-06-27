@@ -194,7 +194,7 @@ c*****compute the number of ions:
 
 c*****compute matrix *c*, which is the derivative of each equation with     
 c*****respect to each atom.                                                 
-26    do k=1,neq                                                      
+      do k=1,neq                                                      
          deltax(k) = -xfic(k) + xatom(k)                                
          do kk=1,neq                                                    
             c(k,kk) = 0.                                                

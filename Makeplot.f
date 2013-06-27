@@ -15,7 +15,9 @@ c******************************************************************************
 c  open the plot device: screen terminal
       if (plotroutine(1:4) .eq. 'term') then
          if (sm_device(smterm) .lt. 0) then
-            write (nf1out,1001) smterm
+            write (array,1001) smterm
+            istat = ivwrite(lscreen+1,1,array,79)
+            write (nf1out,1007) array(1:79)
             stop
          endif
       endif
@@ -25,13 +27,17 @@ c  open the plot device: hardcopy sent to printer
       if (plotroutine(1:4) .eq. 'hard') then
          if     (plotroutine(6:9) .eq. 'land') then
             if     (sm_device('postland') .lt. 0) then
-               write (nf1out,1002)
+               write (array,1002)
+               istat = ivwrite(lscreen+1,1,array,34)
+               write (nf1out,1007) array(1:34)
                stop
             endif
          elseif (plotroutine(6:9) .eq. 'port') then
             if (sm_device('postport') .lt. 0) then
+               write (array,1009)
+               istat = ivwrite(lscreen+1,1,array,34)
+               write (nf1out,1007) array(1:34)
                write (nf1out,1009)
-1009           format ('DEVICE OPENING ERROR FOR: postport')
                stop
             endif
          endif
@@ -49,7 +55,7 @@ c  open the plot device: postscript file
             nchars = 80
             call getcount (nchars,f5out)
          endif
-10       if     (plotroutine(6:9) .eq. 'land') then
+         if     (plotroutine(6:9) .eq. 'land') then
             if (nchars .lt. 10) then
                write (errmess,1003) nchars
             else
@@ -64,7 +70,8 @@ c  open the plot device: postscript file
          endif
          write (array,errmess) f5out(1:nchars)
          if (sm_device(array(1:nchars+13)) .lt. 0) then
-            write (nf1out,1006) array(1:nchars+9)
+            write (nf1out,1007) array(1:nchars+9)
+            istat = ivwrite(lscreen+1,1,array,nchars+9)
             stop
          endif
       endif
@@ -103,11 +110,12 @@ c  issue standard ending commands; exit normally
 c*****format statements
 1001  format ('DEVICE OPENING ERROR FOR:',a54)
 1002  format ('DEVICE OPENING ERROR FOR: postland')
+1009  format ('DEVICE OPENING ERROR FOR: postport')
+1007  format (a80)
 1003  format ('(13hpostlandfile ,a',i1,'$)')
 1004  format ('(13hpostlandfile ,a',i2,'$)')
 1005  format ('(13hpostportfile ,a',i1,'$)')
 1006  format ('(13hpostportfile ,a',i2,'$)')
-1007  format ('FILE OPENING ERROR FOR:',a56)
 
 
       end

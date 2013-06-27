@@ -57,20 +57,23 @@ c*****go through the option list; the routine may be exited at this point
 
 c*****or a default plot may be made upon entering the routine
       if (choice.eq.'1' .or. choice.eq.'g') then
-c*****make cross correlation to line up synthetic and observed spectra 
-c*****in velocity (wavelength) space.  Comment this line out if it is
+c*****make a cross correlation to line up synthetic and observed spectra 
+c*****in velocity (wavelength) space; the user can turn this off/on
 c*****not working for you
          call smooth (-1,ncall)
 c----------------------------------------------------------------------------
          if (plotopt.eq.2 .and. ncall.eq.1) then
-            wmiddle = (start + sstop)/2.
+            vfactor = 1.0 + veladd/2.99795e+5
             do i=1,lount
-               xobs(i) = veladd*wmiddle/2.99795e+5 + xobs(i)
+               xobs(i) = vfactor*xobs(i)
             enddo
-c            call correl 
-            do i=1,lount
-               xobs(i) = deltavel*wmiddle/2.99795e+5 + xobs(i)
-            enddo
+            if (maxshift .gt. 0) then
+               call correl (maxshift)
+               vfactor = 1.0 + deltavel/2.99795e+5
+               do i=1,lount
+                  xobs(i) = vfactor*xobs(i)
+               enddo
+            endif
          endif
 c----------------------------------------------------------------------------
          if (ncall .eq. 1) then
@@ -169,10 +172,9 @@ c*****or the observations may be shifted by a constant velocity
          nchars = 51
          call getnum (nchars,13,xnum,vveladd)
          veladd = veladd * vveladd
-         wmiddle = (start + sstop)/2.
-         if (iunits .eq. 1) wmiddle = 1.d-4*wmiddle
+         vfactor = 1.0 + veladd/2.99795e+5
          do i=1,lount
-            xobs(i) = vveladd*wmiddle/2.99795e+5 + xobs(i)
+            xobs(i) = vveladd*xobs(i)/2.99795e+5 + xobs(i)
          enddo
       endif
 
@@ -198,13 +200,13 @@ c*****or the plot boundaries may be changed
 c*****or the cross hairs can be used to zoom in on a part of the plot
       if (choice .eq. 'z') then
          array = 'MARK THE LOWER LEFT HAND CORNER WITH THE CURSOR'
-220      istat = ivcleof(13,1)
+         istat = ivcleof(13,1)
          istat = ivwrite(13,3,array,47)
          call pointcurs
          xlo = xplotpos
          ylo = yplotpos
          array = 'MARK THE UPPER RIGHT HAND CORNER WITH THE CURSOR'
-212      istat = ivcleof(14,1)
+         istat = ivcleof(14,1)
          istat = ivwrite (14,1,array,48)
          call pointcurs
          xhi = xplotpos
@@ -222,7 +224,7 @@ c*****or the cross hairs can be used to zoom in on a part of the plot
 c*****or cursor position can be returned
       if (choice .eq. 'p') then
          array = 'MARK THE POSITION WITH THE CURSOR'
- 213     istat=ivcleof(21,1)
+         istat=ivcleof(21,1)
          istat=ivwrite(13,3,array,34)
          call drawcurs
          go to 100
@@ -249,7 +251,7 @@ c     observed/synthtic spectrum differences
 
 c*****or the plot boundaries may be reset to the original values;
 c     this is a basic starting over plot
-13    if (choice .eq. 'o') then
+      if (choice .eq. 'o') then
          xlo = start
          xhi = sstop
          if (iunits .eq. 1) then

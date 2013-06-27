@@ -1,0 +1,259 @@
+Only in release: Angles.com
+diff release/Atmos.com base/Atmos.com
+27c27
+<      .             fbarklem, fbarklemUV, AtmosDir, OutDir
+---
+>      .             fbarklem, fbarklemUV
+55c55
+<      .                  fbarklem, fbarklemUV, AtmosDir, OutDir,
+---
+>      .                  fbarklem, fbarklemUV,
+Only in release: CalcGeom.f
+Only in release: CalcOpacities.f
+Only in release: ComplexVoigt.f
+Only in release: Curfit.f
+Only in release: DELOQuad.f
+Only in release: GridStokes.f
+diff release/Inlines.f base/Inlines.f
+15,18c15,16
+<       include 'Stokes.com'
+<       real*8     swave1(400), satom1(400), se(400),sgf(400),
+<      .           sdampnum(400),sd0(400),swidth(400), scharge(400),
+<      .           sdeltamj(400), scrad(400), sc4(400)
+---
+>       real*8        swave1(40), satom1(40), se(40),sgf(40),
+>      .              sdampnum(40),sd0(40),swidth(40), scharge(40)
+84c82
+<          do j=1,401
+---
+>          do j=1,41
+88,91c86
+<                sdeltamj(j) = 0.0
+<                scrad(j) = 0.0
+<                sc4(j) = 0.0
+<             elseif (linfileopt .eq. 1) then
+---
+>             else
+94,100d88
+<                sdeltamj(j) = 0.0
+<                scrad(j) = 0.0
+<                sc4(j) = 0.0
+<             elseif (linfileopt .eq. 2) then
+<                read (nfslines,1016,end=340) swave1(j),satom1(j),se(j),
+<      .            sgf(j),sdampnum(j),sd0(j),swidth(j),sdeltamj(j),
+<      .            scrad(j),sc4(j)
+111,112c99,100
+<          if (nstrong .gt. 400) then
+<             write(*,*) 'STRONG LINE LIST HAS MORE THAN 400 LINES. THIS'
+---
+>          if (nstrong .gt. 40) then
+>             write(*,*) 'STRONG LINE LIST HAS MORE THAN 40 LINES. THIS'
+123,126c111
+<          deltamj(j) = 0.0
+<          crad(j) = 0.0
+<          c4(j) = 0.0
+<       elseif (linfileopt .eq. 1) then
+---
+>       else
+129,134d113
+<          deltamj(j) = 0.0
+<          crad(j) = 0.0
+<          c4(j) = 0.0
+<       elseif (linfileopt .eq. 2) then
+<          read (nflines,1016,end=311) wave1(j),atom1(j),e(j,1),gf(j),
+<      .          dampnum(j),d0(j),width(j),deltamj(j),crad(j),c4(j)
+160,162d138
+<             deltamj(nlines+k) = sdeltamj(k)
+<             crad(nlines+k) = scrad(k)
+<             c4(nlines+k) = sc4(k)
+317d292
+< 1016  format (10e10.3)
+diff release/Linex.com base/Linex.com
+12d11
+<       real*8       deltamj(2500),crad(2500),c4(2500)
+26c25
+<       real*8       gammatot, gammav, gammas, gammar, viewang
+---
+>       real*8       gammatot, gammav, gammas, gammar
+33d31
+<      .             deltamj, crad, c4,
+47c45
+<      .             gammatot, gammav, gammas, gammar, viewang,
+---
+>      .             gammatot, gammav, gammas, gammar,
+Only in release: Makefile.MoogStokes
+Only in release: Makefile.MoogStokes64
+Only in release: Makefile.MoogStokes64silent
+Only in release: Makefile.MoogStokesMac
+Only in release: Makefile.MoogStokesMacsilent
+Only in release: Makefile.MoogStokessilent
+Only in base: MOOG
+diff release/Moog.f base/Moog.f
+22c22
+<      .  '/home/deen/Code/FORTRAN/release/'
+---
+>      .  '/home/deen/Code/FORTRAN/base/'
+diff release/Moogsilent.f base/Moogsilent.f
+22c22
+<      .  '/home/deen/Code/FORTRAN/release/'
+---
+>      .  '/Users/chris/CODES/moog'
+29c29
+<       machine = "pcl"
+---
+>       machine = "mac"
+Only in release: MoogStokes
+Only in release: MoogStokes.f
+Only in release: MoogStokes.README
+Only in release: MoogStokessilent
+Only in release: MoogStokessilent.f
+diff release/Params.f base/Params.f
+15,20c15,18
+<       include 'Angles.com'
+<       include 'Stokes.com'
+<       real*8 deltalogab(5), temp
+<       character keyword*20, sandbox*80
+<       character arrayz*80, stokes_base*80
+<       integer kk, outflag, atmosflag
+---
+>       real*8 deltalogab(5)
+>       character keyword*20
+>       character arrayz*80
+>       integer kk
+73,78d70
+<       fAngles = 'Stokes.angles'
+<       fStokesI = 'Stokes.spectrum_I'
+<       fStokesQ = 'Stokes.spectrum_Q'
+<       fStokesU = 'Stokes.spectrum_U'
+<       fStokesV = 'Stokes.spectrum_V'
+<       fContinuum = 'Stokes.spectrum_continuum'
+90,98d81
+<       nfAngles = 0
+<       nfStokesI = 0
+<       nfStokesQ = 0
+<       nfStokesU = 0
+<       nfStokesV = 0
+<       nfContinuum = 0
+<       modelnum = 0
+<       outflag = 0
+<       atmosflag = 0
+181,195d163
+< c  INITIALIZE SOME VARIABLES: MOOGStokes specific stellar geometry
+<       inclination = 3.1415926/2.0
+<       position_angle = 0.0
+<       diskflag = 1             ! 1 => annuli, 0 => disco-ball
+<       ncells = 695
+<       nrings = 23
+< 
+< c  INITIALIZE SOME VARIABLES: MOOGStokes test flag
+<       testflag = 0
+< 
+< c  INITIALIZE SOME VARIABLE: WaveGrid parameters
+<       beta_strong = 5.0
+<       beta_weak = 7.0
+<       R_strong = 0.5
+<       R_weak = 0.25
+261,263d228
+< c     MOOGStokes Modification - If freeform = 2, then Inlines will
+< c      expect 100 character lines in the linelist (delta_mj,
+< c      radiative_damping_coeff, C4_coefficient)
+313,314d277
+< c         sandbox = trim(OutDir)//trim(stokes_base)
+< c         f3out = trim(sandbox)//'.moog'
+316,391d278
+< c  keyword 'atmos_dir' specifies the location of the model atmosphere'
+<       elseif (keyword .eq. 'atmos_dir') then
+<          read (array,*) sandbox
+<          AtmosDir = trim(sandbox)
+<          atmosflag = 1
+< 
+< c  keyword 'out_dir' specifies the location of the model atmosphere'
+<       elseif (keyword .eq. 'out_dir') then
+<          read (array,*) sandbox
+<          OutDir = trim(sandbox)
+<          outflag = 1
+< 
+< c  keyword 'stokes_out' controls the base name of all the Stokes-related output
+<       elseif (keyword .eq. 'stokes_out') then
+<          read (array,*) stokes_base
+<          if (outflag .eq. 1) then
+<              sandbox = trim(OutDir)//trim(stokes_base)
+<          else
+<              sandbox = trim(stokes_base)
+<          endif
+<          fAngles = trim(sandbox)//'.angles'
+<          fStokesI = trim(sandbox)//'.spectrum_I'
+<          fStokesQ = trim(sandbox)//'.spectrum_Q'
+<          fStokesU = trim(sandbox)//'.spectrum_U'
+<          fStokesV = trim(sandbox)//'.spectrum_V'
+<          fContinuum = trim(sandbox)//'.continuum'
+< 
+< c  keyword 'nrings' controls the number of latitude belts to synthesize in the
+< c        discoball (diskflag = 0)
+<       elseif (keyword .eq. 'nrings') then
+<          read (array,*) nrings
+< 
+< c  keyword 'ncells' controls the number of cells to synthesize in the
+< c        discoball (diskflag = 0)
+<       elseif (keyword .eq. 'ncells') then
+<          read (array,*) ncells
+< 
+< c  keyword 'inclination' controls the inclination of the stellar
+< c          rotation axis
+<       elseif (keyword .eq. 'inclination') then
+<          read (array,*) inclination
+< 
+< c  keyword 'pos_ang' controls the position angle of the stellar rotation
+<       elseif (keyword .eq. 'pos_ang') then
+<          read (array,*) position_angle
+< 
+< c  keyword 'diskflag' controls whether MOOGStokes calculates annuli (1) or a
+< c         disco-ball (0)
+<       elseif (keyword .eq. 'diskflag') then
+<          read (array,*) diskflag
+< 
+< c  keyword 'testflag' controls whether MOOGStokes calculates full disk
+< c         spectrum (0) or just a single pencil beam (1)
+<       elseif (keyword .eq. 'testflag') then
+<          read (array,*) testflag
+< 
+< c  keyword 'beta_strong' controls wavelength stepsize around strong lines
+<       elseif (keyword .eq. 'beta_strong') then
+<          read (array,*) beta_strong
+< 
+< c  keyword 'R_strong' controls wavelength stepsize around strong lines
+<       elseif (keyword .eq. 'R_strong') then
+<          read (array,*) R_strong
+< 
+< c  keyword 'beta_weak' controls wavelength stepsize around weak lines
+<       elseif (keyword .eq. 'beta_weak') then
+<          read (array,*) beta_weak
+< 
+< c  keyword 'R_weak' controls wavelength stepsize around weak lines
+<       elseif (keyword .eq. 'R_weak') then
+<          read (array,*) R_weak
+< 
+< c  keyword 'viewang' controls the viewing angle (measured in Degrees)
+<       elseif (keyword .eq. 'viewang') then
+<          read (array,*) temp 
+<          viewang = dble(3.14159262/180.0)*temp
+413,418d299
+<          if (atmosflag .eq. 1) then
+<              sandbox = trim(AtmosDir)//trim(fmodel)
+<          else
+<              sandbox = trim(fmodel)
+<          endif
+<          fmodel = sandbox
+827,828c708
+<      .    control .eq. 'binary ' .or. control .eq. 'abandy ' .or.
+<      .    control .eq. 'gridsto') then
+---
+>      .    control .eq. 'binary ' .or. control .eq. 'abandy ') then
+Only in release: SplineDriver.f
+Only in release: Spline.f
+Only in release: Stokes.com
+Only in release: SynStokes.f
+diff release/Synth.f base/Synth.f
+15d14
+<       include 'Stokes.com'
+Only in release: WaveGrid.f

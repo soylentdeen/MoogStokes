@@ -26,7 +26,7 @@ c*****compute the wavelength array
 
 
 c*****use the RINTEG routine to do an integration
-      answer = 1000.*rinteg(waveint,d,depthint,ntotal,0,0.)         
+      answer = 1000.*rinteg(waveint,d,depthint,ntotal,0.)         
       write (nf1out,1001) answer, ntotal                               
       write (nf2out,1001) answer, ntotal                               
       w(ncurve) = answer/1000.

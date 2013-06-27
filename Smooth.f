@@ -16,8 +16,8 @@ c******************************************************************************
 
 
 c*****initialize parameters
-      write (abitle,1001)
-      write (isoitle,1001)
+      write (abitle(1:400),1081)
+      write (isoitle(1:240),1082)
       nsyn = 1
       if (ncall .eq. 1) then
          gaussflag = 'f'
@@ -100,7 +100,7 @@ c*****branch to the desired smoothing function
 
 c*****compute a stellar rotational broadening function; this follows 
 c     D. F. Gray, 1976, "The Obs. & Anal. of Stell. Phot", p394-9
-30    if (rotateflag .eq. 'f') go to 50
+      if (rotateflag .eq. 'f') go to 50
 32    array = 'GIVE THE STELLAR vsini [0.0]: '
       nchars = 30
       if (line .gt. 0) then
@@ -282,7 +282,7 @@ c*****now read in the raw synthetic spectrum and flip to a flux scale
             if (nabunds .le. 8) then
                ioff = naboff + 9*(nabunds-1)
                abitle(ioff+1:ioff+2) = array(9:10)
-               read (array(26:31),*) abnum
+               read (array(26:32),*) abnum
                if     (abnum .gt. 0) then
                   write (abchars,1061) abnum
                elseif (abnum .le. -10.) then
@@ -443,7 +443,6 @@ c     to do next
 
 
 c*****format statements
-1001  format (480(' '))
 1002  format (a80)
 1003  format (10f7.4)
 1004  format ('           c=v+g, d=m+g, r=m+v+g, p=VARIABLE GAUSS')
@@ -494,6 +493,8 @@ c*****format statements
 1061  format ('+', f4.2)
 1062  format (f5.1)
 1063  format (f5.2)
+1081  format (400(' '))
+1082  format (240(' '))
 
       end
 

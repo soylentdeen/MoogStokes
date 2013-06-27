@@ -163,9 +163,6 @@ c     if appropriate; exit routine normally
       return
 
 
-c*****format statements
-1001  format (/'LINE OPACITIES AT LINE CENTERS')
-1002  format (10h0  kapnu0(,i3,3h,i)/(8(1pd10.2)))
 
       end
 

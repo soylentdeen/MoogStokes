@@ -37,7 +37,14 @@ c*****initialize the synthesis
       n = 1           
       num = 0
       nsteps = 1
-      lim1line = 0
+      if (mode .ne. 4) then 
+         lim1line = 0
+         lim2line = 0
+         lim1obs = 0
+         lim2obs = 0
+         lim1 = 0
+         lim2 = 0
+      endif
 
 
 c*****calculate continuum quantities at the spectrum wavelength
@@ -78,7 +85,6 @@ c*****compute a spectrum depth at this point
       call cdcalc (2)
       first = 0.4343*cd(1)
       d(n) = rinteg(xref,cd,dummy1,ntau,first)       
-      write (nf3out, 1234) wave, 1.0-d(n)
       if (mod(n,10) .eq. 0) then
          if (iraf .eq. 1) then
             do j=1,10
@@ -149,7 +155,6 @@ c*****format statements
 1101  format (/'SPECTRUM DEPTHS')
 1102  format (4f11.3)
 1103  format (4f10.7)
-1234  format (f15.5,f10.7)
 1104  format ('SIMPLE  =    t'/'NAXIS   =     1'/'NAXIS1  = ',i10,/
      .        'W0      =',f10.4/'CRVAL1  =',f10.4/'WPC     =',f10.4/
      .        'CDELT1  =',f10.4)

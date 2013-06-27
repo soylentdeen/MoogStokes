@@ -76,15 +76,15 @@ c2222          format (i4, 3f10.3)
       enddo
 
 
+c*****next, EITHER do a single cross-correlation 
+         call crosscorr (ishift,spy(1),ygood,zgood,itotsyn)
+
 c*****next, do the cross-correlation:
-      mxshft = 25
-      imax = 2*mxshft + 1
+      imax = 2*maxshift + 1
       do i=1,imax
-         ishift = i - 1 - mxshft
+         ishift = i - 1 - maxshift
          spx(i) = dble(ishift)
-         call cross (ishift,spy(i),ygood,zgood,itotsyn)
-c              write (*,2223) i, spx(i), spy(i)
-c2223          format (i2, 2f8.4)
+         call crosscorr (ishift,spy(i),ygood,zgood,itotsyn)
       enddo
 
 c*****interpolate to find the maximum of the correlation function
@@ -127,9 +127,6 @@ c*****translate this into a correction to the input velocity shift
       deltawave = -step*shiftmax
       deltavel = -3.0d5*step*shiftmax/wavecenter
       veladd = veladd + deltavel
-c            write (*,*) shiftmax, step, wavecenter, deltawave
-c            write (*,*) deltavel, veladd
-c            pause
 
 
       return

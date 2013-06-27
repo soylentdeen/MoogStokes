@@ -1,0 +1,183 @@
+
+              MOOGStokes README
+
+                 Release 1.00
+
+---------------------------------------------------------------
+
+Thank you for downloading the MOOGStokes extention to the MOOG spectral
+synthesis program.  This tarball is a fully-functional version of MOOG 
+derived from the February 2013 version (MOOG2013.tar.gz) available on 
+Chris Sneden's website (http://www.as.utexas.edu/~chris/moog.html)
+
+Version 1.0 of the MoogStokes package is described in a methods paper in the
+Astronomical Journal (2013)
+
+Contents
+====================================
+The tarball contains all files necessary for a fully-functional verions of
+MOOG, including the MoogStokes extension.  In addition to the MOOG-specific
+files, the MOOGStokes tarball also includes the following original
+MOOGStokes-specific files:
+
+Angles.com
+CalcGeom.f
+CalcOpacities.f
+ComplexVoigt.f
+Curfit.f
+DELOQuad.f
+GridStokes.f
+Makefile.MoogStokesMac
+Makefile.MoogStokesMacsilent
+Makefile.MoogStokes64
+Makefile.MoogStokes64silent
+Makefile.MoogStokes
+Makefile.MoogStokessilent
+MoogStokes.f
+MoogStokessilent.f
+SplineDriver.f
+Spline.f
+Stokes.com
+SynStokes.f
+Wavegrid.f
+
+The tarball also includes slightly modified versions of the following MOOG-
+specific files:
+
+Atmos.com
+Inlines.f
+Linex.com
+Params.f
+Synth.f
+
+The differences between the original MOOG2013 files and the new versions can
+be found in differences.txt
+
+Dependencies
+=====================================
+In addition to the X11 and Supermongo libraries, MoogStokes also relies upon the
+following linear algebra packages:
+
+ATLAS (http://math-atlas.sourceforge.net/)
+LAPACK (http://www.netlib.org/lapack/)
+
+Make sure you have these libraries installed on your system
+
+Installation Instructions
+=====================================
+1) untar the MOOGStokes.tar.gz in a suitable directory (e.g. /home/user/Codes/Moog/)
+2) Modify the appropriate path and machine-type in MoogStokes.f or MoogStokessilent.f.
+     For the original version of Moog, modify instead Moog.f or Moogsilent.f
+3) Modify the Makefile according to your installation.  Make sure you have the correct
+     directories for the ATLAS and LAPACK libraries.
+4) compile MoogStokes
+
+      > make -f Makefile.MoogStokesXXX  (where XXX is the appropiate make file)
+
+This will make the MoogStokes (or MoogStokessilent) executable.
+
+SynStokes.f
+=====================================
+
+The SynStokes MOOG driver is modeled after the Synth driver.  However, there
+are a few important differences between Synth and SynStokes.
+
+First, Synth saves its spectra in a data file specified by the 'smoothed_out'
+parameter.  Because SynStokes calculates the Stokes vectors at multiple
+locations across the stellar disk, it is impractical to save all emergent 
+Stokes vectors at all locations in a single file.  Instead, SynStokes
+saves the output spectra in several files.  The several files have a common
+base file name, which is specified in the parameter 'stokes_out'.  SynStokes
+then appends endings to this base file name in the following manner:
+
+basename.angles
+basename.spectrum_I
+basename.spectrum_Q
+basename.spectrum_U
+basename.spectrum_V
+basename.continuum
+
+.angles
+----------------
+the .angles file contains geometrical information regarding each emergent
+spectrum.  The format of the .angles file depends on the chosen disk-integration
+algorithm.  If using the annular disk integration method of Valenti & Piskunov
+(diskflag == 1), then the .angles files consists of n lines (where n is the 
+number of annuli into which the stellar disk is divided), each containing the
+following information:
+
+i, phi_angle(i), mu(i)
+
+i is the annulus index,
+phi_angle(i) is the longitudinal angle on the star of the ith annulus
+     (measured so that the center of the stellar disk has a phi_angle of 0.0)
+mu(i) is the viewing angle of the ith annulus at the disk equator.
+     (taken to be the cosine of the phi_angle)
+
+If instead, the diskflag parameter is set to 0, SynStokes divides the stellar
+surface into a number of regions (similar to Figure 5 in Piskunov & Kochukhov
+(2002)).  In this case, the .angles files is formatted slightly differently.
+The first line contains 4 numbers:
+
+ncells, nrings, inclination, position_angle
+
+where ncells is the number of (approximately) equal area tiles into which
+the surface is divided.  nrings is the number of latitude belts.  inclination
+and position angle refer to the orientation of the stellar rotation axis
+on the sky, and are given in radians.
+
+the next ncell lines contain 9 columns each.  The columns are defined as:
+
+Column | variable | description
+----------------------------------------
+  1    |    i     |   tile index
+  2    |    az    |   azimuthal angle of center of tile
+  3    | az_start |   azimuthal angle of northern edge of tile
+  4    | az_stop  |   azimuthal angle of southern edge of tile
+  5    |  long    |   Longitude of center of tile
+  6    | d_long   |   angular width of tile in longitude direction
+  7    | phi_ang  |   Phi angle of the center of the tile
+  8    | chi_ang  |   Chi angle of the center of the tile
+  9    |  mu      |   viewing angle of the center of the tile.
+
+.spectrum_I(QUV)
+--------------------
+The .spectrum files contain all the emergent spectra calculated by SynStokes.
+The .spectrum_I/Q/U/V file contains the emergent Stokes I/Q/U/V flux
+calculated at each location described in the .angles file.  Each file is
+formatted so that there are ncells+1 columns, and the number of lines in each 
+file depends upon the number of wavelength points in the spectrum.  A typical
+line in a .spectrum file is formatted as such:
+
+lambda1 f_lambda1_pos1 f_lambda1_pos2 ... ... f_lambda1_pos_ncells
+lambda2 f_lambda2_pos1 f_lambda2_pos2 ... ... f_lambda2_pos_ncells
+...
+...
+lambdaN f_lambdaN_pos1 f_lambdaN_pos2 ... ... f_lambdaN_pos_ncells
+
+.continuum
+-------------------
+The .continuum file is formatted in the same manner as the .spectrum_ files, 
+but instead of emergent Stokes flux, contains the emergent continuum.  The user
+can create a normalized spectrum by dividing the I, Q, U, and V spectra by
+the continuum.
+
+The post-processing python script "Diskoball" can read in the data products
+produced by SynStokes and perform the disk integration necessary to compare
+to observations.  Diskoball can be obtained from the author, or from the 
+github repository.
+
+Troubleshooting
+=====================================
+1) The linker is complaining about not being able to find super-mongo-specific procedures
+(i.e. "Specplot.f:313: undefined reference to `sm_limits_'")
+
+ A) I have found this is a combination of the SM compilation and gfortran compiler.  Try
+adding the -fsecond-underscore option to the compiler options
+         (e.g.: FC = gfortran -Wall -g -std=legacy -fsecond-underscore)
+
+2) More to come....
+
+Changelog
+---------------------------------------------------------------
+Updated: 26 June 2013 - C. Deen -- Initial release, ver 1.00

@@ -34,7 +34,6 @@ c     spectra, and (if desired) IRAF-style smoothed spectra
      .             f2out,lscreen)
       if (plotopt .gt. 0) then
          nf3out = 22               
-         write (*,*) 'Test!'
          lscreen = lscreen + 2
          array = 'SMOOTHED SYNTHESES OUTPUT'
          nchars = 25
@@ -71,7 +70,7 @@ c*****open and read the model atmosphere file
       array = 'THE MODEL ATMOSPHERE'
       nchars = 20
       call infile ('input  ',nfmodel,'formatted  ',0,nchars,
-     .             trim(AtmosDir)//fmodel,lscreen)
+     .             fmodel,lscreen)
       call inmodel
 
 
@@ -133,7 +132,7 @@ c*****now plot the spectrum
       endif
       if (plotopt .ne. 0) then
          ncall = 1
-c         call pltspec (lscreen,ncall)
+         call pltspec (lscreen,ncall)
       endif
 
 

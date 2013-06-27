@@ -59,7 +59,7 @@ c*****now plot the spectrum
          lscreen = lscreen + 2
          array = 'THE OBSERVED SPECTRUM'
          nchars = 21
-         if     (specfielopt.eq.1 .or. specfielopt.eq.3) then
+         if     (specfileopt.eq.1 .or. specfileopt.eq.3) then
             call infile ('input  ',nfobs,'unformatted',2880,nchars,
      .                   fobs,lscreen)
          else
@@ -70,7 +70,7 @@ c*****now plot the spectrum
       if (plotopt .ne. 0) then
          line = 10
          ncall = 1
-c         call pltspec (line,ncall)
+         call pltspec (line,ncall)
       endif
 
 

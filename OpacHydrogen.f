@@ -1,4 +1,3 @@
-
 c******************************************************************************
 c  The subroutines needed to calculate the H I b-f, H I f-f, H- b-f, and
 c  H- f-f opacities are in this file.  These are from ATLAS9.
@@ -161,7 +160,7 @@ c  main opacity computation yielding "aHminus"
       wavelog = dlog(wave)
       do itheta=1,11
          call linter (wfflog,fflog(1,itheta),22,wavelog,fftlog,1)
-         fftt(itheta) = dexp(fftlog)/thetaff(itheta)*5040.*1.380658E-16       
+         fftt(itheta) = dexp(fftlog)/thetaff(itheta)*5040.*1.380658E-16
       enddo
       hminbf = 0.
       if (freq  .gt.  1.82365d14) 
@@ -187,7 +186,7 @@ c  should be increasing order.
 c******************************************************************************
 
       implicit real*8 (a-h,o-z)
-      real*8 xold(1), yold(1), xnew(1), ynew(1)
+      real*8 xold(*), yold(*), xnew(*), ynew(*)
         
       iold = 2
       do inew=1,nnew
@@ -215,7 +214,7 @@ c  I decided that it would be too dangerous to re-write this one.
 c******************************************************************************
 
       implicit real*8 (a-h,o-z)
-      real*8 xold(1), fold(1), xnew(1), fnew(1)
+      real*8 xold(*), fold(*), xnew(*), fnew(*)
 
       l = 2
       ll = 0

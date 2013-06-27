@@ -102,7 +102,7 @@ c  write a header and find the appropriate parameter file, and exit normally
       nfparam = 50     
       lscreen = 4
       if (silent .eq. 'y') then
-         fparam = 'batch.gridstokes'
+         fparam = 'batch.par'
       else
          fparam = 'no_filename_given'     
       endif
@@ -120,7 +120,7 @@ c*****format statements
 1001  format (79('*'))
 1002  format (a7)
 1003  format (22x,'MOOG IS CONTROLLED BY DRIVER ',a7)
-1004  format (25(' '),'MOOG LTE VERSION (AUG 2010)',26(' '))   
+1004  format (25(' '),'MOOG LTE VERSION (FEB 2013)',26(' '))   
 1010  format (a80)
 1011  format (i3)
 

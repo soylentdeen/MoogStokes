@@ -49,7 +49,7 @@ c*****open and read the line list file; get ready for the line calculations
       nchars = 13
       call infile ('input  ',nflines,'formatted  ',0,nchars,
      .              flines,lscreen)
-101   call inlines (1)
+      call inlines (1)
       call eqlib
       call nearly (1)
 
@@ -62,6 +62,7 @@ c*****do the syntheses
       pec(iatom) = 1
       numpecatom = 1
       pecabund(iatom,1) = 0.
+      mode = 3
 10    ncurve = ncurve + 1
       nlines = 0
       call synspec
@@ -87,12 +88,12 @@ c*****do the syntheses
          pecabund(iatom,1) = pecabund(iatom,1) + rwstep
          go to 20
       endif
-c      call pltcog
+      call pltcog
 
          
 c*****finish
       call finish (0)
-      end                                                                
+      end
 
 
 

@@ -32,7 +32,6 @@ c*****first set some initial parameters
 
 
 c*****branch to the appropriate data file type
-      rewind nfobs
       go to (100,200,300,400,500), specfileopt
 
 
@@ -41,7 +40,7 @@ c     FORTRAN read statements
 c     first get the header records and search for key parameters
 100   irec = 1
 101   read (unit=nfobs,rec=irec,err=1002,iostat=ierr) head
-      call obshead (head,iend)
+      call obshead (head,iend,line)
       if (lount .eq. -1) return
       if (iend .eq. 0) then
          irec = irec + 1
@@ -145,7 +144,8 @@ c*****this is a dummy for future file use
 
 
 c*****here is a MONGO-style input array
-500   read (nfobs,5001) obsitle
+500   rewind nfobs
+      read (nfobs,5001) obsitle
       i = 1
 501   read (nfobs,*,end=525) xobs(i),yobs(i)
       i = i + 1

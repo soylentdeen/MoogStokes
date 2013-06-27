@@ -301,27 +301,28 @@ c*****Read in the names of additional molecules to be used in
 c     molecular equilibrium if needed.
       nmol = 56
 
-      read (nfmodel,2002) list
+      read (nfmodel,2002,end=101) list
       list2 = list(11:)
-      read (list2,*) mmol
-      read (nfmodel,*) (bmol(i),i=1,mmol)
-
-      append = 1
-      do k=1,mmol
-         do l=1,nmol
-            if (int(bmol(k)+0.0000001) .eq. int(amol(l)+0.0000001)) 
-     .      append = 0  
-         enddo
-         if (append .eq. 1) then 
-            nmol = nmol + 1
-            amol(nmol) = bmol(k)
-         endif
+      read (list2,*) moremol
+      if (moremol .ne. 0) then
+         read (nfmodel,*) (bmol(i),i=1,moremol)
          append = 1
-      enddo  
+         do k=1,moremol
+            do l=1,nmol
+               if (int(bmol(k)+0.0000001) .eq. int(amol(l)+0.0000001)) 
+     .         append = 0  
+            enddo
+            if (append .eq. 1) then 
+               nmol = nmol + 1
+               amol(nmol) = bmol(k)
+            endif
+            append = 1
+         enddo  
+      endif
 
 
 c*****do the general molecular equilibrium
-      call eqlib
+101   call eqlib
 
 
 c     In the number density array "numdens", the elements denoted by

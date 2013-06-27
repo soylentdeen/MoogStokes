@@ -265,7 +265,7 @@ c  from first set of deviations, define the plot limits, draw and label box
 
 
 c  plot the array of deviations
-180      if (choice.eq.'h' .or. choice.eq.'f' .or.
+         if (choice.eq.'h' .or. choice.eq.'f' .or.
      .       choice.eq.'g') then
             call defcolor (8)
             call sm_ltype (j-1)

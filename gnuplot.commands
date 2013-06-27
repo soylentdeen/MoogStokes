@@ -1,3 +1,0 @@
-plot '/home/deen/Data/MoogStokes/Verification_Data/line1/Output/B_0.0kG/l1_MARCS_T3500G400.moog' using 1:2 with lines
-pause -1
-q

@@ -58,7 +58,7 @@ c*****open and read the line list file; get ready for the line calculations
 c*****get ready for the line calculations: generate a curve-of-growth lookup
 c     table, read the linelist, etc.
 100   call fakeline
-101   call inlines (1)
+      call inlines (1)
       call eqlib
       call nearly (1)
 
@@ -137,7 +137,7 @@ c*****here a plot may be made on the terminal (and paper) if there
 c     are enough lines; then the user will be prompted on some
 c     options concerning what is seen on the plot
       if (plotopt .ne. 0) then
-c         call pltabun
+         call pltabun
          if     (choice.eq.'v') then
             rewind nf1out
             rewind nf2out

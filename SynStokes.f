@@ -90,7 +90,7 @@ c      lscreen = lscreen + 2
       array = 'THE MODEL ATMOSPHERE'
       nchars = 20
       call infile ('input  ',nfmodel,'formatted  ',0,nchars,
-     .             trim(AtmosDir)//fmodel,lscreen)
+     .             fmodel,lscreen)
       call inmodel
 
 
@@ -234,7 +234,6 @@ c*****Perform the Synthesis
       lim1 = lim1line
       lim2 = lim2line
       call calcopacities
-      write (*,*) wave
       write (nfStokesI, 6520, advance='no') wave
       write (nfStokesQ, 6520, advance='no') wave
       write (nfStokesU, 6520, advance='no') wave
