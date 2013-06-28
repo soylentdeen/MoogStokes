@@ -74,6 +74,13 @@ Installation Instructions
 
       > make -f Makefile.MoogStokesXXX  (where XXX is the appropiate make file)
 
+Alternatively, you can try to install MoogStokes via a python-based 
+installer adapted from Andy Casey's MOOG installer.  The python installer can
+be downloaded from https://github.com/Acetylene5/moog/archive/master.zip.
+
+Simply download and unzip the file, and follow the instructions in the README
+file.
+
 This will make the MoogStokes (or MoogStokessilent) executable.
 
 SynStokes.f
