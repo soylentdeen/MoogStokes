@@ -17,7 +17,7 @@ c**********************************************************************
       real*8 phi_I, phi_U, phi_V, psi_Q, psi_U, psi_V
       real*8 h1, h2, dtau, etau, alph, bet, gam
       real*8 matS1(4), matS2(4), bgfl, ztau
-      real*8 k1, k2, k3, z1, z2, deltaz(100), qmax
+      real*8 k1, k2, k3, z1, z2, deltaz(100), qmax, blah
       real*8 phi_ang, chi_ang, mu, midpoint, delz, delta_tau
 c      real*8 zdepth(20000), z_knots(20000), z_coeffs(20000),taus(20000)
       real*8 ktot, klam, kref
@@ -236,6 +236,20 @@ c         read (*,*)
          call daxpy(4, dble(1.0), matS1, 1, matS2, 1)
          call daxpy(4, dble(1.0), matS2, 1, matZ, 1)
 
+         z1=spl_ev(z_knots,n_z_knots,z_coeffs,logtau-delta_tau)
+         z2=spl_ev(z_knots,n_z_knots,z_coeffs,logtau)
+         k1=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,logtau-delta_tau)
+         k2=spl_ev(ktot_knots,n_ktot_knots,ktot_coeffs,logtau)
+
+         do k=1, 4
+             qmax = (emiss_interp(k,emiss_order(1))*k1 +
+     .               emiss_interp(k,emiss_order(2))*k2)*(z1-z2)
+             if (qmax .gt. 0.0) then
+                 matZ(k) = max(min(qmax, matZ(k)), dble(0.0))
+             else
+                 matZ(k) = min(max(qmax, matZ(k)), dble(0.0))
+             endif
+         enddo
 c****      calculate the RHS of the equation.  Store in matZ
          call dgemv('N',4,4,dble(1.0),matY,4,Stokes,1,dble(1.0),matZ,1)
 
@@ -256,9 +270,17 @@ c****     Now do the same thing for the continuum
          alph = (z-dtau*y)/((dtau+dtau_i)*dtau_i)
          bet = ((dtau_i+dtau)*y - z)/(dtau*dtau_i)
          gam = x+(z-(dtau_i + 2*dtau)*y)/(dtau*(dtau+dtau_i))
-         continuum=etau*continuum+alph*emiss_interp(1,emiss_order(3))+
+c         continuum=etau*continuum+alph*emiss_interp(1,emiss_order(3))+
+         blah = alph*emiss_interp(1,emiss_order(3))+
      .              bet*emiss_interp(1,emiss_order(2))+
      .              gam*emiss_interp(1,emiss_order(1))
+         k1=spl_ev(klam_knots,n_klam_knots,klam_coeffs,logtau-delta_tau)
+         k2=spl_ev(klam_knots,n_klam_knots,klam_coeffs,logtau)
+
+         qmax = (emiss_interp(1,emiss_order(1))*k1 +
+     .           emiss_interp(1,emiss_order(2))*k2)*(z1-z2)
+
+         continuum = etau*continuum+max(min(blah, qmax), dble(0.0))
 
          if (kappa_order(1).eq.1)then
              kappa_order(1) = 2
