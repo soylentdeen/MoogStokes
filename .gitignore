@@ -2,3 +2,4 @@
 *.gz
 *.tar
 Makefile.*
+configure.ac
