@@ -28,7 +28,7 @@ c******************************************************************************
       zeros(3,3) = 0.0
 
 c*****examine the parameter file
-1     call params
+      call params
       linprintopt = linprintalt
       
 c*****open the files for: standard output, raw spectrum depths, smoothed 

@@ -19,7 +19,7 @@ c     be able to pull in auxiliary data files; executing 'make' will
 c     generate a reminder of this necessity
       write (moogpath,1001)
       moogpath = 
-     .  '/home/deen/Code/FORTRAN/MoogStokes/'
+     .  '/home/deen/Code/FORTRAN/release/'
 
 
 c*****What kind of machine are you using?  Possible ones are:

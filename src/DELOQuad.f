@@ -16,10 +16,9 @@ c**********************************************************************
       real*8 tau_interp(3), tau_interp_c(3), logtau
       real*8 phi_I, phi_U, phi_V, psi_Q, psi_U, psi_V
       real*8 h1, h2, dtau, etau, alph, bet, gam
-      real*8 matS1(4), matS2(4), bgfl, ztau
-      real*8 k1, k2, k3, z1, z2, deltaz(100), qmax, blah
-      real*8 phi_ang, chi_ang, mu, midpoint, delz, delta_tau
-c      real*8 zdepth(20000), z_knots(20000), z_coeffs(20000),taus(20000)
+      real*8 matS1(4), matS2(4), bgfl
+      real*8 k1, k2, z1, z2, qmax, blah
+      real*8 phi_ang, chi_ang, mu, delz, delta_tau
       real*8 ktot, klam, kref
       integer emiss_order(3), kappa_order(2)!, n_z_knots
       integer INFO, IPIV(4), LDA, LWORK
@@ -328,7 +327,6 @@ c***********************************************************************
       real*8 k_interp(4,4,2), e_interp(4,3)
       real*8 tau_interp(3), tau_interp_c(3), logtau
       real*8 t_tot, t_lam, deltau, mu
-      real*8 e_1, e_2, e_3, e_4
       real*8 phQ, phU, phV, psQ, psU, psV
       integer k_ord, e_ord
 

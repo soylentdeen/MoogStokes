@@ -97,14 +97,14 @@ c      lscreen = lscreen + 2
 
 c*****open the line list file and the strong line list file
       nflines = 31
-c      lscreen = lscreen + 2
+      lscreen = lscreen + 2
       array = 'THE LINE LIST'
       nchars = 13
       call infile ('input  ',nflines,'formatted  ',0,nchars,
      .              flines,lscreen)
       if (dostrong .gt. 0) then
          nfslines = 32
-c         lscreen = lscreen + 2
+         lscreen = lscreen + 2
          array = 'THE STRONG LINE LIST'
          nchars = 20
          call infile ('input  ',nfslines,'formatted  ',0,nchars,
@@ -220,6 +220,7 @@ c*****Perform the Synthesis
       wavl = 0.
       mode = 3
       wave = oldstart
+c      wave = 22284.1
 30    if (dabs(wave-wavl)/wave .ge. 0.001) then
          wavl = wave
          call opacit (2,wave)
@@ -312,6 +313,10 @@ c****      Calculate the next wavelength step
       if (wave .le. sstop) then
           go to 30
       endif
+      start = oldstart
+      stop  = oldstop
+      step  = oldstep
+      delta = olddelta
 
 c*****finish
       if (control .ne. 'gridend') then

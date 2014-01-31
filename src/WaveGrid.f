@@ -101,21 +101,4 @@ c*****divide the lines into keepers and discards
    50 weak(j+1)=X
    60 CONTINUE
 
-c****   Now, go through and purge duplicates and very close together points
-c      temp(1) = wavelength(1)
-c      I=1
-c      do J=2,nwave
-c         if(abs(wavelength(J)-temp(I)) .lt. 0.001) THEN
-c            temp(I) = (wavelength(J)+temp(I))/2.0
-c            wavelength(J) = 0.0
-c         else
-c            I = I+1
-c            temp(I) = wavelength(J)
-c            wavelength(J) = 0.0
-c         endif
-c      enddo
-c      nwave = I
-c      do J=1, nwave
-c         wavelength(J)=temp(J)
-c      enddo
       END

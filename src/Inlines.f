@@ -13,9 +13,9 @@ c******************************************************************************
       include 'Quants.com'
       include 'Factor.com'
       include 'Stokes.com'
-      real*8     swave1(400), satom1(400), se(400),sgf(400),
-     .           sdampnum(400),sd0(400),swidth(400), scharge(400),
-     .           sdeltamj(400), scrad(400), sc4(400)
+      real*8     swave1(800), satom1(800), se(800),sgf(800),
+     .           sdampnum(800),sd0(800),swidth(800), scharge(800),
+     .           sdeltamj(800), scrad(800), sc4(800)
       integer n1, n2
       data n1,n2 /1,0/
 
@@ -81,7 +81,7 @@ c*****read in the strong lines if needed
 302   nstrong = 0
       if (dostrong .gt. 0 ) then
          rewind nfslines
-         do j=1,401
+         do j=1,801
             if (linfileopt .eq. 0) then
                read (nfslines,1002,end=340) swave1(j),satom1(j),se(j),
      .                             sgf(j),sdampnum(j),sd0(j),swidth(j)
@@ -108,8 +108,8 @@ c*****read in the strong lines if needed
                stop
             endif
          enddo
-         if (nstrong .gt. 400) then
-            write(*,*) 'STRONG LINE LIST HAS MORE THAN 400 LINES. THIS'
+         if (nstrong .gt. 800) then
+            write(*,*) 'STRONG LINE LIST HAS MORE THAN 800 LINES. THIS'
             write(*,*) 'IS NOT ALLOWED. I QUIT!'
             stop
          endif

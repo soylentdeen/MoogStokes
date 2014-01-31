@@ -198,7 +198,7 @@ c*****format statements
 1002  format (a80)
 1003  format (f10.2,f10.2,f10.3,'     ',a2,a3,f10.2,f10.1/)
 1004  format (f10.2, f10.2, f10.3, 6x, a2, a2, f10.2, f10.1/)
-1010     format (' i', 5x, 'rhox'2x, 'xref', 5x, 'T', 5x, 'Pgas', 
+1010     format (' i', 5x, 'rhox', 2x, 'xref', 5x, 'T', 5x, 'Pgas', 
      .           6x, 'rho', 3x, 'kaplam', 3x, 'taulam',
      .           3x, 'taunu0', 8x, 'Cd')
 1011  format (i2, 1pd9.2, 0pf6.2, i6, 1p5d9.2, d10.2)

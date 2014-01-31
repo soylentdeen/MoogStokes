@@ -17,9 +17,8 @@ c******************************************************************************
       real*8 deltalogab(5), temp
       character keyword*20, sandbox*80
       character arrayz*80, stokes_base*80
-      integer kk, outflag, atmosflag
+      integer kk
       data newcount, linecount /0, 0/
-
 
       if (linecount .eq. 0) oldcount = 0
 
@@ -35,6 +34,9 @@ c  various variables
             read (nfparam,1001,end=100) arrayz
          enddo
          go to 4
+      else
+         outflag = 0
+         atmosflag = 0
       endif
 
 
@@ -94,8 +96,6 @@ c                    to be used for some other purpose as needed`
       nfStokesV = 0
       nfContinuum = 0
       modelnum = 0
-      outflag = 0
-      atmosflag = 0
 
 
 c  INITIALIZE SOME VARIABLES: input file names and input file numbers
@@ -310,35 +310,37 @@ c  created previously, that will be read in for plotting purposes
 c  keyword 'smoothed_out' controls the name of the smoothed synthesis output
       elseif (keyword .eq. 'smoothed_out') then
          read (array,*) f3out
-c         sandbox = trim(OutDir)//trim(stokes_base)
-c         f3out = trim(sandbox)//'.moog'
+c         sandbox = Jtrim(OutDir)//Jtrim(stokes_base)
+c         f3out = Jtrim(sandbox)//'.moog'
 
 c  keyword 'atmos_dir' specifies the location of the model atmosphere'
       elseif (keyword .eq. 'atmos_dir') then
          read (array,*) sandbox
-         AtmosDir = trim(sandbox)
+         l = len(sandbox)
+         AtmosDir = sandbox(1:l)
          atmosflag = 1
 
 c  keyword 'out_dir' specifies the location of the model atmosphere'
       elseif (keyword .eq. 'out_dir') then
          read (array,*) sandbox
-         OutDir = trim(sandbox)
+         OutDir = sandbox(1:len_trim(sandbox))
          outflag = 1
 
 c  keyword 'stokes_out' controls the base name of all the Stokes-related output
       elseif (keyword .eq. 'stokes_out') then
          read (array,*) stokes_base
          if (outflag .eq. 1) then
-             sandbox = trim(OutDir)//trim(stokes_base)
+             sandbox =OutDir(1:len_trim(Outdir))//
+     ,               stokes_base(1:len_trim(stokes_base))
          else
-             sandbox = trim(stokes_base)
+             sandbox = stokes_base(1:len_trim(stokes_base))
          endif
-         fAngles = trim(sandbox)//'.angles'
-         fStokesI = trim(sandbox)//'.spectrum_I'
-         fStokesQ = trim(sandbox)//'.spectrum_Q'
-         fStokesU = trim(sandbox)//'.spectrum_U'
-         fStokesV = trim(sandbox)//'.spectrum_V'
-         fContinuum = trim(sandbox)//'.continuum'
+         fAngles = sandbox(1:len_trim(sandbox))//'.angles'
+         fStokesI = sandbox(1:len_trim(sandbox))//'.spectrum_I'
+         fStokesQ = sandbox(1:len_trim(sandbox))//'.spectrum_Q'
+         fStokesU = sandbox(1:len_trim(sandbox))//'.spectrum_U'
+         fStokesV = sandbox(1:len_trim(sandbox))//'.spectrum_V'
+         fContinuum = sandbox(1:len_trim(sandbox))//'.continuum'
 
 c  keyword 'nrings' controls the number of latitude belts to synthesize in the
 c        discoball (diskflag = 0)
@@ -411,9 +413,10 @@ c  keyword 'model_in' controls the name of input model atmosphere file
       elseif (keyword .eq. 'model_in') then
          read (array,*) fmodel
          if (atmosflag .eq. 1) then
-             sandbox = trim(AtmosDir)//trim(fmodel)
+             sandbox = AtmosDir(1:len_trim(AtmosDir))//
+     .          fmodel(1:len_trim(fmodel))
          else
-             sandbox = trim(fmodel)
+             sandbox = fmodel(1:len_trim(fmodel))
          endif
          fmodel = sandbox
 
@@ -884,8 +887,25 @@ c*****format statements
 
       end
 
+c      character*(*) function JTRIM(str)
+c      
+c      character*(*) str
+c      JTRIM = str(1:len_trim(str))
+c      return
+c      end
 
+c      subroutine trim_spaces(str)
+c****************************************************************************** 
+c     This subroutine reads in the commands from the parameter file 
+c****************************************************************************** 
 
-
-
-
+c      implicit real*8 (a-h,o-z) 
+c      character*80 str
+c
+c      i=1
+c      do i=1,80
+c          if str(i).eq.' ' then goto 10
+c      enddo
+c10    
+c
+c      end
